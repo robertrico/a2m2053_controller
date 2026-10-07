@@ -15,3 +15,5 @@ docs/private/*
 
 # private build-documentation script (Claude reads it, git never does)
 CLAUDE.local.md
+
+.superpowers/
