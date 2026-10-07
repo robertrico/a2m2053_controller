@@ -3,10 +3,9 @@ export PICO_SDK_PATH
 BUILD   := build
 ELF     := $(BUILD)/a2m_bringup.elf
 
-# SWD via picoprobe / Debug Probe (CMSIS-DAP). OpenOCD must know the RP2350
-# (target/rp2350.cfg): Raspberry Pi's OpenOCD fork or upstream newer than 0.12.
-# The oss-cad-suite build on PATH today only has rp2040.cfg (checked 2026-10-07).
-OPENOCD ?= openocd
+# SWD via picoprobe / Debug Probe (CMSIS-DAP). Default: Raspberry Pi's prebuilt
+# OpenOCD (pico-sdk-tools v2.3.1-0, has target/rp2350.cfg). Override with OPENOCD=.
+OPENOCD ?= $(HOME)/Development/tooling/openocd-rpi/current/openocd
 OCD_CFG := -f interface/cmsis-dap.cfg -f target/rp2350.cfg -c "adapter speed 5000"
 GDB     ?= arm-none-eabi-gdb
 
