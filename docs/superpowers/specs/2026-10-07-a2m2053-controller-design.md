@@ -1,7 +1,6 @@
 # A2M2053 (UniDisk 3.5) replacement controller: design
 
-Status: **draft, awaiting Rico's review of the written spec.** All 4 sections
-were approved in conversation on 2026-10-07.
+Status: **approved** by Rico on 2026-10-07 (written spec).
 
 ## 0. Goal and constraints
 
