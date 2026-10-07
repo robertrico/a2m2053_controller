@@ -22,6 +22,24 @@
 - No hardware action (power, flash, connect, plug/unplug) without Rico saying go. Bench tasks are run by Rico; the agent prepares, reads results, and records.
 - Mechanism connector CN104 pin 20 (/PWM) is tied to +5V. Pin 9 is N/C.
 
+## Execution order and milestone gates
+
+Tasks are numbered by subsystem, but they run **one milestone at a time**.
+Each phase ends at a hard stop: Rico runs the bench task, the results get
+documented (build note + Rico's own photo/log routine), and Rico says go
+before the next phase starts. An executor never starts the next phase on its
+own.
+
+| Phase | Tasks, in this order | Ends with |
+|---|---|---|
+| **M0** | Task 5 (firmware scaffold, safe pin init, flash targets) -> **Task 9 [BENCH]** | `docs/build_log/m0.md`, then **STOP** |
+| M1 | Task 6 (mechanism logic) -> Task 7 (console) -> **Task 10 [BENCH]** | `docs/build_log/m1.md`, then **STOP** |
+| M2 | **Task 11 [BENCH]** (firmware from M1 already covers it) | `docs/build_log/m2.md`, then **STOP** |
+| M3 | Tasks 1 -> 2 -> 3 -> 4 (Python decoder) -> Task 8 (flux capture) -> **Task 12 [BENCH]** | `docs/build_log/m3.md`, then **STOP** |
+
+M0 blocker to clear first: an OpenOCD with `target/rp2350.cfg` (see Task 9
+step 3). Rico chooses and installs it.
+
 ## Review Focus
 
 1. **Boot/reset glitches on mechanism lines.** Expected: the mechanism never steps, ejects or spins when the Pico resets, boots or is flashed. Pinned by: Task 6 test `test_no_addr_change_while_strobe_high` and `test_lstrb_low_after_every_op`; Task 9 bench step scoping GP21 and LSTRB through a reset.
@@ -2567,7 +2585,7 @@ Bench supply: +5 V limited to 1.0 A, +12 V limited to 1.5 A (starting values; ra
 
 Prerequisite: an OpenOCD with `target/rp2350.cfg` and debugprobe firmware recent enough for RP2350 on the picoprobe. Check with `openocd -f interface/cmsis-dap.cfg -f target/rp2350.cfg -c "init; exit"`. If the cfg is missing, Rico picks which OpenOCD to install (Raspberry Pi's fork or a current upstream build) and points `OPENOCD=` at it. The agent doesn't install it unasked.
 
-Probe SWDIO/SWCLK/GND to the Pico 2 debug header. `cd firmware && make flash` (or `make openocd` in one terminal and `make gdb` in another, then `load` / `continue`). Open the console: `python3 -m serial.tools.miniterm /dev/tty.usbmodem* 115200` (or `screen`). The probe also enumerates as a tty, so pick the Pico's USB CDC port. Type `help`. Expected: the help text, then `OK`.
+Probe SWDIO/SWCLK/GND to the Pico 2 debug header. `cd firmware && make flash` (or `make openocd` in one terminal and `make gdb` in another, then `load` / `continue`). Open the console: `python3 -m serial.tools.miniterm /dev/tty.usbmodem* 115200` (or `screen`). The probe also enumerates as a tty, so pick the Pico's USB CDC port. Press Enter. Expected (Task 5 scaffold firmware): `OK a2m_bringup (scaffold)`. The full console arrives in M1 (Task 7).
 
 - [ ] **Step 4: Boot-safety scope check (Rico; agent may drive the oscope MCP if Rico connects probes and says go)**
 
