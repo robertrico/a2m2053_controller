@@ -17,3 +17,6 @@ docs/private/*
 CLAUDE.local.md
 
 .superpowers/
+
+firmware/build/
+firmware/test/build/

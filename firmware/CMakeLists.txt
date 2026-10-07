@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 3.13)
+set(PICO_BOARD pico2)
+include(pico_sdk_import.cmake)
+project(a2m_bringup C CXX ASM)
+set(CMAKE_C_STANDARD 11)
+pico_sdk_init()
+
+add_executable(a2m_bringup
+    src/main.c src/hw.c src/crc32.c)
+target_include_directories(a2m_bringup PRIVATE src)
+target_compile_options(a2m_bringup PRIVATE -Wall -Wextra)
+target_link_libraries(a2m_bringup pico_stdlib)
+pico_enable_stdio_usb(a2m_bringup 1)
+pico_enable_stdio_uart(a2m_bringup 0)
+pico_add_extra_outputs(a2m_bringup)
