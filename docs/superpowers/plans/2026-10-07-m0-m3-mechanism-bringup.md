@@ -2577,19 +2577,21 @@ Mechanism power on the CN104 tap: pin 11 = +5V, pins 13/15/17/19 = +12V, pins 1/
 One common ground: Pico GND, both shifters, bench supply, mechanism.
 Pin 1 of CN104 = red stripe on the ribbon. Confirm orientation against `docs/research_notes.md` sec. 7 before power.
 
-- [ ] **Step 2: Power with no Pico firmware running (Rico)**
+- [ ] **Step 2: Power the mechanism with the Pico unplugged (Rico)**
 
-Bench supply: +5 V limited to 1.0 A, +12 V limited to 1.5 A (starting values; raise only if spin-up trips the limit later). Pico on USB, holding its current (scaffold or empty) firmware. Measure and record: +5 V and +12 V idle current; voltage at CN104 pins 11 and 13; GP21 level (expect ~3.3 V, held by the pull-up).
+Pico **unplugged** (USB and probe). With VCCA unpowered the 8T245 outputs are Hi-Z, so the mechanism sees only the B-side pulls. Never power the mechanism while the Pico runs an unknown image: old firmware could drive GP21 low. Bench supply: +5 V limited to 1.0 A, +12 V limited to 1.5 A (starting values; raise only if spin-up trips the limit later). Measure and record: +5 V and +12 V idle current; voltage at CN104 pins 11 and 13. Power the mechanism down again.
 
 - [ ] **Step 3: Flash the bring-up firmware (Rico)**
 
-Prerequisite: an OpenOCD with `target/rp2350.cfg` and debugprobe firmware recent enough for RP2350 on the picoprobe. Check with `openocd -f interface/cmsis-dap.cfg -f target/rp2350.cfg -c "init; exit"`. If the cfg is missing, Rico picks which OpenOCD to install (Raspberry Pi's fork or a current upstream build) and points `OPENOCD=` at it. The agent doesn't install it unasked.
+Prerequisite: debugprobe firmware v2.x on the picoprobe (RP2350 support). OpenOCD: Raspberry Pi prebuilt at `~/Development/tooling/openocd-rpi/current/openocd` (the Makefile default; the oss-cad-suite `openocd` on PATH has no rp2350.cfg). Check: `~/Development/tooling/openocd-rpi/current/openocd -f interface/cmsis-dap.cfg -f target/rp2350.cfg -c "init; exit"`.
+
+Mechanism supply **off** while flashing.
 
 Probe SWDIO/SWCLK/GND to the Pico 2 debug header. `cd firmware && make flash` (or `make openocd` in one terminal and `make gdb` in another, then `load` / `continue`). Open the console: `python3 -m serial.tools.miniterm /dev/tty.usbmodem* 115200` (or `screen`). The probe also enumerates as a tty, so pick the Pico's USB CDC port. Press Enter. Expected (Task 5 scaffold firmware): `OK a2m_bringup (scaffold)`. The full console arrives in M1 (Task 7).
 
 - [ ] **Step 4: Boot-safety scope check (Rico; agent may drive the oscope MCP if Rico connects probes and says go)**
 
-CH1 on GP21 (U2 /OE), CH2 on CN104 pin 8 (LSTRB, B side), CH3 on CN104 pin 4 (CA1). Trigger on CH1, single shot, then press the Pico reset (or replug USB). Expected: GP21 stays high through reset and boot; LSTRB stays low; no pulses on CA1. The mechanism doesn't move. Save the screenshot to `docs/captures/m0/`.
+CH1 on GP21 (U2 /OE), CH2 on CN104 pin 8 (LSTRB, B side), CH3 on CN104 pin 4 (CA1). Turn the mechanism supply on. Trigger on CH1, single shot, then reset the Pico: `make reset` (the Pico 2 has no reset button), or briefly ground the RUN pin, or replug USB. Expected: GP21 stays high through reset and boot; LSTRB stays low; no pulses on CA1. The mechanism doesn't move. Save the screenshot to `docs/captures/m0/`.
 
 - [ ] **Step 5: Record**
 
