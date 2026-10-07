@@ -1,0 +1,17 @@
+.DS_Store
+build/
+*.uf2
+*.elf
+*.bin
+__pycache__/
+.venv/
+
+# third-party docs: local only, never in history (see docs/SOURCES.md)
+docs/private/*
+!docs/private/.gitkeep
+
+# editor state
+.obsidian/
+
+# private build-documentation script (Claude reads it, git never does)
+CLAUDE.local.md
