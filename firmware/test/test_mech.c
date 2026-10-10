@@ -112,7 +112,8 @@ static void test_motor_on_not_ready(void) {
     mech_state_t s; mech_state_init(&s);
     CHECK(mech_motor(&b, &s, true) == MECH_ERR_NOT_READY);
     CHECK(f.strobes[MCMD_MOTOR_ON] == 1);
-    CHECK(f.now_us <= MECH_SPINUP_TIMEOUT_US + 2 * (MECH_READY_POLL_US + s.settle_us) + 100);
+    CHECK(f.strobes[MCMD_MOTOR_OFF] == 1);
+    CHECK(f.now_us <= MECH_SPINUP_TIMEOUT_US + 2 * (MECH_READY_POLL_US + s.settle_us) + 200);
 }
 
 static void test_eject_no_disk(void) {

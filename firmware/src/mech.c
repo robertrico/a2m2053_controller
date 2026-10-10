@@ -102,8 +102,10 @@ mech_err_t mech_motor(const mech_bus_t *b, const mech_state_t *s, bool on) {
         return MECH_OK;
     }
     mech_command(b, MCMD_MOTOR_ON);
-    if (!wait_level(b, s, MREG_READY, false, MECH_READY_POLL_US, MECH_SPINUP_TIMEOUT_US))
+    if (!wait_level(b, s, MREG_READY, false, MECH_READY_POLL_US, MECH_SPINUP_TIMEOUT_US)) {
+        mech_command(b, MCMD_MOTOR_OFF);
         return MECH_ERR_NOT_READY;
+    }
     return MECH_OK;
 }
 
