@@ -2605,6 +2605,10 @@ git commit -m "docs(m0): bench rig and boot-safety results"
 
 ### Task 10: [BENCH, Rico] M1: mechanism status reads
 
+**Bench safety:** before any Pico USB unplug or replug, run `oe off` and switch the mechanism supply off (M0 build log Step 4b: the 8T245 drives LSTRB high on 3V3 power edges, and /ENBL can now be held low by firmware). SWD flash and `make reset` are fine.
+
+Console: the firmware echoes typed characters and handles backspace, so `screen /dev/cu.usbmodem* 115200` works (as does miniterm).
+
 **Files:**
 - Create: `docs/build_log/m1.md`
 - Modify: `docs/research_notes.md`
@@ -2619,7 +2623,7 @@ Console: `oe on`, `enbl on`, `status`. Expected for an 800K drive (tashnotes dri
 
 - [ ] **Step 3: Settle time**
 
-Scope CH1 on CN104 pin 2 (CA0), CH2 on CN104 pin 16 (RD). Run `status 1` then `status 0` repeatedly with a disk in. Measure CA change -> RD stable. Record it. If it exceeds 5 us, run `settle <2x measured>` and note the value for M4's default.
+Scope CH1 on CN104 pin 2 (CA0), CH2 on CN104 pin 16 (RD). Alternate `status 12` (SIDES, reads 1 on an 800K drive) and `status 14` (DRVIN, reads 0). They differ only in CA0, so RD toggles with or without a disk. (Addresses 0 and 1 differ only in SEL on pin 12, and with a disk in both DIRTN and CSTIN read 0, so they would show nothing.) Measure CA0 edge -> RD stable. Record it. If it exceeds 5 us, run `settle <2x measured>` and note the value for M4's default.
 
 - [ ] **Step 4: Record**
 
