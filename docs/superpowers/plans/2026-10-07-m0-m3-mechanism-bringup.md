@@ -2675,7 +2675,9 @@ git commit -m "docs(m2): motor, seek, zone speeds and eject on the bench"
 
 - [ ] **Step 1: Reference disk (Rico, normal use of the working UniDisk)**
 
-On the Apple IIe with the **working** UniDisk: format an 800K ProDOS disk, copy a few known files onto it, then image it over ADTPro to `docs/private/ref/ref_800k.po` (private: the disk content is test data, keep it out of git unless Rico decides otherwise).
+Reference image: `/Applications/ADTPro-v.r.m/disks/REF800K.po` (built 2026-10-10 with AppleCommander, outside git). ProDOS volume /REF800K/, 1600 blocks: DATA0-DATA5 (BIN, 120K each, Python `random.Random(0xA22053 + i)`) and README (TXT). 1453 unique non-zero blocks, 147 zero (free). SHA-256 `bfed064fef52e30578723b3c9fcc6768ab52907f4bb1aa4670f70823657742ab`.
+
+On the Apple IIe with the **working** UniDisk, use ADTPro to write REF800K.po to an 800K floppy. That floppy is the test disk; the .po is ground truth. Only the 512-byte data blocks are compared; tag bytes and the format byte come from the UniDisk's own formatting.
 
 - [ ] **Step 2: First capture and histogram**
 
@@ -2709,7 +2711,7 @@ If probe shows 0 good for every order but headers decode: **stop** and record. C
 
 ```bash
 .venv/bin/python a2mflux.py disk --port /dev/tty.usbmodem* --out ../docs/private/ref/read_800k.po \
-    --compare ../docs/private/ref/ref_800k.po
+    --compare /Applications/ADTPro-v.r.m/disks/REF800K.po
 ```
 Pass: `1600/1600 blocks good` and `0 blocks differ`; exit code 0.
 
