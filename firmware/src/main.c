@@ -7,17 +7,19 @@
 static mech_state_t ms;
 static bool oe_on, enbl_on, motor_on;
 
-static void read_line(char *buf, size_t len) {
+static bool read_line(char *buf, size_t len) {
     size_t n = 0;
+    bool overflow = false;
     for (;;) {
         int ch = getchar_timeout_us(100000);
         if (ch == PICO_ERROR_TIMEOUT) continue;
         if (ch == '\r' || ch == '\n') {
-            if (n == 0) continue;
+            if (n == 0 && !overflow) continue;
             buf[n] = 0;
-            return;
+            return !overflow;
         }
         if (n + 1 < len) buf[n++] = (char)ch;
+        else overflow = true;
     }
 }
 
@@ -145,7 +147,10 @@ int main(void) {
     mech_state_init(&ms);
     char line[CON_LINE_MAX];
     for (;;) {
-        read_line(line, sizeof line);
+        if (!read_line(line, sizeof line)) {
+            puts("ERR line too long");
+            continue;
+        }
         con_cmd_t c = console_parse(line);
         execute(&c);
     }
