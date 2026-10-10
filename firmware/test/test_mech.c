@@ -130,6 +130,10 @@ static void test_eject_success(void) {
     CHECK(mech_eject(&b, &s) == MECH_OK);
     CHECK(f.nseq == 2 && f.seq[0] == MCMD_MOTOR_OFF && f.seq[1] == MCMD_EJECT);
     CHECK(!s.track_known);
+    // Driving the mechanism directly, eject needs LSTRB held high ~0.5 s (tashnotes mci.md).
+    CHECK(f.hi_us[MCMD_EJECT] >= MECH_EJECT_STROBE_US);
+    CHECK(f.hi_us[MCMD_MOTOR_OFF] < 100);
+    CHECK(f.violations == 0 && !f.lstrb);
 }
 
 static void test_eject_fail(void) {

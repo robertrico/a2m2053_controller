@@ -16,6 +16,8 @@ typedef struct fake {
     int strobes[16];
     int seq[256]; int nseq;             // strobed addresses in order
     uint64_t now_us;
+    uint64_t hi_since;                  // now_us at the last LSTRB rising edge
+    uint64_t hi_us[16];                 // length of the last strobe per address
 } fake_t;
 
 static void f_push(fake_t *f, ev_type_t t, uint32_t v) {
@@ -26,7 +28,11 @@ static void f_set_addr(void *c, uint8_t a) {
 }
 static void f_set_lstrb(void *c, bool h) {
     fake_t *f = c;
-    if (h && !f->lstrb) { f->strobes[f->addr]++; if (f->nseq < 256) f->seq[f->nseq++] = f->addr; }
+    if (h && !f->lstrb) {
+        f->strobes[f->addr]++; if (f->nseq < 256) f->seq[f->nseq++] = f->addr;
+        f->hi_since = f->now_us;
+    }
+    if (!h && f->lstrb) f->hi_us[f->addr] = f->now_us - f->hi_since;
     f->lstrb = h; f_push(f, EV_LSTRB, h);
 }
 static bool f_read(void *c) {
