@@ -120,7 +120,8 @@ CXD1013. **[guess, strongly supported; confirm mechanism pinout on a real unit]*
 
 1. Exact mechanism part (Sony MP-F51W-xx variant?) and whether speed control
    is internal to the mech (800K Sony mechs) or needs PWM from the controller.
-2. CN104 pin-by-pin map. Need a real unit + continuity/scope.
+2. ~~CN104 pin-by-pin map.~~ Orientation confirmed by continuity 2026-10-10
+   (pin 1 = GND, pin 8 = LSTRB). Resolved.
 3. Host connector pinout on CN102 vs SmartPort DB-19; which pins carry /EN,
    WRPROT/ACK, RDDATA/WRDATA.
 4. Eject button and LED wiring (CN105-108?).
@@ -169,7 +170,10 @@ RD out of the mech is digital flux transitions.
 
 Matches tashnotes 2x10 header map (`private/bitsavers_sony/tashnotes_floppy/connector.md`).
 Pin 20 is PWM on 400K, N/C on black-label 800K, /CSTOUT on red-label 800K.
-**Verify CN104 pin 1 orientation on a dead-board drive before powering.**
+**Orientation [measured] 2026-10-10:** continuity on a dead-board drive. Pin 1
+beeps to GND on the test cable, the mechanism board and the GND test point.
+Pin 8 beeps to the LSTRB test point through connector and test cable.
+Pin 11 beeps to the 5VF test point.
 
 ### Speed: mechanism self-regulates **[doc]**
 
