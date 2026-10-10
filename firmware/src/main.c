@@ -158,7 +158,7 @@ static void execute(const con_cmd_t *c) {
         printf("FLUX BEGIN %lu %u\n", (unsigned long)n, FLUX_TICK_NS);
         stdio_flush();
         const uint8_t *p = (const uint8_t *)flux_data();
-        for (uint32_t i = 0; i < n * 2; i++) putchar_raw(p[i]);
+        stdio_put_string((const char *)p, (int)(n * 2), false, false);
         printf("\nFLUX END %08lx\n", (unsigned long)crc32_update(0, p, n * 2));
         puts("OK");
         return;

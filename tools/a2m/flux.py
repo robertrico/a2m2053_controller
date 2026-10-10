@@ -1,13 +1,13 @@
 """Flux intervals <-> bit cells <-> GCR nibbles.
 
 Firmware PIO counts in 40 ns ticks (Task 8: 150 MHz / clkdiv 3 / 2 cycles
-per count). Each interval loses 3 PIO cycles (1.5 ticks) at the edge, so we
+per count). Each interval loses 4 PIO cycles (2 ticks) at the edge, so we
 add them back. 800K data rate is 489.6 kbit/s (ERS 699-0321): 2.0425 us cells.
 """
 import random
 
 TICK_NS = 40.0
-PIO_EDGE_OVERHEAD_TICKS = 1.5
+PIO_EDGE_OVERHEAD_TICKS = 2.0
 NOMINAL_CELL_NS = 1e9 / 489_600
 
 

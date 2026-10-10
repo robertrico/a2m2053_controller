@@ -1,7 +1,8 @@
 ; Flux interval timer for the mechanism RD line (falling edge = flux transition).
 ; Counts down X in 2-cycle loops through the low and high phases; on each
-; falling edge pushes ~X (elapsed counts). 3 cycles per edge are not counted
-; (mov isr, push, mov x): the host adds 1.5 counts back (tools/a2m/flux.py).
+; falling edge pushes ~X (elapsed counts). 4 cycles per interval are not counted
+; (mov isr, push, mov x, and the taken jmp pin at the low->high transition):
+; the host adds 2 counts back (tools/a2m/flux.py).
 ; With clkdiv 3.0 at 150 MHz: 50 MHz PIO, 25 MHz count rate = 40 ns per count.
 .program flux_rx
 .wrap_target

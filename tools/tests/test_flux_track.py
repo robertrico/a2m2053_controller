@@ -71,7 +71,7 @@ def test_histogram_has_three_peaks():
     p = payloads_for(0, 0)
     lines = flux.histogram_lines(flux.encode_flux(synth.track_bits(0, 0, p)))
     text = "\n".join(lines)
-    assert " 2.0 us" in text and " 4.1 us" in text and " 6.1 us" in text
+    assert " 2.0 us" in text and " 4.0 us" in text and " 6.1 us" in text
 
 
 def test_drift_tracking_is_needed():
@@ -82,3 +82,12 @@ def test_drift_tracking_is_needed():
     assert all(tracked.sectors[s].payload == p[s] for s in p)
     fixed = track.decode_track(flux.bits_to_nibbles(flux.intervals_to_bits(ivs, alpha=0.0)), 70, 1)
     assert len(fixed.sectors) < 8
+
+
+def test_out_of_range_sector_is_bad_header():
+    p = payloads_for(70, 0)
+    bits = (synth.SYNC * 6 + synth.bytes_bits(gcr.encode_address(70, 15, 0))
+            + synth.SYNC * 6 + synth.bytes_bits(gcr.encode_data(15, bytes(gcr.SECTOR_LEN))))
+    res = track.decode_track(_decode(bits), 70, 0)
+    assert 15 not in res.sectors
+    assert res.bad_headers >= 1

@@ -53,6 +53,9 @@ def decode_track(nibbles: bytes, track: int, side: int, group_order=gcr.GROUP_OR
         if (addr.track, addr.side) != (track, side):
             res.misplaced.append((addr.track, addr.side, addr.sector))
             continue
+        if addr.sector >= gcr.sectors_per_track(track):
+            res.bad_headers += 1
+            continue
         d = nibbles.find(gcr.DATA_PROLOG, i + 5, i + 5 + 64)
         if d < 0:
             res.bad_data += 1

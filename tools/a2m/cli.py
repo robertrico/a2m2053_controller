@@ -77,7 +77,7 @@ def _disk(args) -> int:
         for line in ("motor off", "enbl off", "oe off"):
             try:
                 con.cmd(line, timeout=5.0)
-            except ConsoleError:
+            except Exception:
                 pass
     img, good, missing = assemble_image(results)
     Path(args.out).write_bytes(img)
