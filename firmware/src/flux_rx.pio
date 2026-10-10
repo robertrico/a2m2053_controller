@@ -1,0 +1,29 @@
+; Flux interval timer for the mechanism RD line (falling edge = flux transition).
+; Counts down X in 2-cycle loops through the low and high phases; on each
+; falling edge pushes ~X (elapsed counts). 3 cycles per edge are not counted
+; (mov isr, push, mov x): the host adds 1.5 counts back (tools/a2m/flux.py).
+; With clkdiv 3.0 at 150 MHz: 50 MHz PIO, 25 MHz count rate = 40 ns per count.
+.program flux_rx
+.wrap_target
+    mov x, ~null
+count_low:
+    jmp pin, count_high
+    jmp x-- count_low
+count_high:
+    jmp x-- check_high
+check_high:
+    jmp pin, count_high
+    mov isr, ~x
+    push noblock
+.wrap
+
+% c-sdk {
+static inline void flux_rx_program_init(PIO pio, uint sm, uint offset, uint pin, float clkdiv) {
+    pio_sm_config c = flux_rx_program_get_default_config(offset);
+    sm_config_set_jmp_pin(&c, pin);
+    sm_config_set_in_pins(&c, pin);
+    sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_RX);
+    sm_config_set_clkdiv(&c, clkdiv);
+    pio_sm_init(pio, sm, offset, &c);
+}
+%}

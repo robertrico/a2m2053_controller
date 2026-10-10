@@ -3,6 +3,8 @@
 #include "hw.h"
 #include "mech.h"
 #include "console.h"
+#include "flux.h"
+#include "crc32.h"
 
 static mech_state_t ms;
 static bool oe_on, enbl_on, motor_on;
@@ -145,9 +147,22 @@ static void execute(const con_cmd_t *c) {
         ms.settle_us = (uint32_t)c->arg[0];
         puts("OK");
         return;
-    case CON_CAPTURE:
-        puts("ERR capture not built yet");
+    case CON_CAPTURE: {
+        if (!need_mech()) return;
+        if (!motor_on) { puts("ERR motor off"); return; }
+        mech_err_t e = mech_seek(b, &ms, (int)c->arg[0]);
+        if (e != MECH_OK) { printf("ERR seek: %s\n", mech_err_str(e)); return; }
+        mech_select_head(b, (int)c->arg[1]);
+        sleep_us(100);
+        uint32_t n = flux_capture((uint32_t)c->arg[2], 2000);
+        printf("FLUX BEGIN %lu %u\n", (unsigned long)n, FLUX_TICK_NS);
+        stdio_flush();
+        const uint8_t *p = (const uint8_t *)flux_data();
+        for (uint32_t i = 0; i < n * 2; i++) putchar_raw(p[i]);
+        printf("\nFLUX END %08lx\n", (unsigned long)crc32_update(0, p, n * 2));
+        puts("OK");
         return;
+    }
     case CON_BAD:
     default:
         puts("ERR bad command (try help)");
@@ -159,6 +174,7 @@ int main(void) {
     hw_init_safe();             // first: mechanism shifter Hi-Z, idle levels
     stdio_init_all();
     mech_state_init(&ms);
+    flux_init();
     char line[CON_LINE_MAX];
     for (;;) {
         if (!read_line(line, sizeof line)) {
