@@ -95,3 +95,97 @@ def unmangle(data: bytes) -> tuple[bytes, bytes]:
         out.append(byte)
         carry, c = divmod(c + byte + carry, 256)
     return bytes(out), bytes((a, b, c))
+
+
+from dataclasses import dataclass
+
+ADDR_PROLOG = b"\xD5\xAA\x96"
+DATA_PROLOG = b"\xD5\xAA\xAD"
+EPILOG = b"\xDE\xAA"
+DATA_NIBBLES = 699        # 174 groups of 4 + 1 group of 3
+CHECKSUM_NIBBLES = 4
+
+# Address-field format byte: 0x20 = double-sided, low bits = interleave.
+# The decoder records it but never checks it. UniDisk value is a [guess].
+FORMAT_UNIDISK = 0x24
+
+# On-disk order of the 3 mangled bytes inside each 4-nibble group, and of the
+# 3 checksum bytes. Not yet confirmed on real media: Task 12 runs
+# `a2mflux.py probe` on a real capture and changes these only if it says so.
+GROUP_ORDER = (0, 1, 2)
+CHECKSUM_ORDER = (0, 1, 2)
+
+
+@dataclass(frozen=True)
+class Address:
+    track: int
+    sector: int
+    side: int
+    fmt: int
+    ok: bool
+
+
+def encode_address(track: int, sector: int, side: int, fmt: int = FORMAT_UNIDISK) -> bytes:
+    t_lo = track & 0x3F
+    side_b = (side << 5) | (track >> 6)
+    vals = [t_lo, sector & 0x3F, side_b, fmt & 0x3F]
+    chk = vals[0] ^ vals[1] ^ vals[2] ^ vals[3]
+    vals.append(chk)
+    return ADDR_PROLOG + bytes(NIBBLES[v] for v in vals) + EPILOG
+
+
+def decode_address(sixes: list[int]) -> Address:
+    t_lo, sector, side_b, fmt, chk = sixes[:5]
+    ok = (t_lo ^ sector ^ side_b ^ fmt) == chk
+    return Address(track=t_lo | ((side_b & 1) << 6), sector=sector,
+                   side=(side_b >> 5) & 1, fmt=fmt, ok=ok)
+
+
+def _encode_groups(raw: bytes, order) -> list[int]:
+    sixes = []
+    for i in range(0, len(raw), 3):
+        chunk = raw[i:i + 3]
+        vals = [chunk[j] for j in order if j < len(chunk)]
+        hi = 0
+        for k, v in enumerate(vals):
+            hi |= (v >> 6) << (4 - 2 * k)
+        sixes.append(hi)
+        sixes.extend(v & 0x3F for v in vals)
+    return sixes
+
+
+def _decode_groups(sixes: list[int], nbytes: int, order) -> bytes:
+    out = bytearray()
+    i = 0
+    while len(out) < nbytes:
+        k = min(3, nbytes - len(out))
+        hi = sixes[i]
+        vals = [(((hi >> (4 - 2 * m)) & 3) << 6) | sixes[i + 1 + m] for m in range(k)]
+        i += 1 + k
+        present = [j for j in order if j < k]
+        chunk = [0] * k
+        for pos, j in enumerate(present):
+            chunk[j] = vals[pos]
+        out.extend(chunk)
+    return bytes(out)
+
+
+def encode_data(sector: int, payload: bytes, group_order=GROUP_ORDER,
+                checksum_order=CHECKSUM_ORDER) -> bytes:
+    if len(payload) != SECTOR_LEN:
+        raise ValueError("payload must be 524 bytes (12 tag + 512 data)")
+    mangled, csum = mangle(payload)
+    sixes = [sector & 0x3F] + _encode_groups(mangled, group_order) + _encode_groups(csum, checksum_order)
+    return DATA_PROLOG + bytes(NIBBLES[s] for s in sixes) + EPILOG
+
+
+def decode_data(sixes: list[int], group_order=GROUP_ORDER,
+                checksum_order=CHECKSUM_ORDER) -> tuple[int, bytes, bool]:
+    need = 1 + DATA_NIBBLES + CHECKSUM_NIBBLES
+    if len(sixes) < need:
+        raise ValueError(f"need {need} values, got {len(sixes)}")
+    sector = sixes[0]
+    mangled = _decode_groups(sixes[1:1 + DATA_NIBBLES], SECTOR_LEN, group_order)
+    disk_csum = _decode_groups(sixes[1 + DATA_NIBBLES:need], 3, checksum_order)
+    payload, calc = unmangle(mangled)
+    return sector, payload, calc == disk_csum
