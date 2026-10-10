@@ -175,6 +175,15 @@ beeps to GND on the test cable, the mechanism board and the GND test point.
 Pin 8 beeps to the LSTRB test point through connector and test cable.
 Pin 11 beeps to the 5VF test point.
 
+**Status bits [measured] 2026-10-10 (M1, dead-board drive mechanism):**
+DRVIN=0, SIDES=1, REVISED=1, SUPERDRIVE=0: an 800K double-sided mechanism.
+CSTIN 1 = no disk, 0 = disk in. WRPROT 0 = write-protected (tab hole open),
+1 = write-enabled; reads 0 with no disk. MOTORON=1 (off) and DIRTN=0 while idle.
+The mechanism spins the motor for about 0.5 s on its own when a disk is inserted.
+RD follows a CA0 change in about 27 ns (RD falling) and about 36 ns (RD rising,
+read off the screen), measured at CN104. RD is actively driven in both
+directions. The 10 us firmware settle default is far longer than needed.
+
 ### Speed: mechanism self-regulates **[doc]**
 
 Five zones, drive picks speed from track:

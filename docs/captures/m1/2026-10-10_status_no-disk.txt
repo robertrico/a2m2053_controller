@@ -1,0 +1,15 @@
+> help
+help
+help | oe on|off | enbl on|off | status [0-15] | cmd <0-15> | motor on|off
+recal | seek <0-79> | head <0|1> | eject | tach | settle <us> | capture <t> <s> <n>
+OK
+> oe on
+oe on
+OK
+> enbl on
+enbl on
+OK
+> status
+status
+STATUS DIRTN=0 CSTIN=1 STEP=1 WRPROT=0 MOTORON=1 TK0=0 SWITCHED=0 TACH=0 RDDATA0=0 RDDATA1=0 SUPERDRIVE=0 REG_B=0 SIDES=1 READY=1 DRVIN=0 REVISED=1
+OK
