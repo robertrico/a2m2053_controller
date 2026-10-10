@@ -16,10 +16,24 @@ static bool read_line(char *buf, size_t len) {
         if (ch == '\r' || ch == '\n') {
             if (n == 0 && !overflow) continue;
             buf[n] = 0;
+            fputs("\r\n", stdout);
+            fflush(stdout);
             return !overflow;
         }
-        if (n + 1 < len) buf[n++] = (char)ch;
-        else overflow = true;
+        if (ch == 0x08 || ch == 0x7F) {
+            if (n > 0 && !overflow) {
+                n--;
+                fputs("\b \b", stdout);
+                fflush(stdout);
+            }
+            continue;
+        }
+        if (ch < 0x20) continue;
+        if (n + 1 < len) {
+            buf[n++] = (char)ch;
+            putchar(ch);
+            fflush(stdout);
+        } else overflow = true;
     }
 }
 

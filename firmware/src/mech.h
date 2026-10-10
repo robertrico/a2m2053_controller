@@ -10,12 +10,13 @@
 #define MECH_STROBE_US           2         // ROM Se64d: ph3 on, ph3 off
 #define MECH_HOLD_US             1
 #define MECH_STEP_POLL_US        100
-#define MECH_STEP_TIMEOUT_US     50000     // ROM has none; ERS: 36 ms/step
+#define MECH_STEP_TIMEOUT_US     50000     // ROM has none. /STEP goes high once the step is counted (ERS 3.2.4.2, T2 72 us max),
+                                           // not when the head arrives; 50 ms is a generous bound
 #define MECH_STEP_SETTLE_US      150       // ROM Se4cf tail loop
 #define MECH_RECAL_POLLS         80        // ROM Le4f7: $50 polls
 #define MECH_RECAL_POLL_US       7000      // ROM: delay(7)
 #define MECH_READY_POLL_US       1000
-#define MECH_READY_TIMEOUT_US    500000    // ERS: 152 ms max with zone change
+#define MECH_READY_TIMEOUT_US    1000000   // ERS 3.4.3.3 T2 is 500 ms max with steps at the maximum rate; 2x margin
 #define MECH_SPINUP_TIMEOUT_US   2000000
 #define MECH_EJECT_MOTOR_OFF_US  200000    // ROM Se51b: delay($C8)
 #define MECH_EJECT_TRIES         3         // ROM Z39
