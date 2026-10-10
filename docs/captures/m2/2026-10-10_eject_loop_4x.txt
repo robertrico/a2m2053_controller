@@ -1,0 +1,4 @@
+cycle 1: 14:38:50 eject=OK elapsed=1.01s STATUS CSTIN=1
+cycle 2: 14:39:00 eject=OK elapsed=1.02s STATUS CSTIN=1
+cycle 3: 14:39:10 eject=OK elapsed=1.07s STATUS CSTIN=1
+cycle 4: 14:39:19 eject=OK elapsed=1.02s STATUS CSTIN=1
