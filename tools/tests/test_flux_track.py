@@ -72,3 +72,13 @@ def test_histogram_has_three_peaks():
     lines = flux.histogram_lines(flux.encode_flux(synth.track_bits(0, 0, p)))
     text = "\n".join(lines)
     assert " 2.0 us" in text and " 4.1 us" in text and " 6.1 us" in text
+
+
+def test_drift_tracking_is_needed():
+    p = payloads_for(70, 1)
+    ivs = flux.encode_flux(synth.track_bits(70, 1, p), jitter=0.06, drift=0.12, seed=3)
+    tracked = track.decode_track(flux.bits_to_nibbles(flux.intervals_to_bits(ivs)), 70, 1)
+    assert sorted(tracked.sectors) == list(range(8))
+    assert all(tracked.sectors[s].payload == p[s] for s in p)
+    fixed = track.decode_track(flux.bits_to_nibbles(flux.intervals_to_bits(ivs, alpha=0.0)), 70, 1)
+    assert len(fixed.sectors) < 8
