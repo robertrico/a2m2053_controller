@@ -2684,7 +2684,13 @@ Insert the reference disk in the dead-board drive's mechanism. Console: `oe on`,
 .venv/bin/python a2mflux.py capture --port /dev/tty.usbmodem* --track 0 --side 0 --out ../docs/captures/m3/t00s0.flux
 .venv/bin/python a2mflux.py hist ../docs/captures/m3/t00s0.flux
 ```
-Expected: three peaks around 2.0, 4.1 and 6.1 us (1, 2 and 3 bit cells). Record the histogram.
+Expected: three peaks around 2.0, 4.0 and 6.1 us (1, 2 and 3 bit cells). Record the histogram.
+
+Notes for this step:
+- Time the first `capture` (wall clock) and record it. The host allows 10 s per capture, covering the seek, a 2 s capture window and the USB dump.
+- Close the console terminal before running a2mflux.py. Two readers on one port split the bytes and every capture fails CRC. Pass the Pico's port explicitly (this bench: `/dev/cu.usbmodem114401`; the Debug Probe is the other usbmodem port), not a glob.
+- The motor keeps spinning between manual steps. Send `motor off` when pausing to analyse (Steps 2 and 3).
+- If the histogram peaks sit near 4, 6 and 8 us instead of 2, 4 and 6 us, RD is toggling per transition rather than pulsing (a research gap). Stop and record it; do not change the decoder.
 
 - [ ] **Step 3: Decode one track, probe the byte order**
 
@@ -2692,7 +2698,7 @@ Expected: three peaks around 2.0, 4.1 and 6.1 us (1, 2 and 3 bit cells). Record 
 .venv/bin/python a2mflux.py decode ../docs/captures/m3/t00s0.flux --track 0 --side 0
 .venv/bin/python a2mflux.py probe  ../docs/captures/m3/t00s0.flux --track 0 --side 0
 ```
-Expected: decode shows headers found (bad headers low). Probe's top line shows `12 good`. If the top line's orders are not `(0, 1, 2) (0, 1, 2)`, set `GROUP_ORDER` and `CHECKSUM_ORDER` in `tools/a2m/gcr.py` to the probe's values, rerun `cd tools && .venv/bin/pytest -q` (all pass: the tests use the constants consistently), and commit:
+Expected: decode shows headers found (bad headers low). Probe's top line shows `12 good`. The on-disk checksum order may well not be the default (0, 1, 2). Probe covers all 36 orders, so a gcr.py commit here is expected, not a failure. If the top line's orders are not `(0, 1, 2) (0, 1, 2)`, set `GROUP_ORDER` and `CHECKSUM_ORDER` in `tools/a2m/gcr.py` to the probe's values, rerun `cd tools && .venv/bin/pytest -q` (all pass: the tests use the constants consistently), and commit:
 ```bash
 git add tools/a2m/gcr.py
 git commit -m "fix(tools): GCR byte order confirmed on real media"
