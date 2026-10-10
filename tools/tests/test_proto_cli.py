@@ -1,8 +1,7 @@
 import struct
 import zlib
 import pytest
-from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from a2m import gcr, synth, flux, proto, cli, serialio
 from a2m.track import TrackResult, Sector
 
@@ -96,14 +95,20 @@ class FakeSerial:
 
 
 def test_capture_handles_chunked_data():
-    """Verify capture() correctly handles payload received in chunks."""
-    # Create a stream with values that include bytes matching the FLUX END marker
-    # We need to construct values that, when little-endian encoded, could contain b"\nFLUX END"
-    values = [0x100, 0x200, 0x3000, 0x4000]  # arbitrary values
+    """Verify capture() waits for counted payload, not regex match inside binary.
+
+    Embeds the literal FLUX END marker inside the payload itself, with chunks
+    broken at awkward boundaries to force the old regex-search code to fail.
+    """
+    # Create payload that contains the literal FLUX END marker bytes
+    raw = b"\nFLUX END 00000000\n" + b"\x00"  # 20 bytes: the marker plus one extra
+    values = list(struct.unpack(f"<{len(raw)//2}H", raw))
     stream = make_stream(values)
 
-    # Split stream into chunks (simulating serial data arriving in pieces)
-    chunks = [stream[i:i+20] for i in range(0, len(stream), 20)]
+    # Feed the stream in 7-byte chunks, forcing chunk boundaries inside the marker.
+    # Old code (END_RE.search) would match the embedded marker and return early,
+    # losing bytes. New code (payload_count-based) reads the full counted payload.
+    chunks = [stream[i:i+7] for i in range(0, len(stream), 7)]
 
     con = serialio.Console.__new__(serialio.Console)
     con.ser = FakeSerial(chunks)
@@ -111,7 +116,7 @@ def test_capture_handles_chunked_data():
     # Verify capture returns the complete stream
     result = con.capture(0, 0, len(values), timeout=5.0)
     assert result == stream
-    # Verify we can parse it back
+    # Verify we can parse it back to the original values
     parsed_vals, _ = proto.parse_capture(result)
     assert parsed_vals == values
 
@@ -139,6 +144,10 @@ def test_disk_cleanup_on_error(tmp_path):
     with patch("a2m.serialio.Console", FakeConsole):
         with pytest.raises(serialio.ConsoleError):
             cli.main(["disk", "--port", "fake", "--out", str(tmp_path / "o.po")])
+
+    # Verify setup commands were issued before recal
+    recal_idx = commands.index("recal")
+    assert commands[:recal_idx] == ["oe on", "enbl on", "motor on"]
 
     # Verify cleanup commands were issued in finally
     assert "motor off" in commands
