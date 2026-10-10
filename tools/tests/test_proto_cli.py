@@ -1,7 +1,9 @@
 import struct
 import zlib
 import pytest
-from a2m import gcr, synth, flux, proto, cli
+from pathlib import Path
+from unittest.mock import patch, MagicMock
+from a2m import gcr, synth, flux, proto, cli, serialio
 from a2m.track import TrackResult, Sector
 
 
@@ -71,3 +73,76 @@ def test_decode_capture_end_to_end():
     ivs = flux.encode_flux(synth.track_bits(0, 0, payloads))
     res, _ = cli.decode_capture(make_stream([min(v, 65535) for v in ivs]), 0, 0)
     assert len(res.sectors) == 12
+
+
+class FakeSerial:
+    """Mock serial port that yields data in chunks."""
+    def __init__(self, chunks):
+        self.chunks = list(chunks)
+        self.chunk_idx = 0
+
+    def read(self, n):
+        if self.chunk_idx >= len(self.chunks):
+            return b""
+        chunk = self.chunks[self.chunk_idx]
+        self.chunk_idx += 1
+        return chunk
+
+    def write(self, data):
+        pass
+
+    def reset_input_buffer(self):
+        pass
+
+
+def test_capture_handles_chunked_data():
+    """Verify capture() correctly handles payload received in chunks."""
+    # Create a stream with values that include bytes matching the FLUX END marker
+    # We need to construct values that, when little-endian encoded, could contain b"\nFLUX END"
+    values = [0x100, 0x200, 0x3000, 0x4000]  # arbitrary values
+    stream = make_stream(values)
+
+    # Split stream into chunks (simulating serial data arriving in pieces)
+    chunks = [stream[i:i+20] for i in range(0, len(stream), 20)]
+
+    con = serialio.Console.__new__(serialio.Console)
+    con.ser = FakeSerial(chunks)
+
+    # Verify capture returns the complete stream
+    result = con.capture(0, 0, len(values), timeout=5.0)
+    assert result == stream
+    # Verify we can parse it back
+    parsed_vals, _ = proto.parse_capture(result)
+    assert parsed_vals == values
+
+
+def test_disk_cleanup_on_error(tmp_path):
+    """Verify _disk() always runs cleanup commands even on error."""
+    # Track which commands are issued
+    commands = []
+
+    class FakeConsole:
+        def __init__(self, port):
+            self.port = port
+
+        def cmd(self, line, timeout=5.0):
+            commands.append(line)
+            if line == "recal":
+                raise serialio.ConsoleError("recal failed")
+            return []
+
+        def capture(self, track, side, count):
+            # Never reached due to recal failure
+            pass
+
+    # Patch Console in the cli module
+    with patch("a2m.serialio.Console", FakeConsole):
+        with pytest.raises(serialio.ConsoleError):
+            cli.main(["disk", "--port", "fake", "--out", str(tmp_path / "o.po")])
+
+    # Verify cleanup commands were issued in finally
+    assert "motor off" in commands
+    assert "enbl off" in commands
+    assert "oe off" in commands
+    # Verify they are the last three commands (in order)
+    assert commands[-3:] == ["motor off", "enbl off", "oe off"]

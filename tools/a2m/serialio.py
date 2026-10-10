@@ -43,9 +43,15 @@ class Console:
                 for raw in buf.split(b"\n")[:-1]:
                     if raw.strip().startswith(b"ERR"):
                         raise ConsoleError(raw.decode(errors="replace").strip())
-            elif END_RE.search(buf):
-                tail_deadline = time.monotonic() + 1.0
-                while not re.search(rb"\nOK\r?\n", buf[-16:]) and time.monotonic() < tail_deadline:
-                    buf += self.ser.read(64)
-                return buf
+            else:
+                # FLUX BEGIN found; check if we have the full counted payload
+                m = re.search(rb"FLUX BEGIN (\d+) (\d+)\r?\n", buf)
+                if m:
+                    payload_count = int(m[1])
+                    end = m.end() + 2 * payload_count
+                    if len(buf) >= end and END_RE.match(buf, end):
+                        tail_deadline = time.monotonic() + 1.0
+                        while not re.search(rb"\nOK\r?\n", buf[-16:]) and time.monotonic() < tail_deadline:
+                            buf += self.ser.read(64)
+                        return buf
         raise ConsoleError(f"capture {track} {side} timed out")

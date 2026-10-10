@@ -54,10 +54,10 @@ def _print_track(res: TrackResult, track: int, side: int):
 def _disk(args) -> int:
     from .serialio import Console, ConsoleError
     con = Console(args.port)
-    for line in ("oe on", "enbl on", "motor on", "recal"):
-        con.cmd(line, timeout=10.0)
     results = {}
     try:
+        for line in ("oe on", "enbl on", "motor on", "recal"):
+            con.cmd(line, timeout=10.0)
         for t in range(gcr.TRACKS):
             for s in range(gcr.SIDES):
                 merged = TrackResult()
@@ -74,7 +74,11 @@ def _disk(args) -> int:
                 results[(t, s)] = merged
                 print(f"T{t:02d} S{s} {len(merged.sectors)}/{gcr.sectors_per_track(t)}", flush=True)
     finally:
-        con.cmd("motor off", timeout=5.0)
+        for line in ("motor off", "enbl off", "oe off"):
+            try:
+                con.cmd(line, timeout=5.0)
+            except ConsoleError:
+                pass
     img, good, missing = assemble_image(results)
     Path(args.out).write_bytes(img)
     print(f"{good}/{gcr.TOTAL_BLOCKS} blocks good -> {args.out}")
