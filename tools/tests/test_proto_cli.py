@@ -97,23 +97,29 @@ class FakeSerial:
 def test_capture_handles_chunked_data():
     """Verify capture() waits for counted payload, not regex match inside binary.
 
-    Embeds the literal FLUX END marker inside the payload itself, with chunks
-    broken at awkward boundaries to force the old regex-search code to fail.
+    Embeds both a fake FLUX END marker and a fake OK inside the payload.
+    Old code would: match the fake marker, see the fake OK, and return early
+    with a truncated stream. New code uses the FLUX BEGIN count to read exactly
+    the right number of bytes, then matches the real marker at the correct position.
     """
-    # Create payload that contains the literal FLUX END marker bytes
-    raw = b"\nFLUX END 00000000\n" + b"\x00"  # 20 bytes: the marker plus one extra
+    # Create payload containing fake FLUX END marker and fake OK
+    raw = b"\nFLUX END 00000000\n" + b"\nOK\r\n" + b"\x01\x02\x03\x04"  # 28 bytes, even
     values = list(struct.unpack(f"<{len(raw)//2}H", raw))
     stream = make_stream(values)
 
-    # Feed the stream in 7-byte chunks, forcing chunk boundaries inside the marker.
-    # Old code (END_RE.search) would match the embedded marker and return early,
-    # losing bytes. New code (payload_count-based) reads the full counted payload.
+    # Feed the stream in 7-byte chunks, forcing chunk boundaries inside the fake marker.
+    # Old code (END_RE.search) would:
+    #   1. Match the embedded fake FLUX END marker
+    #   2. See the fake OK in buf[-16:], satisfying its tail condition
+    #   3. Return prematurely, missing bytes after the fake OK
+    # New code (payload_count-based) reads exactly len(values)*2 bytes, then checks
+    # for the real FLUX END marker at the correct position.
     chunks = [stream[i:i+7] for i in range(0, len(stream), 7)]
 
     con = serialio.Console.__new__(serialio.Console)
     con.ser = FakeSerial(chunks)
 
-    # Verify capture returns the complete stream
+    # Verify capture returns the complete stream (would fail with old code)
     result = con.capture(0, 0, len(values), timeout=5.0)
     assert result == stream
     # Verify we can parse it back to the original values
