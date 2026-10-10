@@ -31,17 +31,13 @@ uint16_t mech_status_all(const mech_bus_t *b, const mech_state_t *s) {
     return v;
 }
 
-static void strobe(const mech_bus_t *b, mech_cmd_t cmd, uint32_t high_us) {
+void mech_command(const mech_bus_t *b, mech_cmd_t cmd) {
     b->set_addr(b->ctx, (uint8_t)cmd);
     b->delay_us(b->ctx, MECH_SETUP_US);
     b->set_lstrb(b->ctx, true);
-    b->delay_us(b->ctx, high_us);
+    b->delay_us(b->ctx, MECH_STROBE_US);
     b->set_lstrb(b->ctx, false);
     b->delay_us(b->ctx, MECH_HOLD_US);
-}
-
-void mech_command(const mech_bus_t *b, mech_cmd_t cmd) {
-    strobe(b, cmd, MECH_STROBE_US);
 }
 
 static bool wait_level(const mech_bus_t *b, const mech_state_t *s, mech_reg_t reg,
@@ -118,7 +114,7 @@ mech_err_t mech_eject(const mech_bus_t *b, mech_state_t *s) {
     mech_command(b, MCMD_MOTOR_OFF);
     b->delay_us(b->ctx, MECH_EJECT_MOTOR_OFF_US);
     for (int t = 0; t < MECH_EJECT_TRIES; t++) {
-        strobe(b, MCMD_EJECT, MECH_EJECT_STROBE_US);
+        mech_command(b, MCMD_EJECT);
         for (int p = 0; p < MECH_EJECT_POLLS; p++) {
             b->delay_us(b->ctx, MECH_EJECT_POLL_US);
             if (mech_status(b, s, MREG_CSTIN)) {

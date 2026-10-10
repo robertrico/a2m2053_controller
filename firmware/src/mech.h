@@ -19,8 +19,6 @@
 #define MECH_READY_TIMEOUT_US    1000000   // ERS 3.4.3.3 T2 is 500 ms max with steps at the maximum rate; 2x margin
 #define MECH_SPINUP_TIMEOUT_US   2000000
 #define MECH_EJECT_MOTOR_OFF_US  200000    // ROM Se51b: delay($C8)
-#define MECH_EJECT_STROBE_US     500000    // LSTRB held high for eject: tashnotes mci.md "~0.5 s". The ROM's short
-                                           // strobe only works through the CXD1013; bench 2026-10-10: 2 us does nothing.
 #define MECH_EJECT_TRIES         3         // ROM Z39
 #define MECH_EJECT_POLLS         150       // ROM Z3B = $96
 #define MECH_EJECT_POLL_US       10000     // ROM: delay($0A)
