@@ -42,3 +42,22 @@ void hw_mech_outputs_enable(bool on) { gpio_put(PIN_MECH_OE, !on); }
 void hw_mech_enbl(bool on) { gpio_put(PIN_MECH_ENBL, !on); }
 void hw_led(bool on) { gpio_put(PIN_LED, on); }
 bool hw_mech_rd(void) { return gpio_get(PIN_MECH_RD); }
+
+#include "pico/stdlib.h"
+
+#define ADDR_MASK ((1u << PIN_CA0) | (1u << PIN_CA1) | (1u << PIN_CA2) | (1u << PIN_SEL))
+_Static_assert((ADDR_MASK & (1u << PIN_MECH_WRTGATE)) == 0, "mech bus must never drive /WRTGATE");
+
+static void bus_set_addr(void *ctx, uint8_t a) {
+    (void)ctx;
+    uint32_t v = (((a >> 1) & 1u) << PIN_CA0) | (((a >> 2) & 1u) << PIN_CA1) |
+                 (((a >> 3) & 1u) << PIN_CA2) | ((a & 1u) << PIN_SEL);
+    gpio_put_masked(ADDR_MASK, v);
+}
+static void bus_set_lstrb(void *ctx, bool high) { (void)ctx; gpio_put(PIN_LSTRB, high); }
+static bool bus_read_rd(void *ctx) { (void)ctx; return gpio_get(PIN_MECH_RD); }
+static void bus_delay_us(void *ctx, uint32_t us) { (void)ctx; busy_wait_us_32(us); }
+
+static const mech_bus_t gpio_bus = { bus_set_addr, bus_set_lstrb, bus_read_rd, bus_delay_us, NULL };
+
+const mech_bus_t *hw_mech_bus(void) { return &gpio_bus; }

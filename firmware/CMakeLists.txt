@@ -6,7 +6,7 @@ set(CMAKE_C_STANDARD 11)
 pico_sdk_init()
 
 add_executable(a2m_bringup
-    src/main.c src/hw.c src/crc32.c src/mech.c src/mech_addr.c)
+    src/main.c src/hw.c src/crc32.c src/mech.c src/mech_addr.c src/console.c)
 target_include_directories(a2m_bringup PRIVATE src)
 target_compile_options(a2m_bringup PRIVATE -Wall -Wextra)
 target_link_libraries(a2m_bringup pico_stdlib)
