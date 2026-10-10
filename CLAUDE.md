@@ -68,6 +68,8 @@ third-party material:
   bitsavers mirror) goes in `docs/private/` (git-ignored) with a source entry
   in `docs/SOURCES.md`. Link to it, never commit it. Never `git add -f` there.
 - Our own photos, notes, specs, code and measurements are fine to publish.
+- Strip EXIF (GPS!) from every photo before committing it. Phone JPEGs carry the
+  location. Bake the orientation into the pixels first, then drop APP1/APP13.
 - Never commit Apple ROM binaries. `liron.asm` stays in project_byte_hamr. We
   reference it, we don't copy it.
 
