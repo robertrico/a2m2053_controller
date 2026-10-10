@@ -1,0 +1,50 @@
+> seek 0
+seek 0
+OK
+> tach
+tach
+TACH edges=196 rpm=392
+OK
+> status 5
+status 5
+STATUS TK0=0
+OK
+> seek 16
+seek 16
+OK
+> tach
+tach
+TACH edges=214 rpm=428
+OK
+> seek 32
+seek 32
+OK
+> tach
+tach
+TACH edges=236 rpm=472
+OK
+> seek 48
+seek 48
+OK
+> tach
+tach
+TACH edges=262 rpm=524
+OK
+> seek 64
+seek 64
+OK
+> tach
+tach
+TACH edges=294 rpm=588
+OK
+> seek 79
+seek 79
+OK
+> tach
+tach
+TACH edges=294 rpm=588
+OK
+> status 5
+status 5
+STATUS TK0=1
+OK

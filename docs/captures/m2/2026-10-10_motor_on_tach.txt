@@ -1,0 +1,19 @@
+> motor on
+motor on
+OK
+> status 4
+status 4
+STATUS MOTORON=0
+OK
+> status 13
+status 13
+STATUS READY=0
+OK
+> tach
+tach
+TACH edges=196 rpm=392
+OK
+> tach
+tach
+TACH edges=196 rpm=392
+OK
