@@ -1089,3 +1089,5 @@ disk 2 after board format: all zero = True 819200
   STATUS DIRTN=0 CSTIN=1 STEP=1 WRPROT=0 MOTORON=1 TK0=1 EJECT=0 TACH=0 RDDATA0=0 RDDATA1=0 SUPERDRIVE=0 REG_B=0 SIDES=1 READY=1 DRVIN=0 REVISED=1
   OK
 # step 10: disk 2 (formatted + written by our board) in the working UniDisk, IIe ProDOS (Bitsy Bye): S5,D1:/REF800K lists DATA0-DATA5 + README -> M5 PASS part 2. Screen: 2026-10-11_iie_disk2_catalog_unidisk.png
+TESTWRITE2.po (ADTPro image of disk 2 via the working UniDisk) vs REF800K: 0 blocks differ []
+sha256 bfed064fef52e305 ref bfed064fef52e305

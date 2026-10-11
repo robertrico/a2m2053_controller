@@ -5,17 +5,12 @@ Last updated: 2026-10-11, M5 bench done.
 ## Where things stand
 
 - M0 to M5 done. M5 (write + format) passed on the bench 2026-10-11:
-  `docs/build_log/m5.md`. Branch `m5-write-format` (not merged yet; merge after
-  the ADTPro byte-for-byte check below). No remote.
+  `docs/build_log/m5.md`. ADTPro image of the board-written disk, read through
+  the working UniDisk, is byte-identical to REF800K. Merged into `main`. No remote.
 - Untracked `blinky/` is not part of this work; leave it alone.
 
-## Open before calling M5 published
+## Open
 
-- Rico is imaging disk 2 (formatted + written by our board) with ADTPro on the
-  IIe. Diff that image against REF800K
-  (`/Applications/ADTPro-v.r.m/disks/REF800K.po`); expect 0 blocks differ. Then
-  merge `m5-write-format` into `main` and update the build note's "Not yet
-  confirmed".
 - bytehamr log for M5: not written yet. No Hackaday draft (Rico does Hackaday log
   by log, once proven).
 
