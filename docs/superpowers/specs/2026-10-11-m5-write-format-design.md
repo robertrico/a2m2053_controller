@@ -16,8 +16,9 @@ write the data field, verify), and a whole-disk low-level format.
 - A disk formatted by our board, then filled with REF800K's blocks by our
   board, boots or catalogs in the working UniDisk like REF800K.
 
-What carries forward: `REQ_WRITE` and `REQ_FORMAT` are the requests the
-SmartPort WRITE BLOCK and FORMAT commands (M6/M7) will call. M5 drives them
+What carries forward: `REQ_WRITE` and `REQ_FORMAT_TS` are the requests the
+SmartPort WRITE BLOCK and FORMAT commands (M6/M7) will call. A whole-disk
+format is 160 `REQ_FORMAT_TS` requests issued by core 0. M5 drives them
 from the USB console.
 
 Scope of "format" (decision 2026-10-11): low-level only, as the drive ROM's
@@ -68,20 +69,20 @@ core 0 (console; SmartPort later)            core 1 (mechanism server)
            <--reply queue-- status           seek, SEL, arm decoder (batch 1)
                                              on_header(target) -> fire TX
                                              wait done + 620 us -> verify read
-                                           REQ_FORMAT: per track side
+                                           REQ_FORMAT_TS: one track side
                                              build image -> fire TX -> verify
   PIO1 SM0 flux_rx (M4)  RD -> DMA ring -> flux_dec
-  PIO1 SM1 flux_tx (new) DMA -> TX FIFO -> WRTDATA, /WRTGATE (side-set)
+  PIO1 SM1 flux_tx (new) DMA -> TX FIFO -> WRTDATA, /WRTGATE (set pin)
 ```
 
 ### Units
 
 | Unit | Files | Job | Host-tested |
 |---|---|---|---|
-| flux_tx | `src/flux_tx.pio`, `src/flux_tx.c/.h` | TX state machine on PIO1 SM1 plus one DMA channel. Acts as the IWM's write side: shifts bytes MSB first, one bit per cell, toggles WRTDATA on each 1; /WRTGATE by side-set. Only file allowed to touch GP18. | no (hardware); timing on the scope |
+| flux_tx | `src/flux_tx.pio`, `src/flux_tx.c/.h` | TX state machine on PIO1 SM1 plus one DMA channel. Acts as the IWM's write side: shifts bytes MSB first, one bit per cell, toggles WRTDATA on each 1; /WRTGATE by a `set pins` instruction (side-set would leave 3 delay bits, too few for the 32-cycle bit loop). Only file allowed to touch GP18. | no (hardware); timing on the scope |
 | wtrack | `src/wtrack.c/.h` | Pure builders of the byte images the TX streams: one data field, one whole track side. Uses `gcr_encode_address` / `gcr_encode_data`. | yes |
 | flux_dec | `src/flux_dec.c/.h` (existing) | New `header` sink callback, called at the header's `DE AA`. | yes |
-| mech_server | `src/mech_server.c/.h` (existing) | New `REQ_WRITE` and `REQ_FORMAT` handling, verify, retries, trackbuf update. Talks to TX through a `flux_tx_ops_t` table (load, fire, busy, abort) so it runs on the host with fakes. | yes, with fake bus, fake flux source and fake TX |
+| mech_server | `src/mech_server.c/.h` (existing) | New `REQ_WRITE` and `REQ_FORMAT_TS` handling, verify, retries, trackbuf update. Talks to TX through a `flux_tx_ops_t` table (load, fire, busy, abort) so it runs on the host with fakes. | yes, with fake bus, fake flux source and fake TX |
 | ipc | `src/ipc.c/.h` (existing) | New request ops and fields (below). | yes |
 | console | `src/console.c`, `src/main.c` (existing) | New commands `writeblk`, `format` (section 7). | parser yes |
 | host tool | `tools/a2m/` | `writeblk`, `writedisk`, `format` subcommands; `synth.py` gets the ROM track layout. | yes (pytest) |
@@ -91,15 +92,16 @@ core 0 (console; SmartPort later)            core 1 (mechanism server)
 ```c
 // ipc.h (additions)
 #define ST_WRPROT   0xAB   // $2B with the ROM's $80 bit
-typedef enum { REQ_READ, REQ_WRITE, REQ_FORMAT, REQ_FORMAT_TS } req_op_t;
+typedef enum { REQ_READ, REQ_WRITE, REQ_FORMAT_TS } req_op_t;
 typedef struct {
     req_op_t op;
     uint16_t block;                 // REQ_READ / REQ_WRITE
     uint8_t  cyl, side;             // REQ_FORMAT_TS (one track side, bench aid)
     uint8_t  data[GCR_SECTOR_LEN];  // REQ_WRITE: 12 tag + 512 data
 } req_t;
-// reply_t gains: uint8_t cyl, side;   // REQ_FORMAT*: where it stopped
-//                uint16_t fire_us_max; // REQ_WRITE: header-to-gate latency
+// reply_t gains: uint8_t tries;      // REQ_WRITE / REQ_FORMAT_TS: writes used
+//                uint16_t fire_us;   // REQ_WRITE: header read -> fire, last write
+// reply.block echoes req.block (core 0 tags format requests 0x8000 | cyl << 1 | side).
 
 // flux_dec.h (addition to flux_dec_sink_t)
 void (*header)(void *ctx, int track, int side, int sector);  // at DE AA
@@ -143,14 +145,14 @@ size_t wtrack_track(uint8_t *out, size_t cap, int cyl, int side);
   per-bit loop lands on the nominal cell (150 MHz system clock; target
   within +-0.05 %, half the ERS tolerance). Fractional-divider jitter is one
   PIO clock, well under the 250 ns read/write margin (ERS86 sec. 2.10.2).
-- Sequence: side-set gate low; wait >= 1.8 us (T3); shift bits, toggle
-  WRTDATA on 1; after the last bit hold >= 2 us (T4); side-set gate high;
-  stall. WRTDATA starts high (idle level).
+- Sequence: `set pins` gate low; wait >= 1.8 us (T3); shift bits, toggle
+  WRTDATA on 1; after the last bit hold >= 2 us (T4); `set pins` gate high;
+  park in a self-loop (busy = program counter not on that loop). WRTDATA starts high (idle level).
 - DMA: byte transfers from the image into the TX FIFO, paced by the SM's
   DREQ. `flux_tx_load` pre-fills the FIFO so `flux_tx_fire` starts shifting
   at once.
-- The RX state machine (SM0) keeps running during a write. What RD shows
-  while writing is unknown and unused: the ring is flushed after the write.
+- The RX stream (SM0) is stopped once the TX fires and restarted for the
+  verify, so nothing RD shows while writing is ever decoded.
 
 ## 5. Sector write (REQ_WRITE)
 
@@ -167,16 +169,18 @@ On core 1, in `mech_server`:
 4. **Arm:** flush the RX ring, `flux_dec_reset`, read the ring one interval at
    a time (batch 1) while armed. The `header` callback compares track, side
    and sector. A wrong-track header re-seeks as in M4.
-5. **Fire:** on the target header, `flux_tx_fire()`. Record the latency from
-   the `DE AA` interval to the fire (ticks). The decoder only sees `DE AA`
+5. **Fire:** on the target header, `flux_tx_fire()`. Record `fire_us`: time from reading the
+   interval that completed `DE AA` to the fire; the console also reports the
+   ring backlog, so the true latency is that plus the unread intervals. The decoder only sees `DE AA`
    complete at the next edge; the byte after it is `FF`, so that adds at most
    about 2 us. Budget: under 60 us. Hard limit: about 160 us, the distance to
    the old data mark (`DE AA FF FF 3F CF F3 FC FF D5 AA AD`); a later start
    leaves the old mark in front of our data.
 6. **After:** wait for `flux_tx_busy()` false (about 11.7 ms for 716 bytes),
    then >= 620 us (erase tail, RD valid). Flush the RX ring.
-7. **Verify:** read the target sector from the next revolution, bypassing
-   the track buffer, and compare all 524 bytes.
+7. **Verify:** restart the track buffer for that track side and run the M4
+   fill until the target sector is in (not the whole track, 2 revolutions
+   max), then compare all 524 bytes.
 8. **Retries:**
    - Header not found: M4 fill budget and recal escalation, 5 s cap, then
      `0xA7`.
@@ -184,20 +188,23 @@ On core 1, in `mech_server`:
    - The ROM does not verify block writes (`cmd_write_block` returns right
      after `write_data`, line 1369). Ours does on purpose for M5, since the
      write path is new; revisit for speed in M7.
-9. **Track buffer:** on success the sector in the track buffer is updated
-   with the written payload; on failure the track buffer is invalidated.
+9. **Track buffer:** after the verify it holds the freshly read target
+   sector (other sectors of that side refill on demand); on failure it is
+   invalidated.
 10. **Tags:** `writeblk` takes 512 data bytes and zeroes the 12 tag bytes, as
     the ROM's WriteBlock (lines 1286-1288). `REQ_WRITE` itself carries all
     524 bytes, for tests and for the extended Write command later.
 
 Success after soft events returns `0xE7` with soft flags, as reads do.
 
-## 6. Format (REQ_FORMAT, REQ_FORMAT_TS)
+## 6. Format (REQ_FORMAT_TS; whole disk driven by core 0)
 
 Whole disk, in the ROM's order (`cmd_format_actual`, lines 449-483):
 
-1. No disk -> `0xAF`; write-protected -> `0xAB`. Recalibrate.
-2. For cyl 0..79: side 0, then side 1. After a zone change, poll READY
+1. Each request checks: no disk -> `0xAF`; write-protected -> `0xAB`. The
+   first seek after `server on` recalibrates (position unknown).
+2. Core 0 issues cyl 0..79: side 0, then side 1, and stops at the first
+   failure. After a zone change, poll READY
    (ROM: fixed 150 / 25 ms waits).
 
 One track side:
@@ -221,17 +228,16 @@ One track side:
      the write starts wherever the head is.
 2. **Write:** head select, >= 100 us, `flux_tx_load` + `flux_tx_fire`, wait
    for done (cap: expected time + 10 %), then >= 620 us.
-3. **Verify** with the M4 track read: every sector 0..nsect-1 seen exactly
+3. **Verify** with the M4 track read (2 revolutions max): every sector 0..nsect-1 seen exactly
    once, header and data checksums good, data all zero (ROM `verify_actual`,
    lines 660-680).
 4. **Retries:** up to 10 write + verify attempts per track side (ROM
-   `spb_packet_type` = `$0A`). Final failure stops the format and replies
-   `0xA7` with cyl and side. The ROM also ejects the disk (`Se51b`); we skip
+   `spb_packet_type` = `$0A`). Final failure replies `0xA7`; core 0 stops
+   the format there and reports cyl and side. The ROM also ejects the disk (`Se51b`); we skip
    that in M5.
 5. The track buffer is invalidated when a format starts.
 
-`REQ_FORMAT_TS` does one track side (same steps 1-4), for the first bench
-tests.
+`format <cyl> <side>` issues one `REQ_FORMAT_TS`, for the first bench tests.
 
 Expected time: about 166 ms write + 1-2 revolutions verify + a step, per
 track side; 160 track sides, so about 70-80 s per disk.
@@ -241,8 +247,8 @@ track side; 160 track sides, so about 70-80 s per disk.
 The console line limit (80 chars) stays; block data travels as binary.
 
 - `writeblk <n>` (0-1599) -> `SEND 512`; the host sends 512 binary bytes;
-  the board replies `BLK <n> <status> <soft> <crc32> <fire_us_max>` and
-  `OK`. CRC-32 (zlib) over the 512 bytes received, so the host can check the
+  the board replies `BLK <n> <status> <soft> <crc32> <tries> <fire_us> <backlog>`
+  and `OK` (backlog = largest unread ring count during the request). CRC-32 (zlib) over the 512 bytes received, so the host can check the
   transfer. If the 512 bytes do not arrive within 2 s: `ERR timeout`, nothing
   is written.
 - `format` -> one line per track side as it finishes,
@@ -267,7 +273,7 @@ Host (Mac), `firmware/test`:
 | test_wtrack | Data field image is byte-for-byte the ROM layout. Track image length per zone = 1000 + nsect x 763. Interleave order equals `synth.physical_order`. Header checksums. Round trip: image -> bit cells -> intervals -> `flux_dec` decodes every sector, payload all zero. |
 | test_flux_dec | New `header` callback fires once per good header, at `DE AA`, with the right track/side/sector; not on a bad checksum. |
 | test_mech_server (write) | fake_drive learns to write: when the fake TX fires, it splices the TX bit cells into its track at the current position, with a configurable latency. Cases: write + verify OK; `0xAB` protected and `0xAF` no disk without moving; header never found -> recal -> `0xA7`; corrupt-write fault knob -> 3 writes -> `0xA7`; TX never finishes -> abort, gate high, `0xA7`; latency past the old data mark -> verify fails; track buffer updated after a write and invalidated after a failure. |
-| test_mech_server (format) | One track side format + verify OK; format fails 10 times -> `0xA7` with cyl and side; whole-disk format order (cyl 0..79, side 0 then 1); track buffer invalidated. |
+| test_mech_server (format) | One track side format + verify OK and reads back all-zero sectors; format fails 10 times -> `0xA7`, tries = 10; protected -> `0xAB` without writing; a sector write on a board-formatted track; track buffer invalidated. |
 | test_ipc, test_console | New ops and fields; `writeblk` / `format` parsing and ranges. |
 | check_wrtgate | GP18 only in `pins.h`, the idle table, the static assert and `flux_tx.c`. |
 
