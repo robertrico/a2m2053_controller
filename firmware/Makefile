@@ -3,10 +3,12 @@ export PICO_SDK_PATH
 BUILD   := build
 ELF     := $(BUILD)/a2m_bringup.elf
 
-# SWD via picoprobe / Debug Probe (CMSIS-DAP). Default: Raspberry Pi's prebuilt
+# SWD via picoprobe / Debug Probe (CMSIS-DAP). USE_CORE 0: attach to core 0 only;
+# in SMP mode OpenOCD leaves core 1 debug-halted after programming (M4 bench).
+# Default: Raspberry Pi's prebuilt
 # OpenOCD (pico-sdk-tools v2.3.1-0, has target/rp2350.cfg). Override with OPENOCD=.
 OPENOCD ?= $(HOME)/Development/tooling/openocd-rpi/current/openocd
-OCD_CFG := -f interface/cmsis-dap.cfg -f target/rp2350.cfg -c "adapter speed 5000"
+OCD_CFG := -f interface/cmsis-dap.cfg -c "set USE_CORE 0" -f target/rp2350.cfg -c "adapter speed 5000"
 GDB     ?= arm-none-eabi-gdb
 
 all: $(BUILD)/build.ninja
