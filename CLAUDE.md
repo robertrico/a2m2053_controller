@@ -37,7 +37,7 @@ Research digest: `docs/research_notes.md`. Start there.
 
 - MCU: RP2350A on a Pico 2 for the prototype. Move to an FPGA only if timing
   forces it.
-- 5x 8T245 boards (U1-U5) + 74LVC1G07 for ACK. 25 of 26 GPIO used.
+- 5x 8T245 boards (U1-U5). ACK rides U3 with host RD (no 74LVC1G07). 25 of 26 GPIO used.
 - Mechanism: Sony 800K, CX23077A (logic) + CX20185 (R/W amp). Self-regulating
   speed. CN104 pin 20 (/PWM) tied to +5V.
 - Host: Liron DB-19 / CN102. ACK is on CN102 pin 20. The rear daisy-chain port

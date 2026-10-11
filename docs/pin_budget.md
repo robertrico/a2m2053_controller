@@ -34,7 +34,7 @@ No SD card: the media is the floppy.
 | GP6 | host /WRREQ | in | U1 |
 | GP7 | host /HSTEN | in | U1 |
 | GP8 | host WR (FM data in) | in | U1 |
-| GP9 | ACK | out | 74LVC1G07 open-drain |
+| GP9 | ACK | out | U3 (with host RD), 10k pull-up to +5 on B |
 | GP10 | host RD (FM data out) | out | U3 |
 | GP11 | U3 /OE (host RD release) | out | none |
 | GP12 | CA0 | out | U2 |
@@ -124,7 +124,7 @@ U4 must be gated: RP2350 pins default low-ish at boot, and a low on ENBL_OUT
 would enable the downstream drive. B-side pulls: ENBL_OUT 10k to +5V
 (inactive), PH3_OUT 10k to GND, so the chain is quiet while U4 is Hi-Z.
 
-ACK stays on a 74LVC1G07 (open-drain, wired-OR with downstream drives).
+ACK rides U3 with host RD: driven only while U3 /OE (ENBUS) is low, released otherwise, with a 10k pull-up to +5 on the B side (2026-10-11, M6 bench). No 74LVC1G07.
 Downstream RD/ACK share the host bus wires directly. Every device releases
 them when it's not answering, which is why U3 needs its own /OE.
 

@@ -1,48 +1,56 @@
 # Handoff
 
-Last updated: 2026-10-11, M5 bench done.
+Last updated: 2026-10-11, M6 paused after a bench failure.
 
 ## Where things stand
 
-- M0 to M5 done. M5 (write + format) passed on the bench 2026-10-11:
-  `docs/build_log/m5.md`. ADTPro image of the board-written disk, read through
-  the working UniDisk, is byte-identical to REF800K. Merged into `main`. No remote.
+- M0 to M5 done (`docs/build_log/m5.md`). No remote.
+- M6 started and paused the same day: `docs/build_log/m6.md`. Host-side wiring
+  was built and checked; on first Apple connect a loose strand on the homemade
+  DB-19 adapter bridged -12 V (strip pos 9) onto /WRREQ (pos 10). U1 burned
+  (replaced), and the **Liron card's IWM WRDATA output (pin 8) is dead**.
+  Pico inputs checked OK over SWD.
+- No M6 firmware. No M6 spec yet (brainstorming stopped at the host wiring;
+  architectural path: spec, then plan).
 - Untracked `blinky/` is not part of this work; leave it alone.
 
-## Open
+## Blocked on (Rico)
 
-- bytehamr: M5 log "M5: the UniDisk reads a disk my board wrote" published
-  2026-10-11 (site commit 114429c), with Current state / Open problems updated and
-  14 lines of tool/review narration removed from older logs (unidisk, sigscope,
-  litex-8008-node, dino).
-- No Hackaday draft (Rico does Hackaday log by log, once proven).
-- `project_byte_hamr`: three untracked files from 2026-09-14 stashed there as
-  `stash@{0}: dino - wip`.
+- Proper IDC breakouts (ordered) to replace the homemade DB-19 adapter.
+- Liron repair: swap in a donor IWM from a dead IF-83 board (344-0041-B).
+  Confirm the part number match and socketing first; diode-check the donor.
+
+## Resume order
+
+1. Repaired Liron, no drive: scope `PR#5` (PH0+PH2 reset pulse, FM on WR).
+2. Write test on the working UniDisk through the Liron (save a file).
+3. Rebuild the host side on the IDC breakouts. **Rail-isolation checks before
+   any Apple power, every time** (each Apple rail position vs its neighbours
+   and every signal row). Low current limit on the bench +5 for first connect.
+4. Resume M6 brainstorming: RAM disk content (proposed: ProDOS image in flash
+   plus a RAM write overlay), then the spec. The spec must also replace the
+   74LVC1G07 references (spec sec. 1 and 3.5, `level_shifting.md`) with "ACK on
+   U3 with RD". `CLAUDE.md`, `pin_budget.md` and `pins.h` are already updated.
+5. Proposed small firmware addition (not approved yet): a `pins` console
+   command that prints the host input levels.
 
 ## Bench state at shutdown
 
 - Pico 2 flashed with `61d4690` (M5 + READY fix).
-- Bench +5V supply set to 5.55 V to get 4.94-4.96 V at CN104 pin 11 (0.6 V lost
-  in the wiring). Rework the +5V/GND path, then set the supply back to about 5 V.
-- Scope probes on CN104: CH1 pin 10 /WRTGATE, CH2 pin 18 WRTDATA, CH3 pin 16 RD,
-  ground pin 1. Pins 13/15/17/19 are +12 V. Attach probes with the mechanism
-  supply off.
-- Disk 1 ("TEST write") holds a board-written REF800K copy. Disk 2 is in the
-  working UniDisk.
-- Pico console `/dev/cu.usbmodem114401`, Debug Probe `114202`. Power-down order:
-  mechanism supply off before any Pico USB unplug. Flash XIP error: power cycle
-  the Pico.
+- Bench +5 supply was set back to about 5.0 V for the host test (it was 5.55 V
+  for M5 because of the IR drop to CN104). Rework the +5V/GND path before the
+  mechanism needs to read disks again.
+- New U1 seated; host wiring being cleaned up by Rico.
+- Liron card pulled from the IIe. The working UniDisk stays off it until the
+  repair is tested.
+- Scope probes: moved off CN104 during M6; reattach per the task.
+- Pico console `/dev/cu.usbmodem114401`, Debug Probe `114202`. GPIO state can
+  be read over SWD without halting (`mdw 0xd0000004`, pad registers at
+  `0x40038004 + 4n`).
 
-## Tools added this session
+## Notes
 
-- Bench console log: every command and reply goes to
-  `docs/captures/mNN/<date>_console.log`, tailed live in an iTerm2 window.
-- Window-only screenshots: `~/.claude/scripts/winsnap.sh <app> <name> <out.png>`;
-  scope and capture notes in `~/.claude/CLAUDE.md` ("Bench captures").
-- Apple II screen: the obs-screenshot skill (HDMI capture).
-
-## Next
-
-- Host tool: `Console.writeblk` polls the port with 0.2 s reads; likely most of
-  the 0.5-0.65 s per block in `writedisk`.
-- M6: SmartPort on the RP2350 (PicoPort port, RAM disk, ProDOS boot via Liron).
+- bytehamr: last log is M5, published 2026-10-11.
+- No Hackaday draft (Rico does Hackaday log by log, once proven).
+- `project_byte_hamr`: three untracked files from 2026-09-14 stashed there as
+  `stash@{0}: dino - wip`.

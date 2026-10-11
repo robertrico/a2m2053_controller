@@ -10,7 +10,7 @@
 #define PIN_HOST_WRREQ    6
 #define PIN_HOST_HSTEN    7
 #define PIN_HOST_WR       8
-#define PIN_ACK           9   // via 74LVC1G07: high = released
+#define PIN_ACK           9   // via U3 with host RD; valid only while PIN_HOST_RD_OE is low
 #define PIN_HOST_RD      10
 #define PIN_HOST_RD_OE   11   // U3 /OE, active low
 #define PIN_CA0          12
