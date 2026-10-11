@@ -274,6 +274,33 @@ after the last ID is assigned).
 Flat 20-pin mapping (right column): DB-19 pin n -> flat pin 2n-1 for 1-10
 (odd side), pins 11-19 -> flat 2,4,...18 (even side), flat 20 unused.
 
+## Writing to the mechanism (M5) 2026-10-11
+
+- WRTDATA: each level change writes a flux transition; a 1 bit is a toggle, a 0
+  bit no toggle. Polarity does not matter. **[doc ERS86 3.2.6]** Our PIO toggles
+  per 1 bit at 2.040-2.048 us per cell. **[measured]**
+- /WRTGATE timing **[doc ERS86 p24, p29]**: READY low before the gate (T1); SEL
+  settled >= 100 us before (T6); gate low to first edge >= 1.8 us (T3); last edge
+  to gate high >= 2 us (T4); erase tail 480-590 us and RD valid / /STEP allowed
+  620 us after the gate goes high. Ours: T3 2.17 us, T4 4.02 us. **[measured]**
+- The drive records only with /WRTGATE low, /ENBL low and the tab open.
+  **[doc ERS86 3.2.5]**
+- Track layout written by the drive ROM: preamble 200 x `FF 3F CF F3 FC`
+  (1000 bytes, four 10-bit sync groups per 5 bytes); per sector 35 sync bytes,
+  `FF`, address field, `FF`, `FF 3F CF F3 FC FF`, data field, `FF`. A sector
+  rewrite starts right after the header's `DE AA`. No index pulse: a format
+  writes 1000 + nsect x 763 bytes in one go and the tail wraps over the
+  preamble. **[fw liron.asm 488-593, 2085-2156]** Reproduced by our board; the
+  working UniDisk reads the result. **[measured]**
+- No write precompensation in the ROM or the docs. None used; reads back clean.
+  **[fw] [measured]**
+- Header-to-gate latency on our board: 3.1 us after the decoder can see `DE AA`
+  (ROM: about 16-30 us). **[measured]**
+- READY lags a recalibration: a seek that only recalibrates must still wait for
+  READY before writing. **[measured]**
+- +5V at CN104 pin 11 must stay >= 4.75 V with the motor running, or read data
+  vanishes (M3 and again M5). **[measured]**
+
 ## 10. Rear D-sub <-> CN102 continuity (Rico, dead board, 2026-10-07) **[measured]**
 
 Expected map = Apple "regular" flat mapping (DB-19 n -> flat 2n-1 for 1-10,

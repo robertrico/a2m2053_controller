@@ -1,0 +1,1091 @@
+# M5 bench console, 2026-10-11 (Drive A, firmware m5-write-format e4cb5cf)
+[10:19:34] > help
+  help | oe on|off | enbl on|off | status [0-15] | cmd <0-15> | motor on|off
+  recal | seek <0-79> | head <0|1> | eject | tach | settle <us> | capture <t> <s> <n>
+  server on|off | readblk <0-1599> | readdisk
+  writeblk <0-1599> (then 512 raw bytes) | format [<0-79> <0|1>] (any key stops)
+  OK
+[10:24:02] > oe on
+  OK
+[10:24:02] > enbl on
+  OK
+[10:24:02] > status
+  STATUS DIRTN=0 CSTIN=0 STEP=1 WRPROT=1 MOTORON=1 TK0=0 EJECT=0 TACH=1 RDDATA0=0 RDDATA1=0 SUPERDRIVE=0 REG_B=0 SIDES=1 READY=1 DRVIN=0 REVISED=1
+  OK
+[10:24:08] > motor on
+  OK
+[10:24:08] > seek 10
+  OK
+[10:24:09] > tach
+  TACH edges=196 rpm=392
+  OK
+[10:24:10] $ a2m.cli capture --port /dev/cu.usbmodem114401 --track 0 --side 0 --count 1000 --out /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/regress_t0s0.flux
+  1000 intervals -> /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/regress_t0s0.flux
+[10:24:10] > motor off
+  OK
+[10:24:16] > server on
+  OK
+[10:24:17] $ a2m.cli readdisk --port /dev/cu.usbmodem114401 --out ../docs/captures/m5/disk1_before.po
+  readdisk: 25593 ms, decode 1263 ns/interval (mean), ring backlog max 35 of 8192, 0 failed track sides, 0 with soft errors -> ../docs/captures/m5/disk1_before.po
+# step 3: gate check — scope armed single on /WRTGATE falling, cycling the server
+[10:28:26] > server off
+  OK
+[10:28:27] > server on
+  OK
+[10:28:27] > server off
+  OK
+[10:28:27] > server on
+  OK
+[10:28:28] > readblk 100
+  BLK 100 a7 01
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  000000000000000000000000
+  OK
+[10:28:40] > readblk 100
+  BLK 100 a7 01
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  000000000000000000000000
+  OK
+[10:28:43] > readblk 0
+  BLK 0 a7 01
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  000000000000000000000000
+  OK
+[10:28:45] > readblk 100
+  BLK 100 a7 01
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  000000000000000000000000
+  OK
+[10:28:57] > server off
+  OK
+[10:28:57] > oe on
+  OK
+[10:28:57] > enbl on
+  OK
+[10:28:57] > status
+  STATUS DIRTN=0 CSTIN=0 STEP=1 WRPROT=1 MOTORON=1 TK0=1 EJECT=0 TACH=1 RDDATA0=0 RDDATA1=0 SUPERDRIVE=0 REG_B=0 SIDES=1 READY=1 DRVIN=0 REVISED=1
+  OK
+[10:28:58] > motor on
+  OK
+[10:28:58] > seek 4
+  OK
+[10:28:58] > head 0
+  OK
+[10:29:17] > tach
+  TACH edges=196 rpm=392
+  OK
+[10:29:18] > status
+  STATUS DIRTN=0 CSTIN=0 STEP=1 WRPROT=1 MOTORON=0 TK0=1 EJECT=0 TACH=1 RDDATA0=0 RDDATA1=0 SUPERDRIVE=0 REG_B=0 SIDES=1 READY=0 DRVIN=0 REVISED=1
+  OK
+[10:29:18] $ a2m.cli capture --port /dev/cu.usbmodem114401 --track 4 --side 0 --count 20000 --out /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/t4s0.flux
+  0 intervals -> /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/t4s0.flux
+# 10:3x Rico cold-rebooted the rig (probes attached to a live mechanism killed read flux)
+[10:30:16] > oe on
+  OK
+[10:30:16] > enbl on
+  OK
+[10:30:16] > status
+  STATUS DIRTN=0 CSTIN=0 STEP=1 WRPROT=1 MOTORON=1 TK0=0 EJECT=0 TACH=1 RDDATA0=0 RDDATA1=0 SUPERDRIVE=0 REG_B=0 SIDES=1 READY=1 DRVIN=0 REVISED=1
+  OK
+[10:30:17] > motor on
+  OK
+[10:30:17] > seek 4
+  OK
+[10:30:17] > head 0
+  OK
+[10:30:17] $ a2m.cli capture --port /dev/cu.usbmodem114401 --track 4 --side 0 --count 60000 --out /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/t4s0.flux
+  0 intervals -> /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/t4s0.flux
+[10:30:39] > motor off
+  OK
+[10:31:41] > motor on
+  OK
+[10:31:41] > seek 4
+  OK
+[10:31:41] > head 0
+  OK
+[10:31:42] $ a2m.cli capture --port /dev/cu.usbmodem114401 --track 4 --side 0 --count 60000 --out /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/t4s0.flux
+  0 intervals -> /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/t4s0.flux
+track 4 side 0: 0/12 sectors good, bad headers 0, bad data 0, misplaced 0
+# probes CH2/CH3 + meter removed, mechanism power cycled
+[10:32:59] > oe on
+  OK
+[10:32:59] > enbl on
+  OK
+[10:33:00] > status
+  STATUS DIRTN=0 CSTIN=0 STEP=1 WRPROT=1 MOTORON=1 TK0=0 EJECT=0 TACH=0 RDDATA0=0 RDDATA1=0 SUPERDRIVE=0 REG_B=0 SIDES=1 READY=1 DRVIN=0 REVISED=1
+  OK
+[10:33:00] > motor on
+  OK
+[10:33:00] > seek 4
+  OK
+[10:33:00] > head 0
+  OK
+[10:33:01] $ a2m.cli capture --port /dev/cu.usbmodem114401 --track 4 --side 0 --count 60000 --out /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/t4s0.flux
+  0 intervals -> /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/t4s0.flux
+track 4 side 0: 0/12 sectors good, bad headers 0, bad data 0, misplaced 0
+[10:33:20] > tach
+  TACH edges=196 rpm=392
+  OK
+[10:33:20] > recal
+  OK
+[10:33:21] $ a2m.cli capture --port /dev/cu.usbmodem114401 --track 0 --side 1 --count 20000 --out /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/t0s1.flux
+  0 intervals -> /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/t0s1.flux
+[10:33:23] > motor off
+  OK
+# Rico: +12/pin13, +5/pin11, /PWM pin20 all measure fine
+[10:35:30] > motor on
+  OK
+[10:35:30] > seek 0
+  OK
+[10:35:30] > head 0
+  OK
+[10:35:30] $ a2m.cli capture --port /dev/cu.usbmodem114401 --track 0 --side 0 --count 20000 --out /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/try_t0.flux
+  0 intervals -> /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/try_t0.flux
+[10:35:33] > seek 4
+  OK
+[10:35:33] > head 0
+  OK
+[10:35:33] $ a2m.cli capture --port /dev/cu.usbmodem114401 --track 4 --side 0 --count 20000 --out /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/try_t4.flux
+  0 intervals -> /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/try_t4.flux
+[10:35:35] > seek 40
+  OK
+[10:35:36] > head 0
+  OK
+[10:35:36] $ a2m.cli capture --port /dev/cu.usbmodem114401 --track 40 --side 0 --count 20000 --out /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/try_t40.flux
+  0 intervals -> /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/try_t40.flux
+[10:35:38] > motor off
+  OK
+# disk 2 inserted (read-only test)
+[10:36:56] > status
+  STATUS DIRTN=1 CSTIN=1 STEP=1 WRPROT=1 MOTORON=1 TK0=1 EJECT=1 TACH=1 RDDATA0=1 RDDATA1=1 SUPERDRIVE=1 REG_B=1 SIDES=1 READY=1 DRVIN=1 REVISED=1
+  OK
+[10:36:56] > motor on
+  'motor on': ERR not ready
+[10:36:58] > seek 0
+# rig rebooted again (Rico), disk 2 in
+[10:37:11] > oe on
+  OK
+[10:37:11] > enbl on
+  OK
+[10:37:11] > status
+  STATUS DIRTN=1 CSTIN=0 STEP=1 WRPROT=1 MOTORON=1 TK0=0 EJECT=0 TACH=0 RDDATA0=0 RDDATA1=0 SUPERDRIVE=0 REG_B=0 SIDES=1 READY=1 DRVIN=0 REVISED=1
+  OK
+[10:37:12] > motor on
+  OK
+[10:37:12] > seek 0
+  OK
+[10:37:12] > head 0
+  OK
+[10:37:12] $ a2m.cli capture --port /dev/cu.usbmodem114401 --track 0 --side 0 --count 20000 --out /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/d2_t0.flux
+  0 intervals -> /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/d2_t0.flux
+[10:37:15] > seek 4
+  OK
+[10:37:15] > head 0
+  OK
+[10:37:15] $ a2m.cli capture --port /dev/cu.usbmodem114401 --track 4 --side 0 --count 20000 --out /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/d2_t4.flux
+  0 intervals -> /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/d2_t4.flux
+[10:37:17] > motor off
+  OK
+# CH3 back on CN104 pin 16 (RD); motor on, head 0, scope look
+[10:38:42] > oe on
+  OK
+[10:38:43] > enbl on
+  OK
+[10:38:43] > motor on
+  OK
+[10:38:43] > seek 4
+  OK
+[10:38:44] > head 0
+  OK
+# Rico: +5 at pin 11 sagging under motor load again (M3 IR-drop symptom). Reworking wiring.
+[10:39:59] > motor off
+  OK
+[10:39:59] > recal
+  OK
+[10:39:59] > head 0
+  OK
+# Rico replaced the +5V jumper with solid core
+[10:41:24] > oe on
+  OK
+[10:41:24] > enbl on
+  OK
+[10:41:25] > motor on
+  OK
+[10:41:25] > seek 0
+  OK
+[10:41:25] > head 0
+  OK
+[10:41:26] $ a2m.cli capture --port /dev/cu.usbmodem114401 --track 0 --side 0 --count 60000 --out /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/fix_t0.flux
+  60000 intervals -> /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/fix_t0.flux
+track 0 side 0: 12/12 sectors good, bad headers 1, bad data 0, misplaced 0
+[10:41:26] > seek 4
+  OK
+[10:41:26] > head 0
+  OK
+[10:41:27] $ a2m.cli capture --port /dev/cu.usbmodem114401 --track 4 --side 0 --count 60000 --out /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/fix_t4.flux
+  60000 intervals -> /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/fix_t4.flux
+track 4 side 0: 12/12 sectors good, bad headers 0, bad data 1, misplaced 0
+[10:41:33] > motor off
+  OK
+# disk 1 back in; motor on for +5 measurement
+[10:42:16] > status
+  STATUS DIRTN=0 CSTIN=0 STEP=1 WRPROT=1 MOTORON=1 TK0=1 EJECT=0 TACH=1 RDDATA0=0 RDDATA1=0 SUPERDRIVE=0 REG_B=0 SIDES=1 READY=1 DRVIN=0 REVISED=1
+  OK
+[10:42:16] > motor on
+  OK
+[10:42:47] > motor off
+  OK
+[10:44:58] > motor on
+  OK
+# +5 at CN104 pin 11: 4.6 V motor running at old setpoint; supply raised to 5.55 V -> 4.94 V at pin 11 motor running (0.6 V drop in the path)
+[10:46:32] > motor off
+  OK
+# pin 11 idle 4.96 V (setpoint 5.55). Re-reading disk 1 vs snapshot
+[10:47:17] > server on
+  OK
+[10:47:18] $ a2m.cli readdisk --port /dev/cu.usbmodem114401 --out /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/disk1_check.po --compare ../docs/captures/m5/disk1_before.po
+  readdisk: 25636 ms, decode 1262 ns/interval (mean), ring backlog max 39 of 8192, 0 failed track sides, 0 with soft errors -> /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/disk1_check.po
+  compare vs ../docs/captures/m5/disk1_before.po: 0 blocks differ []
+# step 4: FIRST WRITE — block 100 on disk 1, pattern A5; scope single on /WRTGATE falling
+[10:47:54] $ a2m.cli writeblk --port /dev/cu.usbmodem114401 --block 100 --pattern 0xA5
+  block 100: status 00 soft 00 tries 1 fire 9 us backlog 32
+# step 5: readdisk after first write, diff vs snapshot
+[10:48:24] $ a2m.cli readdisk --port /dev/cu.usbmodem114401 --out ../docs/captures/m5/disk1_after1.po --compare ../docs/captures/m5/disk1_before.po
+  readdisk: 25656 ms, decode 1262 ns/interval (mean), ring backlog max 30 of 8192, 0 failed track sides, 0 with soft errors -> ../docs/captures/m5/disk1_after1.po
+  compare vs ../docs/captures/m5/disk1_before.po: 1 blocks differ [100]
+block 100 all A5: True
+# CH2 on WRTDATA pin 18; mechanism power cycled. Re-home + read check
+[10:50:08] > server off
+  OK
+[10:50:09] > server on
+  OK
+[10:50:09] > readblk 100
+  BLK 100 00 00
+  000000000000000000000000a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5
+  a5a5a5a5a5a5a5a5a5a5a5a5
+  OK
+# step 4b: write block 101 (pattern 5A), scope 1 ms/div whole write
+[10:50:19] $ a2m.cli writeblk --port /dev/cu.usbmodem114401 --block 101 --pattern 0x5A
+  block 101: status 00 soft 00 tries 1 fire 9 us backlog 7
+# write block 102 (pattern 33), scope 1 us/div at gate fall (T3)
+[10:50:40] $ a2m.cli writeblk --port /dev/cu.usbmodem114401 --block 102 --pattern 0x33
+  block 102: status 00 soft 00 tries 1 fire 5 us backlog 7
+# write block 103 (pattern C3), scope 1 us/div at gate rise (T4)
+[10:51:00] $ a2m.cli writeblk --port /dev/cu.usbmodem114401 --block 103 --pattern 0xC3
+  block 103: status 00 soft 00 tries 1 fire 3 us backlog 31
+# write block 104 (pattern 96), scope 20 us/div before gate fall (fire latency from RD)
+[10:51:35] $ a2m.cli writeblk --port /dev/cu.usbmodem114401 --block 104 --pattern 0x96
+  block 104: status 00 soft 00 tries 1 fire 3 us backlog 28
+# scope results (CH1 /WRTGATE pin 10, CH2 WRTDATA pin 18, CH3 RD pin 16; 10x probes; 500 MSa/s)
+#   gate low width 11.7 ms (716 bytes)            scope NWID
+#   T3 gate fall -> first WRTDATA edge 2.17 us     scope FFR C1-C2   (spec >= 1.8 us)
+#   cell 2.040-2.048 us; CH2 period (FF) 4.09 us   CSV edges / scope PER
+#   WRTDATA rise 4.4 ns                            scope RISE        (spec <= 50 ns)
+#   T4 last WRTDATA edge -> gate rise 4.02 us      CSV edges         (spec >= 2 us)
+#   fire latency: RD decoded before the gate: ... D5 AA 96 9D A7 96 DB DF DE AA;
+#     decoder can see DE AA at the next flux edge; gate falls 3.11 us after it  (budget 60 us, limit ~160 us)
+#     (2026-10-11_rd_header_latency.py on the saved CH1/CH3 records)
+# step 7: writedisk REF800K.po onto disk 1 (image read from the Mac only)
+[10:52:51] $ a2m.cli writedisk --port /dev/cu.usbmodem114401 --image /Applications/ADTPro-v.r.m/disks/REF800K.po
+#   writedisk cadence (scope 100 ms/div, CH1): one 11.7 ms gate burst every ~0.51-0.65 s
+  TS 0 0 ok
+  TS 0 1 ok
+  TS 1 0 ok
+  TS 1 1 ok
+  TS 2 0 ok
+  TS 2 1 ok
+  TS 3 0 ok
+  TS 3 1 ok
+  TS 4 0 ok
+  TS 4 1 ok
+  TS 5 0 ok
+  TS 5 1 ok
+  TS 6 0 ok
+  TS 6 1 ok
+  TS 7 0 ok
+  TS 7 1 ok
+  TS 8 0 ok
+  TS 8 1 ok
+  TS 9 0 ok
+  TS 9 1 ok
+  TS 10 0 ok
+  TS 10 1 ok
+  TS 11 0 ok
+  TS 11 1 ok
+  TS 12 0 ok
+  TS 12 1 ok
+  TS 13 0 ok
+  TS 13 1 ok
+  TS 14 0 ok
+  TS 14 1 ok
+  TS 15 0 ok
+  TS 15 1 ok
+  TS 16 0 ok
+  TS 16 1 ok
+  TS 17 0 ok
+  TS 17 1 ok
+  TS 18 0 ok
+  TS 18 1 ok
+  TS 19 0 ok
+  TS 19 1 ok
+  TS 20 0 ok
+  TS 20 1 ok
+  TS 21 0 ok
+  TS 21 1 ok
+  TS 22 0 ok
+  TS 22 1 ok
+  TS 23 0 ok
+  TS 23 1 ok
+  TS 24 0 ok
+  TS 24 1 ok
+  TS 25 0 ok
+  TS 25 1 ok
+  TS 26 0 ok
+  TS 26 1 ok
+  TS 27 0 ok
+  TS 27 1 ok
+  TS 28 0 ok
+  TS 28 1 ok
+  TS 29 0 ok
+  TS 29 1 ok
+  TS 30 0 ok
+  TS 30 1 ok
+  TS 31 0 ok
+  TS 31 1 ok
+  TS 32 0 ok
+  TS 32 1 ok
+  TS 33 0 ok
+  TS 33 1 ok
+  TS 34 0 ok
+  TS 34 1 ok
+  TS 35 0 ok
+  TS 35 1 ok
+  TS 36 0 ok
+  TS 36 1 ok
+  TS 37 0 ok
+  TS 37 1 ok
+  TS 38 0 ok
+  TS 38 1 ok
+  TS 39 0 ok
+  TS 39 1 ok
+  TS 40 0 ok
+  TS 40 1 ok
+  TS 41 0 ok
+  TS 41 1 ok
+  TS 42 0 ok
+  TS 42 1 ok
+  TS 43 0 ok
+  TS 43 1 ok
+  TS 44 0 ok
+  TS 44 1 ok
+  TS 45 0 ok
+  TS 45 1 ok
+  TS 46 0 ok
+  TS 46 1 ok
+  TS 47 0 ok
+  TS 47 1 ok
+  TS 48 0 ok
+  TS 48 1 ok
+  TS 49 0 ok
+  TS 49 1 ok
+  TS 50 0 ok
+  TS 50 1 ok
+  TS 51 0 ok
+  TS 51 1 ok
+  TS 52 0 ok
+  TS 52 1 ok
+  TS 53 0 ok
+  TS 53 1 ok
+  TS 54 0 ok
+  TS 54 1 ok
+  TS 55 0 ok
+  TS 55 1 ok
+  TS 56 0 ok
+  TS 56 1 ok
+  TS 57 0 ok
+  TS 57 1 ok
+  TS 58 0 ok
+  TS 58 1 ok
+  TS 59 0 ok
+  TS 59 1 ok
+  TS 60 0 ok
+  TS 60 1 ok
+  TS 61 0 ok
+  TS 61 1 ok
+  TS 62 0 ok
+  TS 62 1 ok
+  TS 63 0 ok
+  TS 63 1 ok
+  TS 64 0 ok
+  TS 64 1 ok
+  TS 65 0 ok
+  TS 65 1 ok
+  TS 66 0 ok
+  TS 66 1 ok
+  TS 67 0 ok
+  TS 67 1 ok
+  TS 68 0 ok
+  TS 68 1 ok
+  TS 69 0 ok
+  TS 69 1 ok
+  TS 70 0 ok
+  TS 70 1 ok
+  TS 71 0 ok
+  TS 71 1 ok
+  TS 72 0 ok
+  TS 72 1 ok
+  TS 73 0 ok
+  TS 73 1 ok
+  TS 74 0 ok
+  TS 74 1 ok
+  TS 75 0 ok
+  TS 75 1 ok
+  TS 76 0 ok
+  TS 76 1 ok
+  TS 77 0 ok
+  TS 77 1 ok
+  TS 78 0 ok
+  TS 78 1 ok
+  TS 79 0 ok
+  TS 79 1 ok
+  writedisk: 1600 blocks in 854.9 s, 0 with soft errors, fire max 5 us
+# step 7 verify: readdisk vs REF800K
+[11:07:15] $ a2m.cli readdisk --port /dev/cu.usbmodem114401 --out ../docs/captures/m5/disk1_after_writedisk.po --compare /Applications/ADTPro-v.r.m/disks/REF800K.po
+  readdisk: 26125 ms, decode 1203 ns/interval (mean), ring backlog max 27 of 8192, 0 failed track sides, 0 with soft errors -> ../docs/captures/m5/disk1_after_writedisk.po
+  compare vs /Applications/ADTPro-v.r.m/disks/REF800K.po: 0 blocks differ []
+[11:11:07] > server off
+  OK
+[11:11:07] > oe on
+  OK
+[11:11:08] > enbl on
+  OK
+[11:11:08] > eject
+  OK
+[11:11:08] > status
+  STATUS DIRTN=0 CSTIN=1 STEP=1 WRPROT=0 MOTORON=1 TK0=1 EJECT=0 TACH=0 RDDATA0=0 RDDATA1=0 SUPERDRIVE=0 REG_B=0 SIDES=1 READY=1 DRVIN=0 REVISED=1
+  OK
+# step 8: disk 2 in Drive A. Board format of track 0 side 0 (scope 20 ms/div)
+[11:11:30] > status
+  STATUS DIRTN=0 CSTIN=0 STEP=1 WRPROT=1 MOTORON=1 TK0=1 EJECT=0 TACH=0 RDDATA0=0 RDDATA1=0 SUPERDRIVE=0 REG_B=0 SIDES=1 READY=1 DRVIN=0 REVISED=1
+  OK
+[11:11:30] > server on
+  OK
+[11:11:30] $ a2m.cli format --port /dev/cu.usbmodem114401 --cyl 0 --side 0
+  FMT 0 0 10 a7
+  format: status a7, 718 ms
+# format 0 0 failed: 10 tries in 718 ms, gate never low. Hypothesis: READY lags after spin-up/recal and the format loop doesn't wait. Test: readblk 0 first (motor up, head settled), then format 0 0
+[11:11:51] > readblk 0
+  BLK 0 00 00
+  0000000000000000000000000138b003
+  4c32a18643c903088a29704a4a4a4a09
+  c08549a0ff844828c8b148d03ab00ea9
+  038d0008e63da54948a95b4860854085
+  48a063b148999409c8c0ebd0f6a206bc
+  1d09bd240999f209bd2b099d7f0aca10
+  eea9098549a986a000c9f9b02f854884
+  60844a844c844e8447c88442c88446a9
+  0c8561854b201209b068e661e661e646
+  a546c90690efad000c0d010cd06da904
+  d002a54a186d230ca8900de64ba54b4a
+  b006c90af055a004844aad0209290fa8
+  b14ad90209d0db8810f629f0c920d03b
+  a010b14ac9ffd033c8b14a8546c8b14a
+  8547a900854aa01e844b8461c8844d20
+  1209b017e661e661a44ee64eb14a8546
+  b14c8547114ad0e74c00204c3f092650
+  524f444f53202020202020202020a560
+  8544a56185456c4800081e243f454776
+  f4d7d1b64bb4aca62b18604cbc09a99f
+  48a9ff48a901a2004c79f42058fca01c
+  b9500999ae058810f74c4d09aaaaaaa0
+  d5cec1c2ccc5a0d4cfa0cccfc1c4a0d0
+  d2cfc4cfd3a0aaaaaaa55329032a052b
+  aabd80c0a92ca211cad0fde901d0f7a6
+  2b60a5462907c9042903080a282a853d
+  a5474aa5466a4a4a85410a8551a54585
+  27a62bbd89c020bc09e627e63de63db0
+  0320bc09bc88c060a5400a8553a90085
+  54a553855038e551f014b004e6539002
+  c65338206d09a55018206f09d0e3a07f
+  8452082838c652f0ce180888f0f5bd8c
+  c010fb000000000000000000
+  OK
+[11:11:52] $ a2m.cli format --port /dev/cu.usbmodem114401 --cyl 0 --side 0
+  FMT 0 0 1 00
+  format: status 00, 321 ms
+# confirmed: format 0 0 OK first try once motor up and head settled. Re-format 0 0 with scope armed
+[11:12:10] > readblk 0
+  BLK 0 00 00
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  00000000000000000000000000000000
+  000000000000000000000000
+  OK
+[11:12:10] $ a2m.cli format --port /dev/cu.usbmodem114401 --cyl 0 --side 0
+  FMT 0 0 1 00
+  format: status 00, 321 ms
+#   format t0s0 gate low 165.95 ms (scope NWID); expected 10156 x 16.34 us = 165.9 ms
+[11:12:23] > server off
+  OK
+[11:12:23] > oe on
+  OK
+[11:12:23] > enbl on
+  OK
+[11:12:24] > motor on
+  OK
+[11:12:24] > recal
+  OK
+[11:12:24] > head 0
+  OK
+[11:12:25] $ a2m.cli capture --port /dev/cu.usbmodem114401 --track 0 --side 0 --count 100000 --out ../docs/captures/m5/2026-10-11_format_t0s0.flux
+  100000 intervals -> ../docs/captures/m5/2026-10-11_format_t0s0.flux
+track 0 side 0: 12/12 sectors good, bad headers 0, bad data 1, misplaced 0
+  good: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+all zero: True sectors [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+[11:12:26] > motor off
+  OK
+# fix committed: mech_seek waits READY after a recal-only seek (test_seek_after_recal_waits_ready)
+# flashed 61d4690
+# Pico power-cycled (XIP flash error), reflash
+[11:18:20] > help
+  help | oe on|off | enbl on|off | status [0-15] | cmd <0-15> | motor on|off
+  recal | seek <0-79> | head <0|1> | eject | tach | settle <us> | capture <t> <s> <n>
+  server on|off | readblk <0-1599> | readdisk
+  writeblk <0-1599> (then 512 raw bytes) | format [<0-79> <0|1>] (any key stops)
+  OK
+# cold test of the READY fix: server on, format 0 0 with no read first
+[11:18:32] > server on
+  OK
+[11:18:33] $ a2m.cli format --port /dev/cu.usbmodem114401 --cyl 0 --side 0
+  FMT 0 0 1 00
+  format: status 00, 556 ms
+# step 8: full format of disk 2
+[11:18:40] $ a2m.cli format --port /dev/cu.usbmodem114401
+  FMT 0 0 1 00
+  FMT 0 1 1 00
+  FMT 1 0 1 00
+  FMT 1 1 1 00
+  FMT 2 0 1 00
+  FMT 2 1 1 00
+  FMT 3 0 1 00
+  FMT 3 1 1 00
+  FMT 4 0 1 00
+  FMT 4 1 1 00
+  FMT 5 0 1 00
+  FMT 5 1 1 00
+  FMT 6 0 1 00
+  FMT 6 1 1 00
+  FMT 7 0 1 00
+  FMT 7 1 1 00
+  FMT 8 0 1 00
+  FMT 8 1 1 00
+  FMT 9 0 1 00
+  FMT 9 1 1 00
+  FMT 10 0 1 00
+  FMT 10 1 1 00
+  FMT 11 0 1 00
+  FMT 11 1 1 00
+  FMT 12 0 1 00
+  FMT 12 1 1 00
+  FMT 13 0 1 00
+  FMT 13 1 1 00
+  FMT 14 0 1 00
+  FMT 14 1 1 00
+  FMT 15 0 1 00
+  FMT 15 1 1 00
+  FMT 16 0 1 00
+  FMT 16 1 1 00
+  FMT 17 0 1 00
+  FMT 17 1 1 00
+  FMT 18 0 1 00
+  FMT 18 1 1 00
+  FMT 19 0 1 00
+  FMT 19 1 1 00
+  FMT 20 0 1 00
+  FMT 20 1 1 00
+  FMT 21 0 1 00
+  FMT 21 1 1 00
+  FMT 22 0 1 00
+  FMT 22 1 1 00
+  FMT 23 0 1 00
+  FMT 23 1 1 00
+  FMT 24 0 1 00
+  FMT 24 1 1 00
+  FMT 25 0 1 00
+  FMT 25 1 1 00
+  FMT 26 0 1 00
+  FMT 26 1 1 00
+  FMT 27 0 1 00
+  FMT 27 1 1 00
+  FMT 28 0 1 00
+  FMT 28 1 1 00
+  FMT 29 0 1 00
+  FMT 29 1 1 00
+  FMT 30 0 1 00
+  FMT 30 1 1 00
+  FMT 31 0 1 00
+  FMT 31 1 1 00
+  FMT 32 0 1 00
+  FMT 32 1 1 00
+  FMT 33 0 1 00
+  FMT 33 1 1 00
+  FMT 34 0 1 00
+  FMT 34 1 1 00
+  FMT 35 0 1 00
+  FMT 35 1 1 00
+  FMT 36 0 1 00
+  FMT 36 1 1 00
+  FMT 37 0 1 00
+  FMT 37 1 1 00
+  FMT 38 0 1 00
+  FMT 38 1 1 00
+  FMT 39 0 1 00
+  FMT 39 1 1 00
+  FMT 40 0 1 00
+  FMT 40 1 1 00
+  FMT 41 0 1 00
+  FMT 41 1 1 00
+  FMT 42 0 1 00
+  FMT 42 1 1 00
+  FMT 43 0 1 00
+  FMT 43 1 1 00
+  FMT 44 0 1 00
+  FMT 44 1 1 00
+  FMT 45 0 1 00
+  FMT 45 1 1 00
+  FMT 46 0 1 00
+  FMT 46 1 1 00
+  FMT 47 0 1 00
+  FMT 47 1 1 00
+  FMT 48 0 1 00
+  FMT 48 1 1 00
+  FMT 49 0 1 00
+  FMT 49 1 1 00
+  FMT 50 0 1 00
+  FMT 50 1 1 00
+  FMT 51 0 1 00
+  FMT 51 1 1 00
+  FMT 52 0 1 00
+  FMT 52 1 1 00
+  FMT 53 0 1 00
+  FMT 53 1 1 00
+  FMT 54 0 1 00
+  FMT 54 1 1 00
+  FMT 55 0 1 00
+  FMT 55 1 1 00
+  FMT 56 0 1 00
+  FMT 56 1 1 00
+  FMT 57 0 1 00
+  FMT 57 1 1 00
+  FMT 58 0 1 00
+  FMT 58 1 1 00
+  FMT 59 0 1 00
+  FMT 59 1 1 00
+  FMT 60 0 1 00
+  FMT 60 1 1 00
+  FMT 61 0 1 00
+  FMT 61 1 1 00
+  FMT 62 0 1 00
+  FMT 62 1 1 00
+  FMT 63 0 1 00
+  FMT 63 1 1 00
+  FMT 64 0 1 00
+  FMT 64 1 1 00
+  FMT 65 0 1 00
+  FMT 65 1 1 00
+  FMT 66 0 1 00
+  FMT 66 1 1 00
+  FMT 67 0 1 00
+  FMT 67 1 1 00
+  FMT 68 0 1 00
+  FMT 68 1 1 00
+  FMT 69 0 1 00
+  FMT 69 1 1 00
+  FMT 70 0 1 00
+  FMT 70 1 1 00
+  FMT 71 0 1 00
+  FMT 71 1 1 00
+  FMT 72 0 1 00
+  FMT 72 1 1 00
+  FMT 73 0 1 00
+  FMT 73 1 1 00
+  FMT 74 0 1 00
+  FMT 74 1 1 00
+  FMT 75 0 1 00
+  FMT 75 1 1 00
+  FMT 76 0 1 00
+  FMT 76 1 1 00
+  FMT 77 0 1 00
+  FMT 77 1 1 00
+  FMT 78 0 1 00
+  FMT 78 1 1 00
+  FMT 79 0 1 00
+  FMT 79 1 1 00
+  format: status 00, 46098 ms
+[11:19:36] $ a2m.cli readdisk --port /dev/cu.usbmodem114401 --out /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/disk2_formatted.po
+  readdisk: 26214 ms, decode 1258 ns/interval (mean), ring backlog max 30 of 8192, 0 failed track sides, 0 with soft errors -> /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/disk2_formatted.po
+disk 2 after board format: all zero = True 819200
+# Rico: the board's format sounds just like a format on the Apple II (same step-and-write rhythm). Log note.
+# step 9: writedisk REF800K.po onto disk 2 (board-formatted)
+[11:21:06] $ a2m.cli writedisk --port /dev/cu.usbmodem114401 --image /Applications/ADTPro-v.r.m/disks/REF800K.po
+  TS 0 0 ok
+  TS 0 1 ok
+  TS 1 0 ok
+  TS 1 1 ok
+  TS 2 0 ok
+  TS 2 1 ok
+  TS 3 0 ok
+  TS 3 1 ok
+  TS 4 0 ok
+  TS 4 1 ok
+  TS 5 0 ok
+  TS 5 1 ok
+  TS 6 0 ok
+  TS 6 1 ok
+  TS 7 0 ok
+  TS 7 1 ok
+  TS 8 0 ok
+  TS 8 1 ok
+  TS 9 0 ok
+  TS 9 1 ok
+  TS 10 0 ok
+  TS 10 1 ok
+  TS 11 0 ok
+  TS 11 1 ok
+  TS 12 0 ok
+  TS 12 1 ok
+  TS 13 0 ok
+  TS 13 1 ok
+  TS 14 0 ok
+  TS 14 1 ok
+  TS 15 0 ok
+  TS 15 1 ok
+  TS 16 0 ok
+  TS 16 1 ok
+  TS 17 0 ok
+  TS 17 1 ok
+  TS 18 0 ok
+  TS 18 1 ok
+  TS 19 0 ok
+  TS 19 1 ok
+  TS 20 0 ok
+  TS 20 1 ok
+  TS 21 0 ok
+  TS 21 1 ok
+  TS 22 0 ok
+  TS 22 1 ok
+  TS 23 0 ok
+  TS 23 1 ok
+  TS 24 0 ok
+  TS 24 1 ok
+  TS 25 0 ok
+  TS 25 1 ok
+  TS 26 0 ok
+  TS 26 1 ok
+  TS 27 0 ok
+  TS 27 1 ok
+  TS 28 0 ok
+  TS 28 1 ok
+  TS 29 0 ok
+  TS 29 1 ok
+  TS 30 0 ok
+  TS 30 1 ok
+  TS 31 0 ok
+  TS 31 1 ok
+  TS 32 0 ok
+  TS 32 1 ok
+  TS 33 0 ok
+  TS 33 1 ok
+  TS 34 0 ok
+  TS 34 1 ok
+  TS 35 0 ok
+  TS 35 1 ok
+  TS 36 0 ok
+  TS 36 1 ok
+  TS 37 0 ok
+  TS 37 1 ok
+  TS 38 0 ok
+  TS 38 1 ok
+  TS 39 0 ok
+  TS 39 1 ok
+  TS 40 0 ok
+  TS 40 1 ok
+  TS 41 0 ok
+  TS 41 1 ok
+  TS 42 0 ok
+  TS 42 1 ok
+  TS 43 0 ok
+  TS 43 1 ok
+  TS 44 0 ok
+  TS 44 1 ok
+  TS 45 0 ok
+  TS 45 1 ok
+  TS 46 0 ok
+  TS 46 1 ok
+  TS 47 0 ok
+  TS 47 1 ok
+  TS 48 0 ok
+  TS 48 1 ok
+  TS 49 0 ok
+  TS 49 1 ok
+  TS 50 0 ok
+  TS 50 1 ok
+  TS 51 0 ok
+  TS 51 1 ok
+  TS 52 0 ok
+  TS 52 1 ok
+  TS 53 0 ok
+  TS 53 1 ok
+  TS 54 0 ok
+  TS 54 1 ok
+  TS 55 0 ok
+  TS 55 1 ok
+  TS 56 0 ok
+  TS 56 1 ok
+  TS 57 0 ok
+  TS 57 1 ok
+  TS 58 0 ok
+  TS 58 1 ok
+  TS 59 0 ok
+  TS 59 1 ok
+  TS 60 0 ok
+  TS 60 1 ok
+  TS 61 0 ok
+  TS 61 1 ok
+  TS 62 0 ok
+  TS 62 1 ok
+  TS 63 0 ok
+  TS 63 1 ok
+  TS 64 0 ok
+  TS 64 1 ok
+  TS 65 0 ok
+  TS 65 1 ok
+  TS 66 0 ok
+  TS 66 1 ok
+  TS 67 0 ok
+  TS 67 1 ok
+  TS 68 0 ok
+  TS 68 1 ok
+  TS 69 0 ok
+  TS 69 1 ok
+  TS 70 0 ok
+  TS 70 1 ok
+  TS 71 0 ok
+  TS 71 1 ok
+  TS 72 0 ok
+  TS 72 1 ok
+  TS 73 0 ok
+  TS 73 1 ok
+  TS 74 0 ok
+  TS 74 1 ok
+  TS 75 0 ok
+  TS 75 1 ok
+  TS 76 0 ok
+  TS 76 1 ok
+  TS 77 0 ok
+  TS 77 1 ok
+  TS 78 0 ok
+  TS 78 1 ok
+  TS 79 0 ok
+  TS 79 1 ok
+  writedisk: 1600 blocks in 852.9 s, 0 with soft errors, fire max 7 us
+[11:35:19] $ a2m.cli readdisk --port /dev/cu.usbmodem114401 --out ../docs/captures/m5/disk2_after_writedisk.po --compare /Applications/ADTPro-v.r.m/disks/REF800K.po
+  readdisk: 25960 ms, decode 1181 ns/interval (mean), ring backlog max 30 of 8192, 0 failed track sides, 0 with soft errors -> ../docs/captures/m5/disk2_after_writedisk.po
+  compare vs /Applications/ADTPro-v.r.m/disks/REF800K.po: 0 blocks differ []
+# step 10: eject disk 2 -> working UniDisk on the IIe
+[11:35:57] > server off
+  OK
+[11:35:57] > oe on
+  OK
+[11:35:58] > enbl on
+  OK
+[11:35:58] > eject
+  OK
+[11:35:58] > status
+  STATUS DIRTN=0 CSTIN=1 STEP=1 WRPROT=0 MOTORON=1 TK0=1 EJECT=0 TACH=0 RDDATA0=0 RDDATA1=0 SUPERDRIVE=0 REG_B=0 SIDES=1 READY=1 DRVIN=0 REVISED=1
+  OK
+# step 10: disk 2 (formatted + written by our board) in the working UniDisk, IIe ProDOS (Bitsy Bye): S5,D1:/REF800K lists DATA0-DATA5 + README -> M5 PASS part 2. Screen: 2026-10-11_iie_disk2_catalog_unidisk.png
