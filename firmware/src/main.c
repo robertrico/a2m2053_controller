@@ -335,6 +335,7 @@ int main(void) {
     ipc_init(&ipc);
     atomic_init(&srv_run, false);
     atomic_init(&srv_running, false);
+    multicore_reset_core1();            // after an SWD flash/reset core 1 may not be in its boot-ROM wait
     multicore_launch_core1(core1_main);
     char line[CON_LINE_MAX];
     for (;;) {
