@@ -4,7 +4,7 @@ OUT    := build
 # Multi-source one-shot compiles keep only the last unit's -MMD deps, so track headers explicitly.
 HDRS   := $(wildcard ../src/*.h *.h)
 
-TESTS  := test_crc32 test_mech test_console test_gcr test_flux_dec test_trackbuf_ipc test_mech_server
+TESTS  := test_crc32 test_mech test_console test_gcr test_flux_dec test_trackbuf_ipc test_mech_server test_wtrack
 
 all: $(addprefix $(OUT)/,$(TESTS))
 	@for t in $(TESTS); do ./$(OUT)/$$t || exit 1; done
@@ -29,6 +29,9 @@ $(OUT)/test_trackbuf_ipc: test_trackbuf_ipc.c ../src/trackbuf.c ../src/ipc.c ../
 	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^)
 
 $(OUT)/test_mech_server: test_mech_server.c ../src/mech_server.c ../src/mech.c ../src/mech_addr.c ../src/flux_dec.c ../src/trackbuf.c ../src/gcr.c $(HDRS) | $(OUT)
+	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^)
+
+$(OUT)/test_wtrack: test_wtrack.c ../src/wtrack.c ../src/gcr.c ../src/flux_dec.c $(HDRS) | $(OUT)
 	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^)
 
 $(OUT):
