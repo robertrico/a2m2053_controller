@@ -1,7 +1,7 @@
 #include "mech_addr.h"
 
 const char *const mech_reg_names[16] = {
-    "DIRTN", "CSTIN", "STEP", "WRPROT", "MOTORON", "TK0", "SWITCHED", "TACH",
+    "DIRTN", "CSTIN", "STEP", "WRPROT", "MOTORON", "TK0", "EJECT", "TACH",
     "RDDATA0", "RDDATA1", "SUPERDRIVE", "REG_B", "SIDES", "READY", "DRVIN", "REVISED",
 };
 
