@@ -11,8 +11,15 @@ Last updated: 2026-10-11, M5 bench done.
 
 ## Open
 
-- bytehamr log for M5: not written yet. No Hackaday draft (Rico does Hackaday log
-  by log, once proven).
+- bytehamr: M5 log "M5: the UniDisk reads a disk my board wrote" written with 3
+  images, Current state and Open problems updated, all committed locally in
+  byte-hamr-labs, **not published**. Also fixed an M1 caption that narrated a
+  tool call ("I asked for the measurement..."). A scan of the whole site for
+  more process/agent language is under way; Rico decides on the fixes, then
+  publish (fetch origin/main first).
+- No Hackaday draft (Rico does Hackaday log by log, once proven).
+- `project_byte_hamr`: three untracked files from 2026-09-14 stashed there as
+  `stash@{0}: dino - wip`.
 
 ## Bench state at shutdown
 
