@@ -28,7 +28,7 @@ $(OUT)/test_flux_dec: test_flux_dec.c ../src/flux_dec.c ../src/gcr.c $(HDRS) | $
 $(OUT)/test_trackbuf_ipc: test_trackbuf_ipc.c ../src/trackbuf.c ../src/ipc.c ../src/gcr.c $(HDRS) | $(OUT)
 	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^)
 
-$(OUT)/test_mech_server: test_mech_server.c ../src/mech_server.c ../src/mech.c ../src/mech_addr.c ../src/flux_dec.c ../src/trackbuf.c ../src/gcr.c $(HDRS) | $(OUT)
+$(OUT)/test_mech_server: test_mech_server.c ../src/mech_server.c ../src/mech.c ../src/mech_addr.c ../src/flux_dec.c ../src/trackbuf.c ../src/wtrack.c ../src/gcr.c $(HDRS) | $(OUT)
 	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^)
 
 $(OUT)/test_wtrack: test_wtrack.c ../src/wtrack.c ../src/gcr.c ../src/flux_dec.c $(HDRS) | $(OUT)

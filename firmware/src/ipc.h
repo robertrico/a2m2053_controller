@@ -8,7 +8,8 @@
 #define ST_SOFT     0xE7   // ok after soft errors (ROM: $E7)
 #define ST_IOERR    0xA7   // SmartPort $27 with the ROM's $80 bit
 #define ST_NODISK   0xAF   // $2F
-#define ST_BADBLK   0xAD   // $2D
+#define ST_BADBLK   0xAD   // $2D (also a bad cyl/side on REQ_FORMAT_TS)
+#define ST_WRPROT   0xAB   // $2B
 
 #define SOFT_RECAL    0x01
 #define SOFT_FOREIGN  0x02
@@ -16,13 +17,20 @@
 #define SOFT_BADADDR  0x08
 #define SOFT_OVERRUN  0x10
 
-typedef enum { REQ_READ } req_op_t;
-typedef struct { req_op_t op; uint16_t block; } req_t;
+typedef enum { REQ_READ, REQ_WRITE, REQ_FORMAT_TS } req_op_t;
+typedef struct {
+    req_op_t op;
+    uint16_t block;                 // REQ_READ / REQ_WRITE; REQ_FORMAT_TS: a tag the reply echoes
+    uint8_t cyl, side;              // REQ_FORMAT_TS
+    uint8_t data[GCR_SECTOR_LEN];   // REQ_WRITE: 12 tag + 512 data
+} req_t;
 typedef struct {
     uint16_t block;
     uint8_t status;
     uint8_t soft;
-    uint8_t data[GCR_SECTOR_LEN];   // 12 tag + 512 data; zeros on error
+    uint8_t tries;                  // REQ_WRITE / REQ_FORMAT_TS: writes used
+    uint16_t fire_us;               // REQ_WRITE: header interval read -> TX fired, last write
+    uint8_t data[GCR_SECTOR_LEN];   // REQ_READ: 12 tag + 512 data; zeros on error
 } reply_t;
 
 #define IPC_REQ_SLOTS   4

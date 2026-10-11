@@ -4,6 +4,8 @@
 // 1.2 x one revolution per speed zone (394/429/472/525/590 rpm).
 static const uint32_t rev_ms[5] = { 183, 168, 153, 138, 123 };
 
+static uint64_t now_us(const mech_server_t *s) { return s->src->now_us(s->src->ctx); }
+
 static void on_sector(void *ctx, int sector, const uint8_t *payload) {
     mech_server_t *s = ctx;
     trackbuf_put(&s->tb, sector, payload);
@@ -23,18 +25,38 @@ static void on_event(void *ctx, flux_ev_t ev, int track, int side, int sector) {
     }
 }
 
-void mech_server_init(mech_server_t *s, const mech_bus_t *bus, const flux_src_t *src) {
+static void on_header(void *ctx, int track, int side, int sector) {
+    mech_server_t *s = ctx;
+    if (s->arm_sector < 0 || s->fired) return;
+    if (track != s->tb.track || side != s->tb.side || sector != s->arm_sector) return;
+    s->tx->fire(s->tx->ctx);                           // first: every us here moves the splice
+    s->fired = true;
+    uint64_t dt = now_us(s) - s->read_us;
+    s->fire_us = dt > 0xFFFFu ? 0xFFFFu : (uint16_t)dt;
+}
+
+static uint16_t all_sectors(int track) { return (uint16_t)((1u << gcr_sectors_per_track(track)) - 1u); }
+
+static bool motor_up(mech_server_t *s) {
+    if (s->motor_on) return true;
+    if (mech_motor(s->bus, &s->ms, true) != MECH_OK) return false;
+    s->motor_on = true;
+    return true;
+}
+
+void mech_server_init(mech_server_t *s, const mech_bus_t *bus, const flux_src_t *src, const flux_tx_t *tx) {
     memset(s, 0, sizeof *s);
     s->bus = bus;
     s->src = src;
+    s->tx = tx;
+    s->arm_sector = -1;
     mech_state_init(&s->ms);
     trackbuf_init(&s->tb);
     s->sink.sector = on_sector;
     s->sink.event = on_event;
+    s->sink.header = on_header;
     s->sink.ctx = s;
 }
-
-static uint64_t now_us(const mech_server_t *s) { return s->src->now_us(s->src->ctx); }
 
 static void motor_off(mech_server_t *s) {
     mech_motor(s->bus, &s->ms, false);
@@ -42,14 +64,16 @@ static void motor_off(mech_server_t *s) {
     trackbuf_invalidate(&s->tb);
 }
 
-// Fill the track buffer for (track, side). Returns true if every sector is present.
-static bool fill(mech_server_t *s, int track, int side, uint64_t t_req) {
+// Read loop on (track, side). Ends true once every sector in `want` is in the track buffer, or,
+// with arm >= 0, once the TX has fired at sector `arm`'s header (one interval per read while armed).
+// Gives up after revs_max revolutions (reads and header search: SRV_REVS_MAX).
+static bool fill(mech_server_t *s, int track, int side, uint64_t t_req, uint16_t want, int arm, int revs_max) {
     s->stats.fills++;
     trackbuf_start(&s->tb, track, side);
-    if (!s->motor_on) {
-        if (mech_motor(s->bus, &s->ms, true) != MECH_OK) return false;
-        s->motor_on = true;
-    }
+    s->arm_sector = arm;
+    s->fired = false;
+    if (!motor_up(s)) return false;
+    int batch = arm >= 0 ? 1 : SRV_BATCH;
     int seeks = 0, revs = 0;
     bool recal_done = false;
     for (;;) {                                         // one pass per (re)seek
@@ -61,7 +85,9 @@ static bool fill(mech_server_t *s, int track, int side, uint64_t t_req) {
         }
         if (mech_seek(s->bus, &s->ms, track) != MECH_OK) { seeks++; s->ms.track_known = false; continue; }
         if (now_us(s) - t_req > (uint64_t)SRV_REQ_TIMEOUT_MS * 1000u) return false;
+        if (arm >= 0 && mech_status(s->bus, &s->ms, MREG_READY)) { seeks++; continue; }   // ERS86 T1
         mech_select_head(s->bus, side);
+        if (arm >= 0) s->bus->delay_us(s->bus->ctx, SRV_SEL_SETTLE_US);                  // ERS86 T6
         s->src->start(s->src->ctx);
         flux_dec_reset(&s->dec, track, side, &s->sink);
         s->foreign_seen = false;
@@ -69,16 +95,18 @@ static bool fill(mech_server_t *s, int track, int side, uint64_t t_req) {
         uint32_t rev_len = rev_ms[track / 16] * 1000u;
         bool reseek = false;
         while (!reseek) {
-            int n = s->src->read(s->src->ctx, s->batch, SRV_BATCH);
+            int n = s->src->read(s->src->ctx, s->batch, batch);
             if (n < 0) { s->soft |= SOFT_OVERRUN; flux_dec_reset(&s->dec, track, side, &s->sink); }
             if (n > 0) {
                 uint64_t d0 = now_us(s);
+                s->read_us = d0;
                 flux_dec_push_many(&s->dec, s->batch, n);
                 uint64_t d1 = now_us(s);
                 s->stats.decode_us += d1 - d0;
                 s->stats.intervals += (uint32_t)n;
             }
-            if (trackbuf_complete(&s->tb)) { s->src->stop(s->src->ctx); return true; }
+            if (s->fired) { s->src->stop(s->src->ctx); return true; }
+            if (want && (s->tb.present & want) == want) { s->src->stop(s->src->ctx); return true; }
             uint64_t now = now_us(s);
             if (now - t_req > (uint64_t)SRV_REQ_TIMEOUT_MS * 1000u) { s->src->stop(s->src->ctx); return false; }
             if (s->foreign_seen) {                     // ROM: resync position to the header, re-seek
@@ -92,7 +120,7 @@ static bool fill(mech_server_t *s, int track, int side, uint64_t t_req) {
             if (now - rev_t >= rev_len) {
                 revs++;
                 rev_t = now;
-                if (revs >= SRV_REVS_MAX) { s->src->stop(s->src->ctx); return false; }
+                if (revs >= revs_max) { s->src->stop(s->src->ctx); return false; }
                 if (revs == SRV_RECAL_AFTER_REVS && !recal_done) {
                     recal_done = true;
                     s->src->stop(s->src->ctx);
@@ -124,7 +152,7 @@ void mech_server_read(mech_server_t *s, uint16_t block, reply_t *r) {
         return;
     }
     s->soft = 0;
-    fill(s, track, side, t_req);
+    fill(s, track, side, t_req, all_sectors(track), -1, SRV_REVS_MAX);
     s->last_us = now_us(s);
     r->soft = s->soft;
     if (trackbuf_has(&s->tb, sector)) {
@@ -140,10 +168,12 @@ void mech_server_idle(mech_server_t *s) {
 }
 
 void mech_server_start(mech_server_t *s) {
+    s->tx->abort(s->tx->ctx);
     motor_off(s);                                      // motor may have been left on outside the server
 }
 
 void mech_server_stop(mech_server_t *s) {
+    s->tx->abort(s->tx->ctx);
     s->src->stop(s->src->ctx);
     motor_off(s);                                      // unconditional: motor_on may be stale
 }

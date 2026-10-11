@@ -26,8 +26,13 @@ static int  hw_src_read(void *c, uint16_t *b, int max) { (void)c; return flux_st
 static uint64_t hw_src_now(void *c) { (void)c; return time_us_64(); }
 static const flux_src_t hw_src = { hw_src_start, hw_src_stop, hw_src_read, hw_src_now, NULL };
 
+static void nop_load(void *c, const uint8_t *b, size_t n) { (void)c; (void)b; (void)n; }
+static void nop_v(void *c) { (void)c; }
+static bool nop_busy(void *c) { (void)c; return false; }
+static const flux_tx_t no_tx = { nop_load, nop_v, nop_busy, nop_v, NULL };
+
 static void core1_main(void) {
-    mech_server_init(&srv, hw_mech_bus(), &hw_src);
+    mech_server_init(&srv, hw_mech_bus(), &hw_src, &no_tx);
     for (;;) {
         if (!atomic_load(&srv_run)) {
             if (atomic_load(&srv_running)) { mech_server_stop(&srv); atomic_store(&srv_running, false); }
@@ -82,7 +87,7 @@ static bool server_set(bool on) {
 }
 
 static bool request(uint16_t block, reply_t *r) {
-    req_t rq = { REQ_READ, block };
+    req_t rq = { .op = REQ_READ, .block = block };
     if (!ipc_req_push(&ipc, &rq)) return false;
     absolute_time_t until = make_timeout_time_ms(SRV_REQ_TIMEOUT_MS + 3000);
     for (;;) {

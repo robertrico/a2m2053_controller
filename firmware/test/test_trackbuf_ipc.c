@@ -25,7 +25,7 @@ static void test_trackbuf(void) {
 static void test_ipc(void) {
     static ipc_t q;
     ipc_init(&q);
-    req_t r = {REQ_READ, 0};
+    req_t r = { .op = REQ_READ, .block = 0 };
     for (int i = 0; i < IPC_REQ_SLOTS; i++) { r.block = (uint16_t)i; CHECK(ipc_req_push(&q, &r)); }
     CHECK(!ipc_req_push(&q, &r));                    // full
     for (int i = 0; i < IPC_REQ_SLOTS; i++) { CHECK(ipc_req_pop(&q, &r)); CHECK(r.block == i); }
@@ -36,6 +36,13 @@ static void test_ipc(void) {
     CHECK(ipc_reply_pop(&q, &b));
     CHECK(b.block == 7 && b.status == 0xE7 && b.soft == 0x01 && b.data[523] == 0x5A);
     CHECK(!ipc_reply_pop(&q, &b));
+    memset(&a, 0, sizeof a); a.block = 0x8007; a.tries = 3; a.fire_us = 1234;
+    CHECK(ipc_reply_push(&q, &a) && ipc_reply_pop(&q, &b));
+    CHECK(b.block == 0x8007 && b.tries == 3 && b.fire_us == 1234);
+    req_t w = { .op = REQ_WRITE, .block = 9 };
+    w.data[0] = 0x11; w.data[523] = 0x22;
+    CHECK(ipc_req_push(&q, &w) && ipc_req_pop(&q, &r));
+    CHECK(r.op == REQ_WRITE && r.block == 9 && r.data[0] == 0x11 && r.data[523] == 0x22);
 }
 
 int main(void) {

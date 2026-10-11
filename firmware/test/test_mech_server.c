@@ -5,13 +5,15 @@
 static fake_drive_t D;
 static mech_bus_t B;
 static flux_src_t S;
+static flux_tx_t T;
 static mech_server_t SRV;
 
 static void setup(void) {
     fake_drive_init(&D);
     B = fake_drive_bus(&D);
     S = fake_flux_src(&D);
-    mech_server_init(&SRV, &B, &S);
+    T = fake_flux_tx(&D);
+    mech_server_init(&SRV, &B, &S, &T);
 }
 
 static bool data_ok(const reply_t *r) {
@@ -210,6 +212,14 @@ static void test_stop(void) {
     CHECK(!D.motor);
 }
 
+static void test_reads_never_touch_tx(void) {
+    setup();
+    reply_t r;
+    mech_server_read(&SRV, 0, &r);
+    mech_server_read(&SRV, 1599, &r);
+    CHECK(r.status == ST_OK && D.tx_loads == 0 && D.tx_fires == 0 && !D.gate_low);
+}
+
 int main(void) {
     test_miss_then_hit();
     test_no_disk();
@@ -230,5 +240,6 @@ int main(void) {
     test_idle_off_invalidates();
     test_no_disk_invalidates();
     test_stop();
+    test_reads_never_touch_tx();
     TEST_END();
 }
