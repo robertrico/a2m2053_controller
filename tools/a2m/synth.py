@@ -32,3 +32,27 @@ def track_bits(track: int, side: int, payloads: dict[int, bytes], interleave: in
             gcr.encode_data(s, payloads[s], group_order, checksum_order))
     bits += SYNC * gap_syncs
     return bits
+
+
+# Drive ROM layout (liron.asm write_trk_actual / Se3b9 / write_data_actual).
+SYNC_PACKED = bytes([0xFF, 0x3F, 0xCF, 0xF3, 0xFC])   # four 10-bit sync groups, byte-packed for the IWM
+ROM_PREAMBLE = SYNC_PACKED * 200                        # 1000 bytes at the start of a format write
+ROM_GAP = SYNC_PACKED * 7                               # 35 bytes before each header
+
+
+def rom_data_field(sector: int, payload: bytes) -> bytes:
+    """What the ROM writes for one sector's data (716 bytes), from just after the header's pad byte."""
+    return SYNC_PACKED + b"\xff" + gcr.encode_data(sector, payload) + b"\xff"
+
+
+def rom_sector(track: int, side: int, sector: int, payload: bytes) -> bytes:
+    """One formatted sector (763 bytes)."""
+    return ROM_GAP + b"\xff" + gcr.encode_address(track, sector, side) + b"\xff" + rom_data_field(sector, payload)
+
+
+def rom_track_bytes(track: int, side: int, payloads: dict | None = None, interleave: int = 4) -> bytes:
+    """A whole format write for one track side; payloads default to 524 zero bytes."""
+    out = bytearray(ROM_PREAMBLE)
+    for s in physical_order(gcr.sectors_per_track(track), interleave):
+        out += rom_sector(track, side, s, payloads[s] if payloads else bytes(gcr.SECTOR_LEN))
+    return bytes(out)

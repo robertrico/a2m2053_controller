@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Generate firmware/test/fixtures from the Python decoder's synthetic tracks and REF800K.
 
-Usage (from tools/): .venv/bin/python mkfixtures.py /Applications/ADTPro-v.r.m/disks/REF800K.po
+Usage (from tools/):
+  .venv/bin/python mkfixtures.py /Applications/ADTPro-v.r.m/disks/REF800K.po
+  .venv/bin/python mkfixtures.py --rom-only   (M5 fixtures only, no REF800K needed)
 """
 import hashlib
 import random
@@ -44,7 +46,21 @@ def corrupt_track_bits(trk, side, payloads):
     return bits, order[0]
 
 
+def write_rom_fixtures():
+    """M5: the drive ROM's byte images, for firmware/test/test_wtrack.c."""
+    OUT.mkdir(parents=True, exist_ok=True)
+    (OUT / "rom_track_t17s1.bin").write_bytes(synth.rom_track_bytes(17, 1))
+    (OUT / "rom_track_t70s0.bin").write_bytes(synth.rom_track_bytes(70, 0))
+    p = payloads_for(17, 1)[5]
+    (OUT / "rom_dfield_s5.pay").write_bytes(p)
+    (OUT / "rom_dfield_s5.bin").write_bytes(synth.rom_data_field(5, p))
+
+
 def main():
+    if sys.argv[1:] == ["--rom-only"]:
+        write_rom_fixtures()
+        print(f"rom fixtures -> {OUT}")
+        return
     ref = Path(sys.argv[1]).read_bytes()
     if hashlib.sha256(ref).hexdigest() != REF_SHA256:
         sys.exit("REF800K hash mismatch")
@@ -74,6 +90,7 @@ def main():
             b = gcr.block_number(t, s, sec)
             blocks += ref[b * 512:(b + 1) * 512]
     (OUT / "real_expected.bin").write_bytes(bytes(blocks))
+    write_rom_fixtures()
     print(f"fixtures -> {OUT}")
 
 
