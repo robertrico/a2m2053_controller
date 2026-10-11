@@ -3,6 +3,7 @@ build/
 *.uf2
 *.elf
 *.bin
+!firmware/test/fixtures/*.bin
 __pycache__/
 .venv/
 
