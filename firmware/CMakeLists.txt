@@ -7,7 +7,7 @@ pico_sdk_init()
 
 add_executable(a2m_bringup
     src/main.c src/hw.c src/crc32.c src/mech.c src/mech_addr.c src/console.c src/flux.c
-    src/gcr.c src/flux_dec.c src/trackbuf.c src/ipc.c src/mech_server.c)
+    src/gcr.c src/flux_dec.c src/trackbuf.c src/ipc.c src/mech_server.c src/wtrack.c)
 pico_generate_pio_header(a2m_bringup ${CMAKE_CURRENT_LIST_DIR}/src/flux_rx.pio)
 target_include_directories(a2m_bringup PRIVATE src)
 target_compile_options(a2m_bringup PRIVATE -Wall -Wextra)

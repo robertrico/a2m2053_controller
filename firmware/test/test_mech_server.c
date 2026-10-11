@@ -220,6 +220,115 @@ static void test_reads_never_touch_tx(void) {
     CHECK(r.status == ST_OK && D.tx_loads == 0 && D.tx_fires == 0 && !D.gate_low);
 }
 
+static void pattern(uint8_t *p, int seed) { for (int i = 0; i < GCR_SECTOR_LEN; i++) p[i] = (uint8_t)(i * 13 + seed); }
+
+static void test_write_then_read_not_stale(void) {
+    setup();
+    reply_t r;
+    uint8_t p[GCR_SECTOR_LEN];
+    pattern(p, 1);
+    mech_server_read(&SRV, 30, &r);                  // t1 s0 sector 6: cached now
+    CHECK(r.status == ST_OK && data_ok(&r));
+    mech_server_write(&SRV, 30, p, &r);
+    CHECK(r.status == ST_OK && r.block == 30 && r.tries == 1 && r.soft == 0);
+    CHECK(D.tx_fires == 1 && !D.gate_low && D.addr_while_writing == 0);
+    CHECK(r.fire_us < 100);
+    mech_server_read(&SRV, 30, &r);
+    CHECK(r.status == ST_OK && memcmp(r.data, p, GCR_SECTOR_LEN) == 0);
+    mech_server_read(&SRV, 31, &r);                  // neighbour untouched
+    CHECK(r.status == ST_OK && data_ok(&r));
+    mech_server_read(&SRV, 29, &r);
+    CHECK(r.status == ST_OK && data_ok(&r));
+}
+
+static void test_write_protected(void) {
+    setup();
+    D.wprot = true;
+    reply_t r;
+    uint8_t p[GCR_SECTOR_LEN] = {0};
+    mech_server_write(&SRV, 30, p, &r);
+    CHECK(r.status == ST_WRPROT && D.tx_fires == 0 && D.step_strobes == 0 && !D.motor);
+}
+
+static void test_write_no_disk_and_range(void) {
+    setup();
+    reply_t r;
+    uint8_t p[GCR_SECTOR_LEN] = {0};
+    mech_server_write(&SRV, 1600, p, &r);
+    CHECK(r.status == ST_BADBLK && D.tx_fires == 0);
+    D.disk_in = false;
+    mech_server_write(&SRV, 30, p, &r);
+    CHECK(r.status == ST_NODISK && D.tx_fires == 0 && D.step_strobes == 0);
+}
+
+static void test_write_retry_after_bad_verify(void) {
+    setup();
+    D.corrupt_writes = 1;
+    reply_t r;
+    uint8_t p[GCR_SECTOR_LEN];
+    pattern(p, 2);
+    mech_server_write(&SRV, 100, p, &r);
+    CHECK(r.status == ST_SOFT && (r.soft & SOFT_BADDATA) && r.tries == 2 && D.tx_fires == 2);
+    mech_server_read(&SRV, 100, &r);
+    CHECK(r.status == ST_OK && memcmp(r.data, p, GCR_SECTOR_LEN) == 0);
+}
+
+static void test_write_gives_up(void) {
+    setup();
+    D.corrupt_writes = 100;
+    reply_t r;
+    uint8_t p[GCR_SECTOR_LEN];
+    pattern(p, 3);
+    mech_server_write(&SRV, 100, p, &r);
+    CHECK(r.status == ST_IOERR && r.tries == SRV_WRITE_TRIES && D.tx_fires == SRV_WRITE_TRIES);
+    CHECK(!SRV.tb.valid && !D.gate_low);
+}
+
+static void test_write_header_missing(void) {
+    setup();
+    D.no_flux = true;
+    reply_t r;
+    uint8_t p[GCR_SECTOR_LEN] = {0};
+    uint64_t t0 = D.now_us;
+    mech_server_write(&SRV, 30, p, &r);
+    CHECK(r.status == ST_IOERR && D.tx_fires == 0 && D.tx_aborts >= 1 && !D.gate_low);
+    CHECK(D.now_us - t0 <= (uint64_t)SRV_REQ_TIMEOUT_MS * 1000u + 200000u);
+}
+
+static void test_write_tx_hang(void) {
+    setup();
+    D.tx_hang = true;
+    reply_t r;
+    uint8_t p[GCR_SECTOR_LEN] = {0};
+    mech_server_write(&SRV, 30, p, &r);
+    CHECK(r.status == ST_IOERR && D.tx_fires == 1 && !D.gate_low && r.tries == 1);
+}
+
+static void test_write_late_fire(void) {
+    setup();
+    D.fire_delay_us = 40;                            // well inside the gap: fine
+    reply_t r;
+    uint8_t p[GCR_SECTOR_LEN];
+    pattern(p, 4);
+    mech_server_write(&SRV, 30, p, &r);
+    CHECK(r.status == ST_OK);
+    setup();
+    D.fire_delay_us = 300;                           // past the old data mark: never verifies
+    mech_server_write(&SRV, 30, p, &r);
+    CHECK(r.status == ST_IOERR && r.tries == SRV_WRITE_TRIES);
+}
+
+static void test_write_ignores_bad_neighbour(void) {
+    setup();
+    D.bad_sector = 7; D.bad_revs = 1000;             // t1 s0 sector 7 never reads
+    reply_t r;
+    uint8_t p[GCR_SECTOR_LEN];
+    pattern(p, 5);
+    uint64_t t0 = D.now_us;
+    mech_server_write(&SRV, 30, p, &r);              // sector 6 of the same track side
+    CHECK(r.status == ST_OK && D.now_us - t0 < 1500000u);
+}
+
 int main(void) {
     test_miss_then_hit();
     test_no_disk();
@@ -241,5 +350,14 @@ int main(void) {
     test_no_disk_invalidates();
     test_stop();
     test_reads_never_touch_tx();
+    test_write_then_read_not_stale();
+    test_write_protected();
+    test_write_no_disk_and_range();
+    test_write_retry_after_bad_verify();
+    test_write_gives_up();
+    test_write_header_missing();
+    test_write_tx_hang();
+    test_write_late_fire();
+    test_write_ignores_bad_neighbour();
     TEST_END();
 }

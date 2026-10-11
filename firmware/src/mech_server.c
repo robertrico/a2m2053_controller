@@ -134,6 +134,56 @@ static bool fill(mech_server_t *s, int track, int side, uint64_t t_req, uint16_t
     }
 }
 
+// After fire: wait for the PIO to raise the gate (or abort at the cap), then the erase tail.
+static bool tx_finish(mech_server_t *s, size_t len) {
+    uint64_t t0 = now_us(s);
+    while (s->tx->busy(s->tx->ctx)) {
+        if (now_us(s) - t0 > SRV_TX_CAP_US(len)) { s->tx->abort(s->tx->ctx); return false; }
+        s->bus->delay_us(s->bus->ctx, SRV_TX_POLL_US);
+    }
+    s->tx->abort(s->tx->ctx);                          // pins back to SIO, gate high
+    s->bus->delay_us(s->bus->ctx, SRV_ERASE_TAIL_US);  // ERS86 T7 erase tail; RD valid after
+    return true;
+}
+
+void mech_server_write(mech_server_t *s, uint16_t block, const uint8_t data[GCR_SECTOR_LEN], reply_t *r) {
+    memset(r, 0, sizeof *r);
+    r->block = block;
+    int track, side, sector;
+    if (mech_status(s->bus, &s->ms, MREG_CSTIN)) {     // CSTIN high = no disk
+        trackbuf_invalidate(&s->tb);
+        r->status = ST_NODISK;
+        return;
+    }
+    if (!gcr_block_to_tss(block, &track, &side, &sector)) { r->status = ST_BADBLK; return; }
+    if (!mech_status(s->bus, &s->ms, MREG_WRPROT)) { r->status = ST_WRPROT; return; }   // WRPROT low = protected
+    wtrack_data_field(s->wbuf, sector, data);          // encode before the search, as the ROM
+    uint64_t t_req = now_us(s);
+    s->soft = 0;
+    bool ok = false;
+    for (int w = 0; w < SRV_WRITE_TRIES && !ok; w++) {
+        r->tries = (uint8_t)(w + 1);
+        s->tx->load(s->tx->ctx, s->wbuf, WT_DATA_FIELD_LEN);
+        if (!fill(s, track, side, t_req, 0, sector, SRV_REVS_MAX)) { s->tx->abort(s->tx->ctx); break; }   // header never seen
+        r->fire_us = s->fire_us;
+        if (!tx_finish(s, WT_DATA_FIELD_LEN)) break;   // TX stuck: aborted, gate high
+        uint16_t want = (uint16_t)(1u << sector);
+        if (fill(s, track, side, t_req, want, -1, SRV_VERIFY_REVS) && memcmp(trackbuf_get(&s->tb, sector), data, GCR_SECTOR_LEN) == 0)
+            ok = true;
+        else
+            s->soft |= SOFT_BADDATA;
+    }
+    s->arm_sector = -1;
+    s->last_us = now_us(s);
+    r->soft = s->soft;
+    if (ok) {
+        r->status = s->soft ? ST_SOFT : ST_OK;
+    } else {
+        trackbuf_invalidate(&s->tb);
+        r->status = ST_IOERR;
+    }
+}
+
 void mech_server_read(mech_server_t *s, uint16_t block, reply_t *r) {
     memset(r, 0, sizeof *r);
     r->block = block;
