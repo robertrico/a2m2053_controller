@@ -28,6 +28,7 @@ static void test_miss_then_hit(void) {
     mech_server_read(&SRV, 0, &r);
     CHECK(r.status == ST_OK && r.soft == 0 && r.block == 0 && data_ok(&r));
     CHECK(D.pos == 0);
+    CHECK(mech_server_stats(&SRV)->intervals > 0);
     int strobes = D.step_strobes;
     mech_server_read(&SRV, 5, &r);                   // same track side: served from the buffer
     CHECK(r.status == ST_OK && data_ok(&r));
@@ -88,6 +89,22 @@ static void test_foreign_forever_fails(void) {
     mech_server_read(&SRV, 0, &r);
     CHECK(r.status == ST_IOERR && (r.soft & SOFT_FOREIGN) && (r.soft & SOFT_RECAL));
     CHECK(D.starts == 4);
+}
+
+static void test_foreign_impossible_track(void) {
+    setup();
+    D.foreign_always = 100;
+    reply_t r;
+    mech_server_read(&SRV, 0, &r);
+    CHECK(r.status == ST_IOERR && r.status == 0xA7 && (r.soft & SOFT_BADADDR));
+    CHECK(D.pos <= 79 && D.pos == 0);                // never resynced to or stepped toward track 100
+}
+
+static void test_start_turns_motor_off(void) {
+    setup();
+    D.motor = true;                                  // left on outside the server
+    mech_server_start(&SRV);
+    CHECK(!D.motor);
 }
 
 static void test_no_flux_times_out(void) {
@@ -188,6 +205,9 @@ static void test_stop(void) {
     mech_server_read(&SRV, 0, &r);
     mech_server_stop(&SRV);
     CHECK(!D.motor && !D.streaming);
+    D.motor = true;                                  // stale motor_on: stop still sends MOTOR_OFF
+    mech_server_stop(&SRV);
+    CHECK(!D.motor);
 }
 
 int main(void) {
@@ -198,6 +218,8 @@ int main(void) {
     test_budget_exhausted();
     test_wrong_track_reseeks();
     test_foreign_forever_fails();
+    test_foreign_impossible_track();
+    test_start_turns_motor_off();
     test_no_flux_times_out();
     test_overrun_recovers();
     test_persistent_overrun_times_out();

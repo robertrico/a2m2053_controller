@@ -26,8 +26,8 @@ typedef struct {
 } flux_src_t;
 
 typedef struct {
-    uint32_t intervals;
-    uint32_t worst_ns_per_interval;   // worst full batch of decode time / intervals
+    uint64_t decode_us;     // time spent in flux_dec_push_many, all batches
+    uint32_t intervals;     // intervals decoded
     uint32_t fills;
 } srv_stats_t;
 
@@ -50,5 +50,6 @@ typedef struct {
 void mech_server_init(mech_server_t *s, const mech_bus_t *bus, const flux_src_t *src);
 void mech_server_read(mech_server_t *s, uint16_t block, reply_t *r);
 void mech_server_idle(mech_server_t *s);
+void mech_server_start(mech_server_t *s);   // stopped -> running: motor off, buffer dropped
 void mech_server_stop(mech_server_t *s);
 const srv_stats_t *mech_server_stats(const mech_server_t *s);

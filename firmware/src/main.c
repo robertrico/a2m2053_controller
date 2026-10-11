@@ -34,7 +34,7 @@ static void core1_main(void) {
             sleep_ms(1);
             continue;
         }
-        atomic_store(&srv_running, true);
+        if (!atomic_load(&srv_running)) { mech_server_start(&srv); atomic_store(&srv_running, true); }
         req_t rq;
         if (ipc_req_pop(&ipc, &rq)) {
             static reply_t rp;
@@ -113,6 +113,9 @@ static void do_readdisk(void) {
     static reply_t r;
     uint64_t t0 = time_us_64();
     if (srv_wedged) { puts("ERR server wedged (server off, then on)"); return; }
+    uint64_t dec0 = mech_server_stats(&srv)->decode_us;
+    uint32_t iv0 = mech_server_stats(&srv)->intervals;
+    flux_stream_backlog_reset();
     printf("DISK BEGIN %d\n", GCR_BLOCKS);
     for (int t = 0; t < GCR_TRACKS; t++) {
         for (int s = 0; s < GCR_SIDES; s++) {
@@ -132,8 +135,11 @@ static void do_readdisk(void) {
             printf("\nTS END %08lx\n", (unsigned long)crc32_update(0, ts, (size_t)nsect * GCR_DATA_LEN));
         }
     }
-    printf("DISK END %lu %lu\n", (unsigned long)mech_server_stats(&srv)->worst_ns_per_interval,
-           (unsigned long)((time_us_64() - t0) / 1000u));
+    // Core 1 stats are read only after the last reply was popped (queue acquire orders them).
+    uint64_t dec_us = mech_server_stats(&srv)->decode_us - dec0;
+    uint32_t ivs = mech_server_stats(&srv)->intervals - iv0;
+    printf("DISK END %lu %lu %lu\n", (unsigned long)(ivs ? dec_us * 1000u / ivs : 0),
+           (unsigned long)flux_stream_backlog_max(), (unsigned long)((time_us_64() - t0) / 1000u));
     puts("OK");
 }
 
@@ -205,7 +211,14 @@ static void execute(const con_cmd_t *c) {
     bool mech_cmd = c->op == CON_OE || c->op == CON_ENBL || c->op == CON_STATUS || c->op == CON_CMD ||
                     c->op == CON_MOTOR || c->op == CON_RECAL || c->op == CON_SEEK || c->op == CON_HEAD ||
                     c->op == CON_EJECT || c->op == CON_TACH || c->op == CON_CAPTURE || c->op == CON_SETTLE;
-    if (mech_cmd && (atomic_load(&srv_run) || atomic_load(&srv_running))) { puts("ERR server on"); return; }
+    if (mech_cmd && (atomic_load(&srv_run) || atomic_load(&srv_running))) {
+        if (c->op == CON_OE && !c->arg[0]) {            // kill switch: stop the server, then the usual oe off
+            if (!server_set(false)) { puts("ERR server did not stop"); return; }
+        } else {
+            puts("ERR server on");
+            return;
+        }
+    }
     const mech_bus_t *b = hw_mech_bus();
     switch (c->op) {
     case CON_SERVER:

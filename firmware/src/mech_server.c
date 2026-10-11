@@ -17,6 +17,7 @@ static void on_event(void *ctx, flux_ev_t ev, int track, int side, int sector) {
     case FLUX_EV_NO_DATA:  case FLUX_EV_BAD_DATA: s->soft |= SOFT_BADDATA; break;
     case FLUX_EV_FOREIGN:
         s->soft |= SOFT_FOREIGN;
+        if (track >= GCR_TRACKS) { s->soft |= SOFT_BADADDR; break; }   // impossible track: never resync to it
         if (track != s->tb.track) { s->foreign_seen = true; s->foreign_track = track; }
         break;
     }
@@ -74,11 +75,8 @@ static bool fill(mech_server_t *s, int track, int side, uint64_t t_req) {
                 uint64_t d0 = now_us(s);
                 flux_dec_push_many(&s->dec, s->batch, n);
                 uint64_t d1 = now_us(s);
+                s->stats.decode_us += d1 - d0;
                 s->stats.intervals += (uint32_t)n;
-                if (n == SRV_BATCH) {
-                    uint32_t ns = (uint32_t)((d1 - d0) * 1000u / (uint64_t)n);
-                    if (ns > s->stats.worst_ns_per_interval) s->stats.worst_ns_per_interval = ns;
-                }
             }
             if (trackbuf_complete(&s->tb)) { s->src->stop(s->src->ctx); return true; }
             uint64_t now = now_us(s);
@@ -141,10 +139,13 @@ void mech_server_idle(mech_server_t *s) {
     if (s->motor_on && now_us(s) - s->last_us > (uint64_t)SRV_IDLE_OFF_MS * 1000u) motor_off(s);
 }
 
+void mech_server_start(mech_server_t *s) {
+    motor_off(s);                                      // motor may have been left on outside the server
+}
+
 void mech_server_stop(mech_server_t *s) {
     s->src->stop(s->src->ctx);
-    if (s->motor_on) motor_off(s);
-    trackbuf_invalidate(&s->tb);
+    motor_off(s);                                      // unconditional: motor_on may be stale
 }
 
 const srv_stats_t *mech_server_stats(const mech_server_t *s) { return &s->stats; }

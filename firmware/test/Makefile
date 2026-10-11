@@ -1,6 +1,8 @@
 CC     ?= cc
 CFLAGS := -std=c11 -Wall -Wextra -Werror -I../src -Ibuild
 OUT    := build
+# Multi-source one-shot compiles keep only the last unit's -MMD deps, so track headers explicitly.
+HDRS   := $(wildcard ../src/*.h *.h)
 
 TESTS  := test_crc32 test_mech test_console test_gcr test_flux_dec test_trackbuf_ipc test_mech_server
 
@@ -8,26 +10,26 @@ all: $(addprefix $(OUT)/,$(TESTS))
 	@for t in $(TESTS); do ./$(OUT)/$$t || exit 1; done
 	@sh ./check_wrtgate.sh
 
-$(OUT)/test_crc32: test_crc32.c ../src/crc32.c | $(OUT)
-	$(CC) $(CFLAGS) -o $@ $^
+$(OUT)/test_crc32: test_crc32.c ../src/crc32.c $(HDRS) | $(OUT)
+	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^)
 
-$(OUT)/test_mech: test_mech.c ../src/mech.c ../src/mech_addr.c | $(OUT)
-	$(CC) $(CFLAGS) -o $@ $^
+$(OUT)/test_mech: test_mech.c ../src/mech.c ../src/mech_addr.c $(HDRS) | $(OUT)
+	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^)
 
-$(OUT)/test_console: test_console.c ../src/console.c | $(OUT)
-	$(CC) $(CFLAGS) -o $@ $^
+$(OUT)/test_console: test_console.c ../src/console.c $(HDRS) | $(OUT)
+	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^)
 
-$(OUT)/test_gcr: test_gcr.c ../src/gcr.c | $(OUT)
-	$(CC) $(CFLAGS) -o $@ $^
+$(OUT)/test_gcr: test_gcr.c ../src/gcr.c $(HDRS) | $(OUT)
+	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^)
 
-$(OUT)/test_flux_dec: test_flux_dec.c ../src/flux_dec.c ../src/gcr.c | $(OUT)
-	$(CC) $(CFLAGS) -o $@ $^
+$(OUT)/test_flux_dec: test_flux_dec.c ../src/flux_dec.c ../src/gcr.c $(HDRS) | $(OUT)
+	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^)
 
-$(OUT)/test_trackbuf_ipc: test_trackbuf_ipc.c ../src/trackbuf.c ../src/ipc.c ../src/gcr.c | $(OUT)
-	$(CC) $(CFLAGS) -o $@ $^
+$(OUT)/test_trackbuf_ipc: test_trackbuf_ipc.c ../src/trackbuf.c ../src/ipc.c ../src/gcr.c $(HDRS) | $(OUT)
+	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^)
 
-$(OUT)/test_mech_server: test_mech_server.c ../src/mech_server.c ../src/mech.c ../src/mech_addr.c ../src/flux_dec.c ../src/trackbuf.c ../src/gcr.c | $(OUT)
-	$(CC) $(CFLAGS) -o $@ $^
+$(OUT)/test_mech_server: test_mech_server.c ../src/mech_server.c ../src/mech.c ../src/mech_addr.c ../src/flux_dec.c ../src/trackbuf.c ../src/gcr.c $(HDRS) | $(OUT)
+	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^)
 
 $(OUT):
 	mkdir -p $(OUT)

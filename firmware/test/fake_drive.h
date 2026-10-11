@@ -107,7 +107,7 @@ static void fd_build(fake_drive_t *d) {
         int sec = (k * stride) % spt;              // fixed interleave; must visit every sector
         uint8_t a[GCR_ADDR_FIELD_LEN], p[GCR_SECTOR_LEN], f[GCR_DATA_FIELD_LEN];
         for (int i = 0; i < GCR_SECTOR_LEN; i++) p[i] = fd_payload_byte(hdr_t, d->side, sec, i);   // content belongs to the track the header claims
-        gcr_encode_address(hdr_t < 0 ? 0 : (hdr_t > 79 ? 79 : hdr_t), sec, d->side, a);
+        gcr_encode_address(hdr_t < 0 ? 0 : (hdr_t > 127 ? 127 : hdr_t), sec, d->side, a);
         gcr_encode_data(sec, p, f);
         if (sec == d->bad_sector && d->revs < d->bad_revs) f[60] = gcr_nibbles[(gcr_decode6(f[60]) + 1) % 64];
         for (int i = 0; i < 6; i++) fd_sync(d, &run, cell);
