@@ -55,3 +55,24 @@ class Console:
                             buf += self.ser.read(64)
                         return buf
         raise ConsoleError(f"capture {track} {side} timed out")
+
+    def readblk(self, block: int, timeout: float = 10.0) -> list[str]:
+        return self.cmd(f"readblk {block}", timeout=timeout)
+
+    def readdisk(self, timeout: float = 900.0) -> bytes:
+        self.ser.reset_input_buffer()
+        self.ser.write(b"readdisk\n")
+        deadline = time.monotonic() + timeout
+        buf = b""
+        while time.monotonic() < deadline:
+            buf += self.ser.read(65536)
+            if b"DISK BEGIN" not in buf:
+                for raw in buf.split(b"\n")[:-1]:
+                    if raw.strip().startswith(b"ERR"):
+                        raise ConsoleError(raw.decode(errors="replace").strip())
+            elif re.search(rb"DISK END \d+ \d+\r?\n", buf):
+                tail_deadline = time.monotonic() + 1.0
+                while not re.search(rb"\nOK\r?\n", buf[-16:]) and time.monotonic() < tail_deadline:
+                    buf += self.ser.read(64)
+                return buf
+        raise ConsoleError("readdisk timed out")

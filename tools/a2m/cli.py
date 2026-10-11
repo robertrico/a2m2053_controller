@@ -6,7 +6,7 @@ from pathlib import Path
 
 from . import gcr
 from .flux import intervals_to_bits, bits_to_nibbles, histogram_lines
-from .proto import parse_capture, CaptureError
+from .proto import parse_capture, CaptureError, parse_disk, parse_blk
 from .track import decode_track, TrackResult
 
 
@@ -110,6 +110,12 @@ def main(argv=None) -> int:
     k.add_argument("--port", required=True); k.add_argument("--out", required=True)
     k.add_argument("--compare"); k.add_argument("--count", type=int, default=100000)
     k.add_argument("--retries", type=int, default=3)
+    r = sub.add_parser("readdisk", help="read the whole disk on the board (M4)")
+    r.add_argument("--port", required=True); r.add_argument("--out", required=True)
+    r.add_argument("--compare")
+    b = sub.add_parser("readblk", help="read one block on the board (M4)")
+    b.add_argument("--port", required=True); b.add_argument("--block", type=int, required=True)
+    b.add_argument("--compare")
     args = ap.parse_args(argv)
 
     if args.cmd == "hist":
@@ -132,6 +138,35 @@ def main(argv=None) -> int:
         Path(args.out).write_bytes(raw)
         ivs, _ = parse_capture(raw)
         print(f"{len(ivs)} intervals -> {args.out}")
+        return 0
+    if args.cmd == "readdisk":
+        from .serialio import Console
+        con = Console(args.port)
+        img, tracks, worst, ms = parse_disk(con.readdisk())
+        Path(args.out).write_bytes(img)
+        bad = [(t, s, st) for (t, s, st, _) in tracks if st not in (0x00, 0xE7)]
+        soft = [(t, s) for (t, s, st, _) in tracks if st == 0xE7]
+        print(f"readdisk: {ms} ms, worst decode {worst} ns/interval, "
+              f"{len(bad)} failed track sides, {len(soft)} with soft errors -> {args.out}")
+        if bad:
+            print("failed:", bad[:20])
+        ok = not bad
+        if args.compare:
+            ref = Path(args.compare).read_bytes()
+            diff = [k for k in range(gcr.TOTAL_BLOCKS) if img[k * 512:(k + 1) * 512] != ref[k * 512:(k + 1) * 512]]
+            print(f"compare vs {args.compare}: {len(diff)} blocks differ", diff[:40])
+            ok = ok and not diff
+        return 0 if ok else 1
+    if args.cmd == "readblk":
+        from .serialio import Console
+        con = Console(args.port)
+        block, status, soft, data = parse_blk(con.readblk(args.block))
+        print(f"block {block}: status {status:02x} soft {soft:02x}")
+        if args.compare:
+            ref = Path(args.compare).read_bytes()
+            same = data[gcr.TAG_LEN:] == ref[block * 512:(block + 1) * 512]
+            print("matches reference" if same else "DIFFERS from reference")
+            return 0 if same else 1
         return 0
     return _disk(args)
 

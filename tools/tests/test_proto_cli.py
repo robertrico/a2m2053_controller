@@ -161,3 +161,54 @@ def test_disk_cleanup_on_error(tmp_path):
     assert "oe off" in commands
     # Verify they are the last three commands (in order)
     assert commands[-3:] == ["motor off", "enbl off", "oe off"]
+
+
+from a2m import proto as _proto
+
+
+def make_disk(image: bytes, bad_crc_at=None, cut=0, fail=()):
+    out = b"junk\r\nDISK BEGIN 1600\r\n"
+    for t in range(80):
+        for s in range(2):
+            n = gcr.sectors_per_track(t)
+            b0 = gcr.block_number(t, s, 0)
+            payload = image[b0 * 512:(b0 + n) * 512]
+            status = 0xA7 if (t, s) in fail else 0x00
+            crc = zlib.crc32(payload)
+            if bad_crc_at == (t, s):
+                crc ^= 1
+            out += b"TS %d %d %d %02x %02x\r\n" % (t, s, n, status, 0) + payload + b"\r\nTS END %08x\r\n" % crc
+    out += b"DISK END 812 131000\r\nOK\r\n"
+    return out[:len(out) - cut] if cut else out
+
+
+def test_parse_disk_ok():
+    img = bytes((i * 7) & 0xFF for i in range(1600 * 512))
+    out, tracks, worst, ms = _proto.parse_disk(make_disk(img))
+    assert out == img and len(tracks) == 160 and worst == 812 and ms == 131000
+    assert all(st == 0 for (_, _, st, _) in tracks)
+
+
+def test_parse_disk_bad_crc():
+    img = bytes(1600 * 512)
+    with pytest.raises(_proto.CaptureError):
+        _proto.parse_disk(make_disk(img, bad_crc_at=(33, 1)))
+
+
+def test_parse_disk_truncated():
+    img = bytes(1600 * 512)
+    with pytest.raises(_proto.CaptureError):
+        _proto.parse_disk(make_disk(img, cut=5000))
+
+
+def test_parse_disk_reports_failed_track():
+    img = bytes(1600 * 512)
+    _, tracks, _, _ = _proto.parse_disk(make_disk(img, fail={(12, 0)}))
+    assert [(t, s) for (t, s, st, _) in tracks if st == 0xA7] == [(12, 0)]
+
+
+def test_parse_blk():
+    data = bytes(range(256)) * 2 + bytes(12)
+    lines = ["readblk 7", "BLK 7 e7 04"] + [data[i:i + 16].hex() for i in range(0, 524, 16)]
+    block, status, soft, out = _proto.parse_blk(lines)
+    assert (block, status, soft, out) == (7, 0xE7, 0x04, data)
