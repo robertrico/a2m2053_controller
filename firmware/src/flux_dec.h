@@ -8,6 +8,10 @@
 #define FLUX_DEC_OVERHEAD      2.0f                          // counts lost per edge in the PIO loop
 #define FLUX_DEC_CELL_COUNTS   (1e9f / 489600.0f / 40.0f)    // 51.0621 counts per bit cell
 #define FLUX_DEC_ALPHA         0.05f
+// 1-3 cell intervals classify correctly only for c in (0.857C, 1.2C); inside that the loop always
+// pulls back toward nominal. Mechanism speed is within +-2.5% (ERS).
+#define FLUX_DEC_CELL_MIN      (FLUX_DEC_CELL_COUNTS * 0.87f)
+#define FLUX_DEC_CELL_MAX      (FLUX_DEC_CELL_COUNTS * 1.19f)
 #define FLUX_DEC_MAX_CELLS     8
 #define FLUX_DEC_DATA_WINDOW   25                            // nibbles after the address epilog (ROM)
 

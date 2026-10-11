@@ -155,6 +155,22 @@ static void test_chunking_is_invisible(void) {
     free(v);
 }
 
+static void test_pll_recovers_from_noise(void) {
+    int n; long el;
+    uint16_t *v = load_u16(FIX "synth_clean_t00s0.u16", &n);
+    uint8_t *exp = load(FIX "synth_clean_t00s0.exp", &el);
+    sink_t s; memset(&s, 0, sizeof s);
+    flux_dec_t d;
+    flux_dec_sink_t k = { on_sector, on_event, &s };
+    flux_dec_reset(&d, 0, 0, &k);
+    for (int i = 0; i < 200; i++) flux_dec_push(&d, 0);
+    flux_dec_push_many(&d, v, n);
+    for (int i = 0; i < 12; i++) if (s.got[i]) s.nsect++;
+    CHECK(s.nsect == 12);
+    for (int i = 0; i < 12; i++) CHECK(memcmp(s.data[i], exp + 524 * i, 524) == 0);
+    free(v); free(exp);
+}
+
 int main(void) {
     test_clean();
     test_jitter_and_drift();
@@ -163,5 +179,6 @@ int main(void) {
     test_empty();
     test_real_captures();
     test_chunking_is_invisible();
+    test_pll_recovers_from_noise();
     TEST_END();
 }

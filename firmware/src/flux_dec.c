@@ -98,6 +98,8 @@ void flux_dec_push(flux_dec_t *d, uint16_t count) {
     for (int i = 1; i < n; i++) bit(d, 0);
     bit(d, 1);
     if (n <= 3) d->cell += FLUX_DEC_ALPHA * (t / (float)n - d->cell);
+    if (d->cell < FLUX_DEC_CELL_MIN) d->cell = FLUX_DEC_CELL_MIN;
+    if (d->cell > FLUX_DEC_CELL_MAX) d->cell = FLUX_DEC_CELL_MAX;
 }
 
 void flux_dec_push_many(flux_dec_t *d, const uint16_t *counts, int n) {
