@@ -35,6 +35,7 @@ static void nibble(flux_dec_t *d, uint8_t nb) {
     case FD_ADDR_EPILOG:
         if ((d->n == 0 && nb == 0xDE) || (d->n == 1 && nb == 0xAA)) {
             if (++d->n < 2) return;
+            if (d->sink && d->sink->header) d->sink->header(d->sink->ctx, d->addr.track, d->addr.side, d->addr.sector);
             if (d->addr.track != d->track || d->addr.side != d->side) {
                 emit(d, FLUX_EV_FOREIGN, d->addr.track, d->addr.side, d->addr.sector);
                 d->st = FD_HUNT_ADDR;

@@ -21,6 +21,8 @@ typedef struct {
     void (*sector)(void *ctx, int sector, const uint8_t payload[GCR_SECTOR_LEN]);
     void (*event)(void *ctx, flux_ev_t ev, int track, int side, int sector);
     void *ctx;
+    // At a good address field's DE AA (M5 writes start here), before the foreign/range checks.
+    void (*header)(void *ctx, int track, int side, int sector);
 } flux_dec_sink_t;
 
 typedef enum { FD_HUNT_ADDR, FD_ADDR, FD_ADDR_EPILOG, FD_HUNT_DATA, FD_DATA } flux_dec_state_t;

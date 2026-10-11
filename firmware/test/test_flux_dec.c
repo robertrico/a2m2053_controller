@@ -59,7 +59,7 @@ static uint16_t *load_flux(const char *path, int *n) {
 static void decode(const uint16_t *v, int n, int track, int side, sink_t *s, int chunk) {
     memset(s, 0, sizeof *s);
     flux_dec_t d;
-    flux_dec_sink_t k = { on_sector, on_event, s };
+    flux_dec_sink_t k = { .sector = on_sector, .event = on_event, .ctx = s };
     flux_dec_reset(&d, track, side, &k);
     if (chunk <= 0) { for (int i = 0; i < n; i++) flux_dec_push(&d, v[i]); }
     else for (int i = 0; i < n; i += chunk) flux_dec_push_many(&d, v + i, n - i < chunk ? n - i : chunk);
@@ -161,7 +161,7 @@ static void test_pll_recovers_from_noise(void) {
     uint8_t *exp = load(FIX "synth_clean_t00s0.exp", &el);
     sink_t s; memset(&s, 0, sizeof s);
     flux_dec_t d;
-    flux_dec_sink_t k = { on_sector, on_event, &s };
+    flux_dec_sink_t k = { .sector = on_sector, .event = on_event, .ctx = &s };
     flux_dec_reset(&d, 0, 0, &k);
     for (int i = 0; i < 200; i++) flux_dec_push(&d, 0);
     flux_dec_push_many(&d, v, n);
@@ -169,6 +169,44 @@ static void test_pll_recovers_from_noise(void) {
     CHECK(s.nsect == 12);
     for (int i = 0; i < 12; i++) CHECK(memcmp(s.data[i], exp + 524 * i, 524) == 0);
     free(v); free(exp);
+}
+
+typedef struct { int n, nsec, track, side, sec[16], nsec_at[16]; } hdr_log_t;
+
+static void hl_hdr(void *ctx, int track, int side, int sector) {
+    hdr_log_t *h = ctx;
+    if (h->n < 16) { h->sec[h->n] = sector; h->nsec_at[h->n] = h->nsec; }
+    h->n++; h->track = track; h->side = side;
+}
+static void hl_sec(void *ctx, int sector, const uint8_t *p) { (void)sector; (void)p; ((hdr_log_t *)ctx)->nsec++; }
+
+static void hdr_run(const char *path, int track, int side, hdr_log_t *h) {
+    int n;
+    uint16_t *v = load_u16(path, &n);
+    memset(h, 0, sizeof *h);
+    flux_dec_t d;
+    flux_dec_sink_t k = { .sector = hl_sec, .ctx = h, .header = hl_hdr };
+    flux_dec_reset(&d, track, side, &k);
+    flux_dec_push_many(&d, v, n);
+    free(v);
+}
+
+static void test_header_callback(void) {
+    hdr_log_t h;
+    hdr_run(FIX "synth_clean_t00s0.u16", 0, 0, &h);
+    CHECK(h.n == 12 && h.track == 0 && h.side == 0);
+    int seen = 0;
+    for (int i = 0; i < 12; i++) seen |= 1 << h.sec[i];
+    CHECK(seen == 0xFFF);
+    for (int i = 0; i < 12; i++) CHECK(h.nsec_at[i] == i);   // fires before its own data field
+}
+
+static void test_header_callback_foreign_and_bad_data(void) {
+    hdr_log_t h;
+    hdr_run(FIX "synth_wrongside_t03s1.u16", 3, 0, &h);   // decoder expects side 0, disk says side 1
+    CHECK(h.n == 12 && h.side == 1 && h.nsec == 0);       // reported with the header's own side
+    hdr_run(FIX "synth_corrupt_t20s0.u16", 20, 0, &h);    // one bad data field, all headers good
+    CHECK(h.n == 11 && h.nsec == 10);
 }
 
 int main(void) {
@@ -180,5 +218,7 @@ int main(void) {
     test_real_captures();
     test_chunking_is_invisible();
     test_pll_recovers_from_noise();
+    test_header_callback();
+    test_header_callback_foreign_and_bad_data();
     TEST_END();
 }
