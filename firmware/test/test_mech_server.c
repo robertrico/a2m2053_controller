@@ -330,6 +330,100 @@ static void test_write_ignores_bad_neighbour(void) {
     CHECK(r.status == ST_OK && D.now_us - t0 < 1500000u);
 }
 
+static bool ts_zero(int t, int s) {
+    reply_t r;
+    for (int sec = 0; sec < gcr_sectors_per_track(t); sec++) {
+        mech_server_read(&SRV, (uint16_t)gcr_tss_to_block(t, s, sec), &r);
+        if (r.status != ST_OK) return false;
+        for (int i = 0; i < GCR_SECTOR_LEN; i++) if (r.data[i]) return false;
+    }
+    return true;
+}
+
+static void test_format_ts_ok(void) {
+    setup();
+    reply_t r;
+    mech_server_format_ts(&SRV, 5, 1, &r);
+    CHECK(r.status == ST_OK && r.tries == 1 && D.tx_fires == 1 && !D.gate_low && D.addr_while_writing == 0);
+    CHECK(D.wbits[5][1] == fd_rev_bits(5));
+    CHECK(ts_zero(5, 1));
+    mech_server_format_ts(&SRV, 79, 0, &r);           // zone 4: shortest revolution, still wraps
+    CHECK(r.status == ST_OK && ts_zero(79, 0));
+}
+
+static void test_format_starts_anywhere(void) {
+    setup();
+    D.idle_bit = 50000;                              // no index: the write wraps over its own preamble
+    reply_t r;
+    mech_server_format_ts(&SRV, 3, 0, &r);
+    CHECK(r.status == ST_OK && ts_zero(3, 0));
+}
+
+static void test_format_then_read_not_stale(void) {
+    setup();
+    reply_t r;
+    mech_server_read(&SRV, 24, &r);                  // t1 s0 cached
+    CHECK(r.status == ST_OK && data_ok(&r));
+    mech_server_format_ts(&SRV, 1, 0, &r);
+    CHECK(r.status == ST_OK && ts_zero(1, 0));
+}
+
+static void test_format_protected_and_args(void) {
+    setup();
+    reply_t r;
+    mech_server_format_ts(&SRV, 80, 0, &r);
+    CHECK(r.status == ST_BADBLK);
+    mech_server_format_ts(&SRV, 0, 2, &r);
+    CHECK(r.status == ST_BADBLK);
+    D.wprot = true;
+    mech_server_format_ts(&SRV, 0, 0, &r);
+    CHECK(r.status == ST_WRPROT && D.tx_fires == 0 && D.step_strobes == 0);
+    D.wprot = false; D.disk_in = false;
+    mech_server_format_ts(&SRV, 0, 0, &r);
+    CHECK(r.status == ST_NODISK && D.tx_fires == 0);
+}
+
+static void test_format_gives_up_after_10(void) {
+    setup();
+    D.corrupt_writes = 1000;                         // the middle of every image is a data nibble
+    reply_t r;
+    mech_server_format_ts(&SRV, 20, 1, &r);
+    CHECK(r.status == ST_IOERR && r.tries == SRV_FORMAT_TRIES && D.tx_fires == SRV_FORMAT_TRIES);
+    CHECK(!SRV.tb.valid && !D.gate_low);
+}
+
+static void test_format_retry_then_ok(void) {
+    setup();
+    D.corrupt_writes = 2;
+    reply_t r;
+    mech_server_format_ts(&SRV, 40, 0, &r);
+    CHECK(r.status == ST_SOFT && r.tries == 3 && (r.soft & SOFT_BADDATA) && ts_zero(40, 0));
+}
+
+static void test_format_tx_hang(void) {
+    setup();
+    D.tx_hang = true;
+    reply_t r;
+    mech_server_format_ts(&SRV, 0, 0, &r);
+    CHECK(r.status == ST_IOERR && D.tx_fires == 1 && !D.gate_low);
+}
+
+static void test_write_on_board_formatted_track(void) {
+    setup();
+    reply_t r;
+    mech_server_format_ts(&SRV, 1, 0, &r);
+    CHECK(r.status == ST_OK);
+    uint8_t p[GCR_SECTOR_LEN];
+    pattern(p, 9);
+    mech_server_write(&SRV, 30, p, &r);              // ROM gaps: DE AA FF | FF 3F CF F3 FC FF D5 AA AD
+    CHECK(r.status == ST_OK && r.tries == 1);
+    mech_server_read(&SRV, 30, &r);
+    CHECK(r.status == ST_OK && memcmp(r.data, p, GCR_SECTOR_LEN) == 0);
+    mech_server_read(&SRV, 31, &r);
+    CHECK(r.status == ST_OK);
+    for (int i = 0; i < GCR_SECTOR_LEN; i++) CHECK(r.data[i] == 0);
+}
+
 int main(void) {
     test_miss_then_hit();
     test_no_disk();
@@ -360,5 +454,13 @@ int main(void) {
     test_write_tx_hang();
     test_write_late_fire();
     test_write_ignores_bad_neighbour();
+    test_format_ts_ok();
+    test_format_starts_anywhere();
+    test_format_then_read_not_stale();
+    test_format_protected_and_args();
+    test_format_gives_up_after_10();
+    test_format_retry_then_ok();
+    test_format_tx_hang();
+    test_write_on_board_formatted_track();
     TEST_END();
 }

@@ -149,9 +149,14 @@ static void fd_wset(fake_drive_t *d, int t, int s, int i, int v) {
     if (v) d->wimg[t][s][i >> 3] |= m; else d->wimg[t][s][i >> 3] &= (uint8_t)~m;
 }
 
-static void fd_to_ivs(fake_drive_t *d) {
+static void fd_to_ivs(fake_drive_t *d, bool circular) {
     float cell = 1e9f / 489600.0f / 40.0f;
     int run = 0;
+    if (circular) {                                // a recorded track is a ring: the zeros after the last 1 lead the first interval
+        int last = d->ncur;
+        while (last > 0 && !d->cur[last - 1]) last--;
+        run = d->ncur - last;
+    }
     d->nivs = 0;
     for (int i = 0; i < d->ncur; i++) {
         run++;
@@ -171,7 +176,7 @@ static void fd_build(fake_drive_t *d) {
     } else {
         fd_generate(d);
     }
-    fd_to_ivs(d);
+    fd_to_ivs(d, d->wbits[t][s] != 0);
 }
 
 // First write to (pos, side): store what is there now, padded with sync to one revolution.

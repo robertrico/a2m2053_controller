@@ -22,6 +22,8 @@
 #define SRV_ERASE_TAIL_US     620     // ERS86 p24/p27: after /WRTGATE high, RD valid and /STEP allowed
 #define SRV_TX_POLL_US        100
 #define SRV_WRITE_TRIES       3       // block write: writes per request, each verified
+#define SRV_FORMAT_TRIES          10      // ROM cmd_format_actual: spb_packet_type = $0A
+#define SRV_FORMAT_TS_TIMEOUT_MS  30000   // one track side, all tries
 #define SRV_VERIFY_REVS       2       // verify reads after a write or format (ROM verify: one pass)
 // Cap on one TX stream: nominal (16.34 us per byte) + 10 % + 1 ms.
 #define SRV_TX_CAP_US(len)    ((uint64_t)(len) * 16340u / 1000u * 11u / 10u + 1000u)
@@ -69,6 +71,7 @@ typedef struct {
     uint64_t read_us;       // when the interval being decoded was read
     uint16_t fire_us;
     uint8_t wbuf[WT_DATA_FIELD_LEN];
+    uint8_t timg[WT_TRACK_MAX];
     srv_stats_t stats;
     uint16_t batch[SRV_BATCH];
 } mech_server_t;
@@ -76,6 +79,7 @@ typedef struct {
 void mech_server_init(mech_server_t *s, const mech_bus_t *bus, const flux_src_t *src, const flux_tx_t *tx);
 void mech_server_read(mech_server_t *s, uint16_t block, reply_t *r);
 void mech_server_write(mech_server_t *s, uint16_t block, const uint8_t data[GCR_SECTOR_LEN], reply_t *r);
+void mech_server_format_ts(mech_server_t *s, int cyl, int side, reply_t *r);
 void mech_server_idle(mech_server_t *s);
 void mech_server_start(mech_server_t *s);   // stopped -> running: motor off, buffer dropped
 void mech_server_stop(mech_server_t *s);

@@ -185,6 +185,51 @@ void mech_server_write(mech_server_t *s, uint16_t block, const uint8_t data[GCR_
     }
 }
 
+static bool track_all_zero(const mech_server_t *s) {
+    for (int sec = 0; sec < s->tb.nsect; sec++) {
+        const uint8_t *p = trackbuf_get(&s->tb, sec);
+        if (!p) return false;
+        for (int i = 0; i < GCR_SECTOR_LEN; i++) if (p[i]) return false;
+    }
+    return true;
+}
+
+// ROM cmd_format_actual for one track side: one write of the whole image (longer than a
+// revolution; the tail lands in the preamble), then a verify read. No index: starts anywhere.
+void mech_server_format_ts(mech_server_t *s, int cyl, int side, reply_t *r) {
+    memset(r, 0, sizeof *r);
+    if (cyl < 0 || cyl >= GCR_TRACKS || side < 0 || side >= GCR_SIDES) { r->status = ST_BADBLK; return; }
+    if (mech_status(s->bus, &s->ms, MREG_CSTIN)) {
+        trackbuf_invalidate(&s->tb);
+        r->status = ST_NODISK;
+        return;
+    }
+    if (!mech_status(s->bus, &s->ms, MREG_WRPROT)) { r->status = ST_WRPROT; return; }
+    trackbuf_invalidate(&s->tb);
+    size_t len = wtrack_track(s->timg, sizeof s->timg, cyl, side);
+    uint64_t t0 = now_us(s);
+    s->soft = 0;
+    bool ok = false;
+    for (int k = 0; k < SRV_FORMAT_TRIES && !ok; k++) {
+        if (now_us(s) - t0 > (uint64_t)SRV_FORMAT_TS_TIMEOUT_MS * 1000u) break;
+        r->tries = (uint8_t)(k + 1);
+        if (!motor_up(s)) break;
+        if (mech_seek(s->bus, &s->ms, cyl) != MECH_OK) { s->ms.track_known = false; s->soft |= SOFT_RECAL; continue; }
+        if (mech_status(s->bus, &s->ms, MREG_READY)) continue;          // ERS86 T1: READY low first
+        mech_select_head(s->bus, side);
+        s->bus->delay_us(s->bus->ctx, SRV_SEL_SETTLE_US);             // ERS86 T6
+        s->tx->load(s->tx->ctx, s->timg, len);
+        s->tx->fire(s->tx->ctx);
+        if (!tx_finish(s, len)) break;
+        if (fill(s, cyl, side, now_us(s), all_sectors(cyl), -1, SRV_VERIFY_REVS) && track_all_zero(s)) ok = true;
+        else s->soft |= SOFT_BADDATA;
+    }
+    if (!ok) trackbuf_invalidate(&s->tb);
+    s->last_us = now_us(s);
+    r->soft = s->soft;
+    r->status = ok ? (s->soft ? ST_SOFT : ST_OK) : ST_IOERR;
+}
+
 void mech_server_read(mech_server_t *s, uint16_t block, reply_t *r) {
     memset(r, 0, sizeof *r);
     r->block = block;
