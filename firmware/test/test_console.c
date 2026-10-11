@@ -41,6 +41,12 @@ int main(void) {
     memset(longline, 'a', sizeof longline - 1);
     longline[sizeof longline - 1] = 0;
     CHECK(P(longline).op == CON_BAD);
+    CHECK(P("server on").op == CON_SERVER && P("server on").arg[0] == 1);
+    CHECK(P("server off").arg[0] == 0);
+    CHECK(P("server").op == CON_BAD);
+    CHECK(P("readblk 0").op == CON_READBLK && P("readblk 1599").arg[0] == 1599);
+    CHECK(P("readblk 1600").op == CON_BAD && P("readblk -1").op == CON_BAD);
+    CHECK(P("readdisk").op == CON_READDISK && P("readdisk 1").op == CON_BAD);
     CHECK(strlen(console_help()) > 20);
     TEST_END();
 }

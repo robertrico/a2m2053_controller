@@ -25,6 +25,9 @@ static const con_spec_t specs[] = {
     {"tach",    CON_TACH,     0, false, {0},       {0}},
     {"settle",  CON_SETTLE,   1, false, {1},       {1000}},
     {"capture", CON_CAPTURE,  3, false, {0, 0, 1}, {79, 1, CON_CAPTURE_MAX}},
+    {"server",   CON_SERVER,   1, true,  {0},       {0}},
+    {"readblk",  CON_READBLK,  1, false, {0},       {1599}},
+    {"readdisk", CON_READDISK, 0, false, {0},       {0}},
 };
 
 static bool parse_long(const char *s, long lo, long hi, long *out) {
@@ -73,5 +76,6 @@ con_cmd_t console_parse(const char *line) {
 
 const char *console_help(void) {
     return "help | oe on|off | enbl on|off | status [0-15] | cmd <0-15> | motor on|off\n"
-           "recal | seek <0-79> | head <0|1> | eject | tach | settle <us> | capture <t> <s> <n>";
+           "recal | seek <0-79> | head <0|1> | eject | tach | settle <us> | capture <t> <s> <n>\n"
+           "server on|off | readblk <0-1599> | readdisk";
 }
