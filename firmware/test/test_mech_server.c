@@ -302,6 +302,7 @@ static void test_write_tx_hang(void) {
     uint8_t p[GCR_SECTOR_LEN] = {0};
     mech_server_write(&SRV, 30, p, &r);
     CHECK(r.status == ST_IOERR && D.tx_fires == 1 && !D.gate_low && r.tries == 1);
+    CHECK(D.now_us - D.abort_us >= SRV_ERASE_TAIL_US);   // tail after the cap abort too
 }
 
 static void test_write_late_fire(void) {

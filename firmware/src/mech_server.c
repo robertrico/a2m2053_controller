@@ -137,13 +137,14 @@ static bool fill(mech_server_t *s, int track, int side, uint64_t t_req, uint16_t
 // After fire: wait for the PIO to raise the gate (or abort at the cap), then the erase tail.
 static bool tx_finish(mech_server_t *s, size_t len) {
     uint64_t t0 = now_us(s);
+    bool done = true;
     while (s->tx->busy(s->tx->ctx)) {
-        if (now_us(s) - t0 > SRV_TX_CAP_US(len)) { s->tx->abort(s->tx->ctx); return false; }
+        if (now_us(s) - t0 > SRV_TX_CAP_US(len)) { done = false; break; }
         s->bus->delay_us(s->bus->ctx, SRV_TX_POLL_US);
     }
     s->tx->abort(s->tx->ctx);                          // pins back to SIO, gate high
-    s->bus->delay_us(s->bus->ctx, SRV_ERASE_TAIL_US);  // ERS86 T7 erase tail; RD valid after
-    return true;
+    s->bus->delay_us(s->bus->ctx, SRV_ERASE_TAIL_US);  // ERS86 T7 erase tail; RD valid after (also after a cap abort)
+    return done;
 }
 
 void mech_server_write(mech_server_t *s, uint16_t block, const uint8_t data[GCR_SECTOR_LEN], reply_t *r) {

@@ -53,6 +53,7 @@ typedef struct {
     const uint8_t *tx_buf;
     size_t tx_len;
     int tx_loads, tx_fires, tx_aborts;
+    uint64_t abort_us;            // time of the last abort
     bool gate_low;                // between fire and abort
     uint64_t tx_end_us;
     bool tx_hang;                 // busy never clears
@@ -239,7 +240,7 @@ static void ft_fire(void *c) {
     fd_splice(d, start, w, d->tx_len);
 }
 static bool ft_busy(void *c) { fake_drive_t *d = c; return d->tx_hang || d->now_us < d->tx_end_us; }
-static void ft_abort(void *c) { fake_drive_t *d = c; d->tx_aborts++; d->gate_low = false; }
+static void ft_abort(void *c) { fake_drive_t *d = c; d->tx_aborts++; d->abort_us = d->now_us; d->gate_low = false; }
 
 static flux_tx_t fake_flux_tx(fake_drive_t *d) {
     flux_tx_t t = { ft_load, ft_fire, ft_busy, ft_abort, d };
