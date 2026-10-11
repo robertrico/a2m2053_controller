@@ -212,3 +212,60 @@ def test_parse_blk():
     lines = ["readblk 7", "BLK 7 e7 04"] + [data[i:i + 16].hex() for i in range(0, 524, 16)]
     block, status, soft, out = _proto.parse_blk(lines)
     assert (block, status, soft, out) == (7, 0xE7, 0x04, data)
+
+
+def test_stream_complete_progression():
+    img = bytes((i * 7) & 0xFF for i in range(1600 * 512))
+    full_stream = make_disk(img)
+    # Feed growing prefixes; all should return False until the full stream, which returns True
+    for i in range(0, len(full_stream), 10000):
+        prefix = full_stream[:i]
+        if i < len(full_stream):
+            assert _proto.disk_stream_complete(prefix) == False
+    # Full stream should return True
+    assert _proto.disk_stream_complete(full_stream) == True
+
+
+def test_stream_err_mid_disk():
+    img = bytes(1600 * 512)
+    # Truncate right after 3rd TS END, then append an ERR
+    stream = make_disk(img)
+    # Count TS END occurrences to find the 3rd one
+    pos = 0
+    for i in range(3):
+        pos = stream.find(b"TS END", pos) + 1
+    # pos is now after the 3rd TS END; find the end of the line
+    pos = stream.find(b"\r\n", pos) + 2
+    truncated = stream[:pos] + b"ERR server timeout\r\n"
+    with pytest.raises(_proto.DiskError) as exc:
+        _proto.disk_stream_complete(truncated)
+    assert "server timeout" in str(exc.value)
+
+
+def test_stream_disk_end_in_payload():
+    # Create an image where block 0 starts with "DISK END" text
+    img = bytearray(1600 * 512)
+    img[0:len(b"\r\nDISK END 1 2\r\nOK\r\n")] = b"\r\nDISK END 1 2\r\nOK\r\n"
+    stream = make_disk(bytes(img))
+    # A prefix ending right after that payload text should return False (not True)
+    # Find the position: DISK BEGIN + 1st TS header + payload with the fake DISK END text
+    fake_disk_end_text = b"\r\nDISK END 1 2\r\nOK\r\n"
+    pos = stream.find(fake_disk_end_text)
+    assert pos > 0
+    prefix = stream[:pos + len(fake_disk_end_text)]
+    # Should return False because we're still in the middle of the disk
+    assert _proto.disk_stream_complete(prefix) == False
+    # Full stream should return True and parse_disk should return the image with that text in block 0
+    assert _proto.disk_stream_complete(stream) == True
+    out, _, _, _ = _proto.parse_disk(stream)
+    assert out[0:len(fake_disk_end_text)] == fake_disk_end_text
+
+
+def test_parse_disk_wrong_count():
+    img = bytes(1600 * 512)
+    stream = make_disk(img)
+    # Replace "DISK BEGIN 1600" with "DISK BEGIN 1599"
+    stream_bad = stream.replace(b"DISK BEGIN 1600", b"DISK BEGIN 1599")
+    with pytest.raises(_proto.DiskError) as exc:
+        _proto.parse_disk(stream_bad)
+    assert "1599" in str(exc.value)

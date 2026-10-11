@@ -140,34 +140,48 @@ def main(argv=None) -> int:
         print(f"{len(ivs)} intervals -> {args.out}")
         return 0
     if args.cmd == "readdisk":
-        from .serialio import Console
-        con = Console(args.port)
-        img, tracks, worst, ms = parse_disk(con.readdisk())
-        Path(args.out).write_bytes(img)
-        bad = [(t, s, st) for (t, s, st, _) in tracks if st not in (0x00, 0xE7)]
-        soft = [(t, s) for (t, s, st, _) in tracks if st == 0xE7]
-        print(f"readdisk: {ms} ms, worst decode {worst} ns/interval, "
-              f"{len(bad)} failed track sides, {len(soft)} with soft errors -> {args.out}")
-        if bad:
-            print("failed:", bad[:20])
-        ok = not bad
-        if args.compare:
-            ref = Path(args.compare).read_bytes()
-            diff = [k for k in range(gcr.TOTAL_BLOCKS) if img[k * 512:(k + 1) * 512] != ref[k * 512:(k + 1) * 512]]
-            print(f"compare vs {args.compare}: {len(diff)} blocks differ", diff[:40])
-            ok = ok and not diff
-        return 0 if ok else 1
+        from .serialio import Console, ConsoleError
+        try:
+            con = Console(args.port)
+            img, tracks, worst, ms = parse_disk(con.readdisk())
+            Path(args.out).write_bytes(img)
+            bad = [(t, s, st) for (t, s, st, _) in tracks if st not in (0x00, 0xE7)]
+            soft = [(t, s) for (t, s, st, _) in tracks if st == 0xE7]
+            print(f"readdisk: {ms} ms, worst decode {worst} ns/interval, "
+                  f"{len(bad)} failed track sides, {len(soft)} with soft errors -> {args.out}")
+            if bad:
+                print("failed:", bad[:20])
+            ok = not bad
+            if args.compare:
+                ref = Path(args.compare).read_bytes()
+                diff = [k for k in range(gcr.TOTAL_BLOCKS) if img[k * 512:(k + 1) * 512] != ref[k * 512:(k + 1) * 512]]
+                print(f"compare vs {args.compare}: {len(diff)} blocks differ", diff[:40])
+                ok = ok and not diff
+            return 0 if ok else 1
+        except (CaptureError, ConsoleError) as e:
+            print(f"readdisk failed: {e}")
+            return 2
     if args.cmd == "readblk":
-        from .serialio import Console
-        con = Console(args.port)
-        block, status, soft, data = parse_blk(con.readblk(args.block))
-        print(f"block {block}: status {status:02x} soft {soft:02x}")
-        if args.compare:
-            ref = Path(args.compare).read_bytes()
-            same = data[gcr.TAG_LEN:] == ref[block * 512:(block + 1) * 512]
-            print("matches reference" if same else "DIFFERS from reference")
-            return 0 if same else 1
-        return 0
+        from .serialio import Console, ConsoleError
+        try:
+            con = Console(args.port)
+            block, status, soft, data = parse_blk(con.readblk(args.block))
+            if block != args.block:
+                print(f"readblk: got block {block}, expected {args.block}")
+                return 2
+            if status not in (0x00, 0xE7):
+                print(f"readblk: block {block} has error status {status:02x}")
+                return 1
+            print(f"block {block}: status {status:02x} soft {soft:02x}")
+            if args.compare:
+                ref = Path(args.compare).read_bytes()
+                same = data[gcr.TAG_LEN:] == ref[block * 512:(block + 1) * 512]
+                print("matches reference" if same else "DIFFERS from reference")
+                return 0 if same else 1
+            return 0
+        except (CaptureError, ConsoleError) as e:
+            print(f"readblk failed: {e}")
+            return 2
     return _disk(args)
 
 

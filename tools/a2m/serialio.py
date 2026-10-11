@@ -3,7 +3,7 @@ import re
 import time
 import serial
 
-from .proto import END_RE
+from .proto import END_RE, disk_stream_complete, DiskError
 
 
 class ConsoleError(Exception):
@@ -70,9 +70,14 @@ class Console:
                 for raw in buf.split(b"\n")[:-1]:
                     if raw.strip().startswith(b"ERR"):
                         raise ConsoleError(raw.decode(errors="replace").strip())
-            elif re.search(rb"DISK END \d+ \d+\r?\n", buf):
-                tail_deadline = time.monotonic() + 1.0
-                while not re.search(rb"\nOK\r?\n", buf[-16:]) and time.monotonic() < tail_deadline:
-                    buf += self.ser.read(64)
-                return buf
+            else:
+                # DISK BEGIN found; check if we have the complete framed stream
+                try:
+                    if disk_stream_complete(buf):
+                        tail_deadline = time.monotonic() + 1.0
+                        while not re.search(rb"\nOK\r?\n", buf[-16:]) and time.monotonic() < tail_deadline:
+                            buf += self.ser.read(64)
+                        return buf
+                except DiskError as e:
+                    raise ConsoleError(str(e))
         raise ConsoleError("readdisk timed out")

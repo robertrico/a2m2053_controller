@@ -44,6 +44,9 @@ def parse_disk(stream: bytes):
     m = DISK_BEGIN_RE.search(stream)
     if not m:
         raise DiskError("no DISK BEGIN in stream")
+    count = int(m[1])
+    if count != 1600:
+        raise DiskError(f"DISK BEGIN count {count}, expected 1600")
     pos = m.end()
     image = bytearray(_gcr.TOTAL_BLOCKS * 512)
     tracks = []
@@ -84,3 +87,46 @@ def parse_blk(lines):
                 raise CaptureError(f"BLK data is {len(data)} bytes")
             return int(m[1]), int(m[2], 16), int(m[3], 16), data
     raise CaptureError("no BLK line")
+
+
+def disk_stream_complete(buf: bytes) -> bool:
+    """True once the whole readdisk stream is in buf. Raises DiskError if the
+    firmware printed an ERR line where a TS header or DISK END was expected."""
+    m = DISK_BEGIN_RE.search(buf)
+    if not m:
+        return False
+    pos = m.end()
+    for t in range(_gcr.TRACKS):
+        for s in range(_gcr.SIDES):
+            # Check for ERR before TS header
+            if buf[pos:].startswith(b"ERR") or buf[pos:].startswith(b"\r\nERR") or buf[pos:].startswith(b"\nERR"):
+                err_line = buf[pos:].split(b"\n")[0].decode(errors="replace").strip()
+                raise DiskError(err_line)
+            # Match TS header
+            h = TS_RE.match(buf, pos)
+            if not h:
+                if len(buf) - pos < 64:  # header may be incomplete
+                    return False
+                raise DiskError(f"bad TS header at {pos}")
+            n = int(h[3])
+            end = h.end() + n * 512
+            if len(buf) < end:
+                return False
+            # Match TS END
+            e = TS_END_RE.match(buf, end)
+            if not e:
+                if len(buf) - end < 32:
+                    return False
+                raise DiskError(f"no TS END after TS {t} {s}")
+            pos = e.end()
+    # Check for ERR before DISK END
+    if buf[pos:].startswith(b"ERR") or buf[pos:].startswith(b"\r\nERR") or buf[pos:].startswith(b"\nERR"):
+        err_line = buf[pos:].split(b"\n")[0].decode(errors="replace").strip()
+        raise DiskError(err_line)
+    # Match DISK END
+    d = DISK_END_RE.match(buf, pos)
+    if d:
+        return True
+    if len(buf) - pos < 64:
+        return False
+    raise DiskError("no DISK END")
