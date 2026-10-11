@@ -28,8 +28,10 @@ static int  hw_src_read(void *c, uint16_t *b, int max) { (void)c; return flux_st
 static uint64_t hw_src_now(void *c) { (void)c; return time_us_64(); }
 static const flux_src_t hw_src = { hw_src_start, hw_src_stop, hw_src_read, hw_src_now, NULL };
 
-static void hw_tx_load(void *c, const uint8_t *b, size_t n) { (void)c; flux_tx_load(b, n); }
-static void hw_tx_fire(void *c)  { (void)c; flux_tx_fire(); }
+// Stream backlog over the armed pass only (load to fire), for the BLK line: fire latency.
+static volatile uint32_t tx_fire_backlog;
+static void hw_tx_load(void *c, const uint8_t *b, size_t n) { (void)c; flux_stream_backlog_reset(); flux_tx_load(b, n); }
+static void hw_tx_fire(void *c)  { (void)c; flux_tx_fire(); tx_fire_backlog = flux_stream_backlog_max(); }
 static bool hw_tx_busy(void *c)  { (void)c; return flux_tx_busy(); }
 static void hw_tx_abort(void *c) { (void)c; flux_tx_abort(); }
 static const flux_tx_t hw_tx = { hw_tx_load, hw_tx_fire, hw_tx_busy, hw_tx_abort, NULL };
@@ -141,14 +143,19 @@ static void do_writeblk(uint16_t block) {
     for (int i = 0; i < GCR_DATA_LEN; i++) {
         int ch;
         do ch = getchar_timeout_us(1000); while (ch == PICO_ERROR_TIMEOUT && !time_reached(until));
-        if (ch == PICO_ERROR_TIMEOUT) { puts("ERR timeout"); return; }
+        if (ch == PICO_ERROR_TIMEOUT) {
+            // Late payload bytes must not run as console commands: drain until 100 ms of silence.
+            absolute_time_t cap = make_timeout_time_ms(2000);
+            while (!time_reached(cap) && getchar_timeout_us(100000) != PICO_ERROR_TIMEOUT) {}
+            puts("ERR timeout");
+            return;
+        }
         rq.data[GCR_TAG_LEN + i] = (uint8_t)ch;
     }
     uint32_t crc = crc32_update(0, rq.data + GCR_TAG_LEN, GCR_DATA_LEN);
-    flux_stream_backlog_reset();
     if (!request(&rq, &r, SRV_REQ_TIMEOUT_MS + 3000)) { puts("ERR server timeout"); return; }
     printf("BLK %u %02x %02x %08lx %u %u %lu\n", block, r.status, r.soft, (unsigned long)crc,
-           r.tries, r.fire_us, (unsigned long)flux_stream_backlog_max());
+           r.tries, r.fire_us, (unsigned long)tx_fire_backlog);
     puts("OK");
 }
 
@@ -167,7 +174,13 @@ static void do_format(const con_cmd_t *c) {
             rq.block = (uint16_t)(0x8000u | (unsigned)(t << 1) | (unsigned)s);
             rq.cyl = (uint8_t)t;
             rq.side = (uint8_t)s;
-            if (!request(&rq, &r, SRV_FORMAT_TS_TIMEOUT_MS + 3000)) { puts("ERR server timeout"); return; }
+            if (getchar_timeout_us(0) != PICO_ERROR_TIMEOUT) {   // any byte stops a running format
+                puts("FMT STOPPED");
+                printf("FORMAT END %02x %lu\n", ST_IOERR, (unsigned long)((time_us_64() - t0) / 1000u));
+                puts("OK");
+                return;
+            }
+            if (!request(&rq, &r, SRV_FORMAT_TS_WAIT_MS)) { puts("ERR server timeout"); return; }
             printf("FMT %d %d %u %02x\n", t, s, r.tries, r.status);
             stdio_flush();
             if (r.status == ST_SOFT && status == ST_OK) status = ST_SOFT;

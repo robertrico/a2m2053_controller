@@ -40,6 +40,7 @@ void flux_tx_abort(void) {
 
 void flux_tx_load(const uint8_t *buf, size_t len) {
     flux_tx_abort();
+    if (len == 0) return;                                      // len*8-1 would wrap; pins stay SIO so a fire cannot reach the pad
     pio_sm_init(TX_PIO, TX_SM, offset, &cfg);                  // stopped, FIFOs cleared, PC at start
     uint32_t level = (1u << PIN_MECH_WRTGATE) | ((uint32_t)gpio_get_out_level(PIN_MECH_WRTDATA) << PIN_MECH_WRTDATA);
     pio_sm_set_pins_with_mask(TX_PIO, TX_SM, level, TX_PINS);  // PIO outputs match the SIO levels

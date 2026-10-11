@@ -147,7 +147,7 @@ size_t wtrack_track(uint8_t *out, size_t cap, int cyl, int side);
   PIO clock, well under the 250 ns read/write margin (ERS86 sec. 2.10.2).
 - Sequence: `set pins` gate low; wait >= 1.8 us (T3); shift bits, toggle
   WRTDATA on 1; after the last bit hold >= 2 us (T4); `set pins` gate high;
-  park in a self-loop (busy = program counter not on that loop). WRTDATA starts high (idle level).
+  park in a self-loop (busy = program counter not on that loop). WRTDATA starts at its SIO idle level (0); only level changes matter.
 - DMA: byte transfers from the image into the TX FIFO, paced by the SM's
   DREQ. `flux_tx_load` pre-fills the FIFO so `flux_tx_fire` starts shifting
   at once.

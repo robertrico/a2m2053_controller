@@ -83,5 +83,5 @@ const char *console_help(void) {
     return "help | oe on|off | enbl on|off | status [0-15] | cmd <0-15> | motor on|off\n"
            "recal | seek <0-79> | head <0|1> | eject | tach | settle <us> | capture <t> <s> <n>\n"
            "server on|off | readblk <0-1599> | readdisk\n"
-           "writeblk <0-1599> (then 512 raw bytes) | format [<0-79> <0|1>]";
+           "writeblk <0-1599> (then 512 raw bytes) | format [<0-79> <0|1>] (any key stops)";
 }

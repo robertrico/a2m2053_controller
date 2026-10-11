@@ -8,5 +8,5 @@
 void flux_tx_init(void);
 void flux_tx_load(const uint8_t *buf, size_t len);   // armed, SM stopped, gate high
 void flux_tx_fire(void);                              // one register write: SM enable
-bool flux_tx_busy(void);                              // false once the program has raised the gate
+bool flux_tx_busy(void);                              // false between load and fire; false once the program has raised the gate
 void flux_tx_abort(void);                             // SM off, DMA off, pins back to SIO, gate high

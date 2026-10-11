@@ -24,6 +24,9 @@
 #define SRV_WRITE_TRIES       3       // block write: writes per request, each verified
 #define SRV_FORMAT_TRIES          10      // ROM cmd_format_actual: spb_packet_type = $0A
 #define SRV_FORMAT_TS_TIMEOUT_MS  30000   // one track side, all tries
+// Core 0 must outlast core 1: the cap is checked only at the start of a try, so one try can run
+// past it by about SRV_REQ_TIMEOUT_MS (seek, tx cap, verify fill) plus slack.
+#define SRV_FORMAT_TS_WAIT_MS     (SRV_FORMAT_TS_TIMEOUT_MS + SRV_REQ_TIMEOUT_MS + 6000)
 #define SRV_VERIFY_REVS       2       // verify reads after a write or format (ROM verify: one pass)
 // Cap on one TX stream: nominal (16.34 us per byte) + 10 % + 1 ms.
 #define SRV_TX_CAP_US(len)    ((uint64_t)(len) * 16340u / 1000u * 11u / 10u + 1000u)

@@ -207,6 +207,7 @@ void mech_server_format_ts(mech_server_t *s, int cyl, int side, reply_t *r) {
     if (!mech_status(s->bus, &s->ms, MREG_WRPROT)) { r->status = ST_WRPROT; return; }
     trackbuf_invalidate(&s->tb);
     size_t len = wtrack_track(s->timg, sizeof s->timg, cyl, side);
+    if (len == 0) { r->status = ST_BADBLK; return; }   // never arm an empty write
     uint64_t t0 = now_us(s);
     s->soft = 0;
     bool ok = false;
