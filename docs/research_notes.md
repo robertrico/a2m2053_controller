@@ -302,4 +302,4 @@ With +5V at CN104 pin 11 sagging to 4.0-4.8 V under motor load (bench wiring
 resistance), the mechanism's read data on RD disappears or breaks up, while
 status, tach, stepping and eject keep working. At about 5 V at the pin, both
 test mechanisms read every sector. The PCB needs low-resistance +5V/+12V/GND
-to CN104 and bulk caps at the connector (the IF-83 has them).
+to CN104 and bulk caps at the connector: the IF-83 uses 4.7 uF 50 V electrolytics [photo/read by Rico]; use the same part.
