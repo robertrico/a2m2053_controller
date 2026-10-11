@@ -295,3 +295,11 @@ current? or one output + one readback). And what generates it: probably
 host /ENBL (CN102:14) gated the same way as PH3 (only after we're
 assigned). **[guess]** Firmware has no separate ENBL bit, so the gating is
 likely tied to PH3EN or ENBUS inside the CXD1013.
+
+## Drive supply requirement [measured] 2026-10-10 (M3)
+
+With +5V at CN104 pin 11 sagging to 4.0-4.8 V under motor load (bench wiring
+resistance), the mechanism's read data on RD disappears or breaks up, while
+status, tach, stepping and eject keep working. At about 5 V at the pin, both
+test mechanisms read every sector. The PCB needs low-resistance +5V/+12V/GND
+to CN104 and bulk caps at the connector (the IF-83 has them).
