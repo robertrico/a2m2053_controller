@@ -48,6 +48,8 @@ static void core1_main(void) {
 
 static bool server_set(bool on) {
     if (on) {
+        if (atomic_load(&srv_run)) return true;         // already on: nothing reset
+        if (atomic_load(&srv_running)) { puts("ERR server still stopping"); return false; }
         ipc_init(&ipc);                 // core 1 is stopped (srv_running false)
         srv.ms.track_known = false;     // core 1 re-homes; core 0's record is stale
         hw_mech_outputs_enable(true);
@@ -56,10 +58,18 @@ static bool server_set(bool on) {
         atomic_store(&srv_run, true);
         absolute_time_t up = make_timeout_time_ms(100);
         while (!atomic_load(&srv_running) && !time_reached(up)) sleep_ms(1);
+        if (!atomic_load(&srv_running)) {
+            atomic_store(&srv_run, false);
+            hw_mech_enbl(false);
+            hw_mech_outputs_enable(false);
+            oe_on = enbl_on = false;
+            puts("ERR server did not start");
+            return false;
+        }
         return true;
     }
     atomic_store(&srv_run, false);
-    absolute_time_t until = make_timeout_time_ms(2000);
+    absolute_time_t until = make_timeout_time_ms(SRV_REQ_TIMEOUT_MS + 3000);
     while (atomic_load(&srv_running) && !time_reached(until)) sleep_ms(1);
     hw_mech_enbl(false);
     hw_mech_outputs_enable(false);
@@ -199,7 +209,8 @@ static void execute(const con_cmd_t *c) {
     const mech_bus_t *b = hw_mech_bus();
     switch (c->op) {
     case CON_SERVER:
-        if (server_set(c->arg[0])) puts("OK"); else puts("ERR server did not stop");
+        if (server_set(c->arg[0])) puts("OK");
+        else if (!c->arg[0]) puts("ERR server did not stop");
         return;
     case CON_READBLK:
         if (!atomic_load(&srv_run)) { puts("ERR server off"); return; }
