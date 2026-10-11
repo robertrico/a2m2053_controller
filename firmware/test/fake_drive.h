@@ -14,7 +14,10 @@ typedef struct {
     bool motor, disk_in;
     uint8_t addr;
     int side;                     // last head selected via RDDATA0/1
-    int step_strobes, recal_like; // counters for the tests
+    int step_strobes, starts;     // counters for the tests
+    uint32_t step_cost_us;        // extra time each STEP strobe takes (slow mechanism)
+    bool ready_stuck;             // READY reads not-ready once a step happened since motor-on
+    int steps_since_motor;
     uint64_t now_us;              // shared clock (bus delays + flux time)
     // flux stream
     bool streaming, no_flux;
@@ -22,6 +25,8 @@ typedef struct {
     int foreign_always;           // >=0: every header claims this track
     int bad_sector, bad_revs;     // corrupt this sector's data for the first bad_revs revolutions
     int overrun_once;             // next read returns -1 once
+    bool overrun_always;          // every read returns -1 (1 ms passes per call)
+    int overrun_after, reads;     // >0: read number overrun_after returns -1 once
     uint16_t ivs[65536];
     int nivs, rd, revs;
 } fake_drive_t;
@@ -39,11 +44,13 @@ static void fd_set_lstrb(void *c, bool high) {
     case MCMD_DIR_OUT:   d->dir = -1; break;
     case MCMD_STEP:
         d->step_strobes++;
+        d->steps_since_motor++;
+        d->now_us += d->step_cost_us;
         d->pos += d->dir;
         if (d->pos < 0) d->pos = 0;
         if (d->pos > 79) d->pos = 79;
         break;
-    case MCMD_MOTOR_ON:  d->motor = true; break;
+    case MCMD_MOTOR_ON:  d->motor = true; d->steps_since_motor = 0; break;
     case MCMD_MOTOR_OFF: d->motor = false; break;
     default: break;
     }
@@ -55,7 +62,8 @@ static bool fd_read_rd(void *c) {
     case MREG_STEP:    return true;
     case MREG_MOTORON: return !d->motor;
     case MREG_TK0:     return d->pos != 0;
-    case MREG_READY:   return !(d->motor && d->disk_in);
+    case MREG_READY:   if (d->ready_stuck && d->steps_since_motor > 0) return true;
+                       return !(d->motor && d->disk_in);
     case MREG_DRVIN:   return false;
     default:           return true;
     }
@@ -110,11 +118,14 @@ static void fd_build(fake_drive_t *d) {
     for (int i = 0; i < 6; i++) fd_sync(d, &run, cell);
 }
 
-static void fs_start(void *c) { fake_drive_t *d = c; d->streaming = true; d->rd = 0; d->revs = 0; fd_build(d); }
+static void fs_start(void *c) { fake_drive_t *d = c; d->streaming = true; d->starts++; d->reads = 0; d->rd = 0; d->revs = 0; fd_build(d); }
 static void fs_stop(void *c)  { ((fake_drive_t *)c)->streaming = false; }
 static int fs_read(void *c, uint16_t *buf, int max) {
     fake_drive_t *d = c;
     if (!d->streaming) return 0;
+    if (d->overrun_always) { d->now_us += 1000; return -1; }
+    d->reads++;
+    if (d->overrun_after && d->reads == d->overrun_after) return -1;
     if (d->overrun_once) { d->overrun_once = 0; return -1; }
     if (d->no_flux || !d->disk_in || !d->motor) { d->now_us += 1000; return 0; }
     int n = 0;

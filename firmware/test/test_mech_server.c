@@ -68,6 +68,7 @@ static void test_budget_exhausted(void) {
     CHECK(r.status == ST_IOERR && (r.soft & SOFT_RECAL));
     for (int i = 0; i < GCR_SECTOR_LEN; i++) CHECK(r.data[i] == 0);
     CHECK(D.now_us - t0 <= (uint64_t)SRV_REQ_TIMEOUT_MS * 1000u + 200000u);
+    CHECK(D.now_us - t0 < 3000000u);                 // 12 revolutions x 183 ms + one recal
     mech_server_read(&SRV, 4, &r);                   // other sectors of that track were good
     CHECK(r.status == ST_OK && data_ok(&r));
 }
@@ -86,6 +87,7 @@ static void test_foreign_forever_fails(void) {
     reply_t r;
     mech_server_read(&SRV, 0, &r);
     CHECK(r.status == ST_IOERR && (r.soft & SOFT_FOREIGN) && (r.soft & SOFT_RECAL));
+    CHECK(D.starts == 4);
 }
 
 static void test_no_flux_times_out(void) {
@@ -95,7 +97,7 @@ static void test_no_flux_times_out(void) {
     uint64_t t0 = D.now_us;
     mech_server_read(&SRV, 0, &r);
     CHECK(r.status == ST_IOERR);
-    CHECK(D.now_us - t0 <= (uint64_t)SRV_REQ_TIMEOUT_MS * 1000u + 2500000u);  // + recal time
+    CHECK(D.now_us - t0 <= (uint64_t)SRV_REQ_TIMEOUT_MS * 1000u + 2000000u);
 }
 
 static void test_overrun_recovers(void) {
@@ -104,6 +106,51 @@ static void test_overrun_recovers(void) {
     reply_t r;
     mech_server_read(&SRV, 0, &r);
     CHECK(r.status == ST_SOFT && (r.soft & SOFT_OVERRUN) && data_ok(&r));
+}
+
+static void test_persistent_overrun_times_out(void) {
+    setup();
+    D.overrun_always = true;
+    reply_t r;
+    uint64_t t0 = D.now_us;
+    mech_server_read(&SRV, 0, &r);
+    CHECK(r.status == ST_IOERR);
+    CHECK(D.now_us - t0 <= (uint64_t)SRV_REQ_TIMEOUT_MS * 1000u + 2000000u);
+}
+
+static void test_ready_stuck_times_out(void) {
+    setup();
+    D.ready_stuck = true;
+    reply_t r;
+    uint64_t t0 = D.now_us;
+    mech_server_read(&SRV, 24 * 2 * 10, &r);
+    CHECK(r.status == ST_IOERR);
+    CHECK(D.now_us - t0 <= (uint64_t)SRV_REQ_TIMEOUT_MS * 1000u + 2000000u);
+}
+
+static void test_slow_seek_hits_cap(void) {
+    setup();
+    D.pos = 0;
+    D.step_cost_us = 100000;                         // 79 steps = 7.9 s: the seek itself passes the cap
+    reply_t r;
+    mech_server_read(&SRV, 1599, &r);
+    CHECK(r.status == ST_IOERR && D.starts == 0);    // no read may start once the cap has passed
+}
+
+static void test_overrun_mid_stream(void) {
+    setup();
+    D.overrun_after = 50;
+    reply_t r;
+    mech_server_read(&SRV, 0, &r);
+    CHECK(r.status == ST_SOFT && (r.soft & SOFT_OVERRUN) && data_ok(&r));
+}
+
+static void test_no_disk_beats_range(void) {
+    setup();
+    D.disk_in = false;
+    reply_t r;
+    mech_server_read(&SRV, 1600, &r);
+    CHECK(r.status == ST_NODISK && D.step_strobes == 0 && !D.motor);
 }
 
 static void test_idle_off_invalidates(void) {
@@ -153,6 +200,11 @@ int main(void) {
     test_foreign_forever_fails();
     test_no_flux_times_out();
     test_overrun_recovers();
+    test_persistent_overrun_times_out();
+    test_ready_stuck_times_out();
+    test_slow_seek_hits_cap();
+    test_overrun_mid_stream();
+    test_no_disk_beats_range();
     test_idle_off_invalidates();
     test_no_disk_invalidates();
     test_stop();

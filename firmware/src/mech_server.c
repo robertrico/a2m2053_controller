@@ -52,9 +52,14 @@ static bool fill(mech_server_t *s, int track, int side, uint64_t t_req) {
     int seeks = 0, revs = 0;
     bool recal_done = false;
     for (;;) {                                         // one pass per (re)seek
+        if (now_us(s) - t_req > (uint64_t)SRV_REQ_TIMEOUT_MS * 1000u) return false;
         if (seeks >= SRV_SEEK_TRIES_MAX) return false;
-        if (seeks == 2) { mech_recal(s->bus, &s->ms); s->soft |= SOFT_RECAL; }
+        if (seeks == 2) {
+            mech_recal(s->bus, &s->ms); s->soft |= SOFT_RECAL;
+            if (now_us(s) - t_req > (uint64_t)SRV_REQ_TIMEOUT_MS * 1000u) return false;
+        }
         if (mech_seek(s->bus, &s->ms, track) != MECH_OK) { seeks++; s->ms.track_known = false; continue; }
+        if (now_us(s) - t_req > (uint64_t)SRV_REQ_TIMEOUT_MS * 1000u) return false;
         mech_select_head(s->bus, side);
         s->src->start(s->src->ctx);
         flux_dec_reset(&s->dec, track, side, &s->sink);
@@ -63,9 +68,8 @@ static bool fill(mech_server_t *s, int track, int side, uint64_t t_req) {
         uint32_t rev_len = rev_ms[track / 16] * 1000u;
         bool reseek = false;
         while (!reseek) {
-            uint64_t b0 = now_us(s);
             int n = s->src->read(s->src->ctx, s->batch, SRV_BATCH);
-            if (n < 0) { s->soft |= SOFT_OVERRUN; flux_dec_reset(&s->dec, track, side, &s->sink); continue; }
+            if (n < 0) { s->soft |= SOFT_OVERRUN; flux_dec_reset(&s->dec, track, side, &s->sink); }
             if (n > 0) {
                 uint64_t d0 = now_us(s);
                 flux_dec_push_many(&s->dec, s->batch, n);
@@ -76,7 +80,6 @@ static bool fill(mech_server_t *s, int track, int side, uint64_t t_req) {
                     if (ns > s->stats.worst_ns_per_interval) s->stats.worst_ns_per_interval = ns;
                 }
             }
-            (void)b0;
             if (trackbuf_complete(&s->tb)) { s->src->stop(s->src->ctx); return true; }
             uint64_t now = now_us(s);
             if (now - t_req > (uint64_t)SRV_REQ_TIMEOUT_MS * 1000u) { s->src->stop(s->src->ctx); return false; }
@@ -97,6 +100,7 @@ static bool fill(mech_server_t *s, int track, int side, uint64_t t_req) {
                     s->src->stop(s->src->ctx);
                     mech_recal(s->bus, &s->ms);
                     s->soft |= SOFT_RECAL;
+                    if (now_us(s) - t_req > (uint64_t)SRV_REQ_TIMEOUT_MS * 1000u) return false;
                     reseek = true;
                 }
             }
@@ -108,12 +112,12 @@ void mech_server_read(mech_server_t *s, uint16_t block, reply_t *r) {
     memset(r, 0, sizeof *r);
     r->block = block;
     int track, side, sector;
-    if (!gcr_block_to_tss(block, &track, &side, &sector)) { r->status = ST_BADBLK; return; }
     if (mech_status(s->bus, &s->ms, MREG_CSTIN)) {     // CSTIN high = no disk
         trackbuf_invalidate(&s->tb);
         r->status = ST_NODISK;
         return;
     }
+    if (!gcr_block_to_tss(block, &track, &side, &sector)) { r->status = ST_BADBLK; return; }
     uint64_t t_req = now_us(s);
     s->last_us = t_req;
     if (trackbuf_matches(&s->tb, track, side) && trackbuf_has(&s->tb, sector)) {

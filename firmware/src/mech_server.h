@@ -11,6 +11,8 @@
 #define SRV_REVS_MAX          12
 #define SRV_RECAL_AFTER_REVS  6
 #define SRV_SEEK_TRIES_MAX    4
+// Cap: no new mechanism operation or read starts after this many ms from the request; an
+// operation already running may finish (worst overshoot is its own timeout, 2 s).
 #define SRV_REQ_TIMEOUT_MS    5000
 #define SRV_IDLE_OFF_MS       1000
 #define SRV_BATCH             256
