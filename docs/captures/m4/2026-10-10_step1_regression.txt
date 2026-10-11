@@ -1,0 +1,25 @@
+oe on
+OK
+enbl on
+OK
+status
+STATUS DIRTN=0 CSTIN=0 STEP=1 WRPROT=0 MOTORON=1 TK0=0 EJECT=0 TACH=1 RDDATA0=0 RDDATA1=0 SUPERDRIVE=0 REG_B=0 SIDES=1 READY=1 DRVIN=0 REVISED=1
+OK
+status 3
+STATUS WRPROT=0
+OK
+motor on
+OK
+recal
+OK
+seek 40
+OK
+tach
+TACH edges=235 rpm=470
+OK
+motor off
+OK
+enbl off
+OK
+oe off
+OK

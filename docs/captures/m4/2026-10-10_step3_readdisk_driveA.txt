@@ -1,0 +1,7 @@
+start 20:48:30
+readdisk: 26102 ms, decode 1179 ns/interval (mean), ring backlog max 37 of 8192, 0 failed track sides, 0 with soft errors -> ../docs/private/ref/m4_driveA.po
+compare vs /Applications/ADTPro-v.r.m/disks/REF800K.po: 0 blocks differ []
+exit code 0
+end 20:48:56
+
+[exited with code 0]

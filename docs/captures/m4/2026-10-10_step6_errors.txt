@@ -1,0 +1,12 @@
+readblk 1600
+ERR bad command (try help)
+status 1
+ERR server on
+server off
+OK
+status 1
+ERR oe off
+OK
+BLK 0 af 00
+OK
+OK
