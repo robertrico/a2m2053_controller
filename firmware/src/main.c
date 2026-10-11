@@ -18,6 +18,7 @@ static bool oe_on, enbl_on, motor_on;
 static ipc_t ipc;
 static mech_server_t srv;
 static atomic_bool srv_run, srv_running;
+static bool srv_wedged;
 
 static void hw_src_start(void *c) { (void)c; flux_stream_start(); }
 static void hw_src_stop(void *c)  { (void)c; flux_stream_stop(); }
@@ -47,10 +48,14 @@ static void core1_main(void) {
 
 static bool server_set(bool on) {
     if (on) {
+        ipc_init(&ipc);                 // core 1 is stopped (srv_running false)
+        srv.ms.track_known = false;     // core 1 re-homes; core 0's record is stale
         hw_mech_outputs_enable(true);
         hw_mech_enbl(true);
         oe_on = enbl_on = true;
         atomic_store(&srv_run, true);
+        absolute_time_t up = make_timeout_time_ms(100);
+        while (!atomic_load(&srv_running) && !time_reached(up)) sleep_ms(1);
         return true;
     }
     atomic_store(&srv_run, false);
@@ -60,22 +65,29 @@ static bool server_set(bool on) {
     hw_mech_outputs_enable(false);
     oe_on = enbl_on = motor_on = false;
     hw_led(false);
-    return !atomic_load(&srv_running);
+    if (atomic_load(&srv_running)) return false;
+    ms.track_known = false;             // core 1 may have stepped
+    srv_wedged = false;
+    return true;
 }
 
 static bool request(uint16_t block, reply_t *r) {
     req_t rq = { REQ_READ, block };
     if (!ipc_req_push(&ipc, &rq)) return false;
     absolute_time_t until = make_timeout_time_ms(SRV_REQ_TIMEOUT_MS + 3000);
-    while (!ipc_reply_pop(&ipc, r)) {
-        if (time_reached(until)) return false;
+    for (;;) {
+        if (ipc_reply_pop(&ipc, r)) {
+            if (r->block == block) return true;
+            continue;                   // stale reply from an earlier timed-out request
+        }
+        if (time_reached(until)) { srv_wedged = true; return false; }
         tight_loop_contents();
     }
-    return true;
 }
 
 static void do_readblk(uint16_t block) {
     static reply_t r;
+    if (srv_wedged) { puts("ERR server wedged (server off, then on)"); return; }
     if (!request(block, &r)) { puts("ERR server timeout"); return; }
     printf("BLK %u %02x %02x\n", block, r.status, r.soft);
     for (int i = 0; i < GCR_SECTOR_LEN; i += 16) {
@@ -90,6 +102,7 @@ static void do_readdisk(void) {
     static uint8_t ts[12 * GCR_DATA_LEN];
     static reply_t r;
     uint64_t t0 = time_us_64();
+    if (srv_wedged) { puts("ERR server wedged (server off, then on)"); return; }
     printf("DISK BEGIN %d\n", GCR_BLOCKS);
     for (int t = 0; t < GCR_TRACKS; t++) {
         for (int s = 0; s < GCR_SIDES; s++) {
@@ -97,7 +110,7 @@ static void do_readdisk(void) {
             uint8_t status = ST_OK, soft = 0;
             for (int sec = 0; sec < nsect; sec++) {
                 uint16_t b = (uint16_t)gcr_tss_to_block(t, s, sec);
-                if (!request(b, &r)) { memset(&r, 0, sizeof r); r.status = ST_IOERR; }
+                if (!request(b, &r)) { puts("\nERR server timeout"); return; }
                 memcpy(ts + sec * GCR_DATA_LEN, r.data + GCR_TAG_LEN, GCR_DATA_LEN);
                 if (r.status == ST_IOERR || r.status == ST_NODISK) status = r.status;
                 else if (r.status == ST_SOFT && status == ST_OK) status = ST_SOFT;
@@ -181,8 +194,8 @@ static void do_tach(const mech_bus_t *b) {
 static void execute(const con_cmd_t *c) {
     bool mech_cmd = c->op == CON_OE || c->op == CON_ENBL || c->op == CON_STATUS || c->op == CON_CMD ||
                     c->op == CON_MOTOR || c->op == CON_RECAL || c->op == CON_SEEK || c->op == CON_HEAD ||
-                    c->op == CON_EJECT || c->op == CON_TACH || c->op == CON_CAPTURE;
-    if (mech_cmd && atomic_load(&srv_run)) { puts("ERR server on"); return; }
+                    c->op == CON_EJECT || c->op == CON_TACH || c->op == CON_CAPTURE || c->op == CON_SETTLE;
+    if (mech_cmd && (atomic_load(&srv_run) || atomic_load(&srv_running))) { puts("ERR server on"); return; }
     const mech_bus_t *b = hw_mech_bus();
     switch (c->op) {
     case CON_SERVER:
