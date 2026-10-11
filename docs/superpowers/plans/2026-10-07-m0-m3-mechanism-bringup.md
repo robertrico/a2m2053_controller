@@ -2683,7 +2683,7 @@ On the Apple IIe with the **working** UniDisk, use ADTPro to write REF800K.po to
 
 Insert the reference disk in the dead-board drive's mechanism. Console: `oe on`, `enbl on`, `motor on`, `recal`. Then from `tools/`:
 ```bash
-.venv/bin/python a2mflux.py capture --port /dev/tty.usbmodem* --track 0 --side 0 --out ../docs/captures/m3/t00s0.flux
+.venv/bin/python a2mflux.py capture --port /dev/cu.usbmodem114401 --track 0 --side 0 --out ../docs/captures/m3/t00s0.flux
 .venv/bin/python a2mflux.py hist ../docs/captures/m3/t00s0.flux
 ```
 Expected: three peaks around 2.0, 4.0 and 6.1 us (1, 2 and 3 bit cells). Record the histogram.
@@ -2710,7 +2710,7 @@ If probe shows 0 good for every order but headers decode: **stop** and record. C
 - [ ] **Step 4: Full disk**
 
 ```bash
-.venv/bin/python a2mflux.py disk --port /dev/tty.usbmodem* --out ../docs/private/ref/read_800k.po \
+.venv/bin/python a2mflux.py disk --port /dev/cu.usbmodem114401 --out ../docs/private/ref/read_800k.po \
     --compare /Applications/ADTPro-v.r.m/disks/REF800K.po
 ```
 Pass: `1600/1600 blocks good` and `0 blocks differ`; exit code 0.
