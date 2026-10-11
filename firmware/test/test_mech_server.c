@@ -233,6 +233,7 @@ static void test_write_then_read_not_stale(void) {
     CHECK(r.status == ST_OK && r.block == 30 && r.tries == 1 && r.soft == 0);
     CHECK(D.tx_fires == 1 && !D.gate_low && D.addr_while_writing == 0);
     CHECK(r.fire_us < 100);
+    CHECK(D.start_us - D.abort_us >= SRV_ERASE_TAIL_US);   // erase tail before the verify read starts
     mech_server_read(&SRV, 30, &r);
     CHECK(r.status == ST_OK && memcmp(r.data, p, GCR_SECTOR_LEN) == 0);
     mech_server_read(&SRV, 31, &r);                  // neighbour untouched

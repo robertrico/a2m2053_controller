@@ -54,6 +54,7 @@ typedef struct {
     size_t tx_len;
     int tx_loads, tx_fires, tx_aborts;
     uint64_t abort_us;            // time of the last abort
+    uint64_t start_us;            // time of the last fs_start
     bool gate_low;                // between fire and abort
     uint64_t tx_end_us;
     bool tx_hang;                 // busy never clears
@@ -197,7 +198,7 @@ static void fd_splice(fake_drive_t *d, int start, const uint8_t *buf, size_t len
         fd_wset(d, t, s, (int)(((size_t)start + k) % (size_t)n), (buf[k >> 3] >> (7 - (k & 7))) & 1);
 }
 
-static void fs_start(void *c) { fake_drive_t *d = c; d->streaming = true; d->starts++; d->reads = 0; d->rd = 0; d->revs = 0; fd_build(d); }
+static void fs_start(void *c) { fake_drive_t *d = c; d->streaming = true; d->starts++; d->start_us = d->now_us; d->reads = 0; d->rd = 0; d->revs = 0; fd_build(d); }
 static void fs_stop(void *c)  { ((fake_drive_t *)c)->streaming = false; }
 static int fs_read(void *c, uint16_t *buf, int max) {
     fake_drive_t *d = c;

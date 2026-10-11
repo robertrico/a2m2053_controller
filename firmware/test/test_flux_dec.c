@@ -209,6 +209,39 @@ static void test_header_callback_foreign_and_bad_data(void) {
     CHECK(h.n == 11 && h.nsec == 10);
 }
 
+// A header whose address checksum is bad must not fire the header callback: it gates M5 writes.
+static int hdr_count_for_addr(const uint8_t addr[GCR_ADDR_FIELD_LEN]) {
+    uint8_t bytes[64];
+    size_t nb = 0;
+    for (int i = 0; i < 8; i++) bytes[nb++] = 0xFF;
+    memcpy(bytes + nb, addr, GCR_ADDR_FIELD_LEN); nb += GCR_ADDR_FIELD_LEN;
+    for (int i = 0; i < 8; i++) bytes[nb++] = 0xFF;
+    uint16_t iv[64 * 8];
+    int ni = 0, run = 0;
+    for (size_t k = 0; k < nb * 8; k++) {
+        run++;
+        if ((bytes[k >> 3] >> (7 - (k & 7))) & 1) {
+            iv[ni++] = (uint16_t)((float)run * FLUX_DEC_CELL_COUNTS - FLUX_DEC_OVERHEAD + 0.5f);
+            run = 0;
+        }
+    }
+    hdr_log_t h;
+    memset(&h, 0, sizeof h);
+    flux_dec_t d;
+    flux_dec_sink_t k = { .sector = hl_sec, .ctx = &h, .header = hl_hdr };
+    flux_dec_reset(&d, 5, 0, &k);
+    flux_dec_push_many(&d, iv, ni);
+    return h.n;
+}
+
+static void test_header_bad_checksum_no_callback(void) {
+    uint8_t a[GCR_ADDR_FIELD_LEN];
+    gcr_encode_address(5, 3, 0, a);
+    CHECK(hdr_count_for_addr(a) == 1);            // control: the good header is seen
+    a[7] = a[7] == 0x96 ? 0x97 : 0x96;            // checksum nibble changed to another valid nibble
+    CHECK(hdr_count_for_addr(a) == 0);
+}
+
 int main(void) {
     test_clean();
     test_jitter_and_drift();
@@ -220,5 +253,6 @@ int main(void) {
     test_pll_recovers_from_noise();
     test_header_callback();
     test_header_callback_foreign_and_bad_data();
+    test_header_bad_checksum_no_callback();
     TEST_END();
 }
