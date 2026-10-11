@@ -1,0 +1,7 @@
+start 20:59:41
+readdisk: 26101 ms, decode 1179 ns/interval (mean), ring backlog max 36 of 8192, 0 failed track sides, 0 with soft errors -> ../docs/private/ref/m4_bracket_driveA.po
+compare vs /Applications/ADTPro-v.r.m/disks/REF800K.po: 0 blocks differ []
+exit code 0
+end 21:00:07
+bfed064fef52e30578723b3c9fcc6768ab52907f4bb1aa4670f70823657742ab  ../docs/private/ref/m4_bracket_driveA.po
+bfed064fef52e30578723b3c9fcc6768ab52907f4bb1aa4670f70823657742ab  /Applications/ADTPro-v.r.m/disks/REF800K.po
