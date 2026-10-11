@@ -107,6 +107,23 @@ static void test_seek_unknown_recals_first(void) {
     CHECK(s.track == 5 && s.track_known);
 }
 
+// READY goes low only on the third read: the head is still settling after the recal.
+static bool rd_ready_late(fake_t *f, uint8_t a) {
+    if (a == MREG_TK0) return false;
+    if (a == MREG_READY) return f->reads[MREG_READY] < 3;
+    return true;
+}
+
+// M5 bench 2026-10-11: a seek that needed only the recal (target track 0) returned
+// before READY, and the format loop then saw READY high on every try.
+static void test_seek_after_recal_waits_ready(void) {
+    fake_t f; mech_bus_t b = fake_bus(&f, rd_ready_late);
+    mech_state_t s; mech_state_init(&s);
+    CHECK(mech_seek(&b, &s, 0) == MECH_OK);
+    CHECK(f.reads[MREG_READY] >= 3);
+    CHECK(s.track == 0 && s.track_known);
+}
+
 static void test_motor_on_not_ready(void) {
     fake_t f; mech_bus_t b = fake_bus(&f, rd_all_high);
     mech_state_t s; mech_state_init(&s);
@@ -183,6 +200,7 @@ int main(void) {
     test_seek_range();
     test_seek_counts_steps();
     test_seek_unknown_recals_first();
+    test_seek_after_recal_waits_ready();
     test_motor_on_not_ready();
     test_eject_no_disk();
     test_eject_success();

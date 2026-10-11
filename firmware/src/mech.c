@@ -79,18 +79,23 @@ mech_err_t mech_recal(const mech_bus_t *b, mech_state_t *s) {
 
 mech_err_t mech_seek(const mech_bus_t *b, mech_state_t *s, int track) {
     if (track < 0 || track >= MECH_TRACKS) return MECH_ERR_RANGE;
+    bool moved = false;
     if (!s->track_known) {
         mech_err_t e = mech_recal(b, s);
         if (e != MECH_OK) return e;
+        moved = true;                   // a recal moves the head too: wait READY below
     }
     int delta = track - s->track;
-    if (delta == 0) return MECH_OK;
-    mech_err_t e = mech_step(b, s, delta > 0, delta > 0 ? delta : -delta);
-    if (e != MECH_OK) {
-        s->track_known = false;
-        return e;
+    if (delta != 0) {
+        mech_err_t e = mech_step(b, s, delta > 0, delta > 0 ? delta : -delta);
+        if (e != MECH_OK) {
+            s->track_known = false;
+            return e;
+        }
+        s->track = track;
+        moved = true;
     }
-    s->track = track;
+    if (!moved) return MECH_OK;
     if (!wait_level(b, s, MREG_READY, false, MECH_READY_POLL_US, MECH_READY_TIMEOUT_US))
         return MECH_ERR_NOT_READY;
     return MECH_OK;
