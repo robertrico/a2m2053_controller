@@ -1,6 +1,7 @@
 """Parse the firmware's flux capture block (see firmware/src/main.c, capture)."""
 import re
 import zlib
+from dataclasses import dataclass
 
 from . import gcr as _gcr
 
@@ -13,6 +14,10 @@ TS_END_RE = re.compile(rb"\r?\nTS END ([0-9a-f]{8})\r?\n")
 DISK_END_RE = re.compile(rb"DISK END (\d+) (\d+) (\d+)\r?\n")
 BLK_RE = re.compile(r"BLK (\d+) ([0-9a-f]{2}) ([0-9a-f]{2})")
 
+WBLK_RE = re.compile(r"BLK (\d+) ([0-9a-f]{2}) ([0-9a-f]{2}) ([0-9a-f]{8}) (\d+) (\d+) (\d+)")
+FMT_RE = re.compile(r"FMT (\d+) (\d+) (\d+) ([0-9a-f]{2})")
+FMT_END_RE = re.compile(r"FORMAT END ([0-9a-f]{2}) (\d+)")
+
 
 class CaptureError(Exception):
     pass
@@ -20,6 +25,17 @@ class CaptureError(Exception):
 
 class DiskError(CaptureError):
     pass
+
+
+@dataclass
+class WriteResult:
+    block: int
+    status: int
+    soft: int
+    crc: int
+    tries: int
+    fire_us: int
+    backlog: int
 
 
 def parse_capture(stream: bytes) -> tuple[list[int], int]:
@@ -87,6 +103,25 @@ def parse_blk(lines):
                 raise CaptureError(f"BLK data is {len(data)} bytes")
             return int(m[1]), int(m[2], 16), int(m[3], 16), data
     raise CaptureError("no BLK line")
+
+
+def parse_wblk(lines) -> WriteResult:
+    for line in lines:
+        m = WBLK_RE.fullmatch(line.strip())
+        if m:
+            return WriteResult(int(m[1]), int(m[2], 16), int(m[3], 16), int(m[4], 16),
+                               int(m[5]), int(m[6]), int(m[7]))
+    raise CaptureError("no BLK line")
+
+
+def parse_fmt(line: str):
+    m = FMT_RE.fullmatch(line.strip())
+    return (int(m[1]), int(m[2]), int(m[3]), int(m[4], 16)) if m else None
+
+
+def parse_format_end(line: str):
+    m = FMT_END_RE.fullmatch(line.strip())
+    return (int(m[1], 16), int(m[2])) if m else None
 
 
 def _err_at(buf: bytes, pos: int):

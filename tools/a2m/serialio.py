@@ -14,7 +14,7 @@ class Console:
     def __init__(self, port: str, baud: int = 115200):
         self.ser = serial.Serial(port, baud, timeout=0.2)
 
-    def cmd(self, line: str, timeout: float = 5.0) -> list[str]:
+    def cmd(self, line: str, timeout: float = 5.0, on_line=None) -> list[str]:
         self.ser.reset_input_buffer()
         self.ser.write((line + "\n").encode())
         deadline = time.monotonic() + timeout
@@ -30,6 +30,8 @@ class Console:
                     raise ConsoleError(f"{line!r}: {s}")
                 if s:
                     lines.append(s)
+                    if on_line:
+                        on_line(s)
         raise ConsoleError(f"timeout on {line!r}")
 
     def capture(self, track: int, side: int, count: int, timeout: float = 10.0) -> bytes:
@@ -58,6 +60,32 @@ class Console:
 
     def readblk(self, block: int, timeout: float = 10.0) -> list[str]:
         return self.cmd(f"readblk {block}", timeout=timeout)
+
+    def writeblk(self, block: int, data: bytes, timeout: float = 15.0) -> list[str]:
+        """writeblk: send the 512 bytes only after the board's SEND 512 line."""
+        if len(data) != 512:
+            raise ValueError("writeblk needs exactly 512 bytes")
+        self.ser.reset_input_buffer()
+        self.ser.write(f"writeblk {block}\n".encode())
+        deadline = time.monotonic() + timeout
+        lines, buf, sent = [], b"", False
+        while time.monotonic() < deadline:
+            buf += self.ser.read(4096)
+            while b"\n" in buf:
+                raw, buf = buf.split(b"\n", 1)
+                s = raw.decode(errors="replace").strip()
+                if s.startswith("ERR"):
+                    raise ConsoleError(f"writeblk {block}: {s}")
+                if s == "SEND 512" and not sent:
+                    self.ser.write(data)
+                    sent = True
+                elif s == "OK":
+                    if not sent:
+                        raise ConsoleError(f"writeblk {block}: OK before SEND")
+                    return lines
+                elif s:
+                    lines.append(s)
+        raise ConsoleError(f"writeblk {block} timed out")
 
     def readdisk(self, timeout: float = 900.0) -> bytes:
         self.ser.reset_input_buffer()

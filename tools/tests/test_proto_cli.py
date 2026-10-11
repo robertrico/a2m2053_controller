@@ -278,3 +278,114 @@ def test_parse_disk_wrong_count():
     with pytest.raises(_proto.DiskError) as exc:
         _proto.parse_disk(stream_bad)
     assert "1599" in str(exc.value)
+
+
+class RecordingSerial(FakeSerial):
+    def __init__(self, chunks):
+        super().__init__(chunks)
+        self.sent = []
+
+    def write(self, data):
+        self.sent.append(bytes(data))
+
+
+def _console(chunks):
+    con = serialio.Console.__new__(serialio.Console)
+    con.ser = RecordingSerial(chunks)
+    return con
+
+
+def test_parse_wblk():
+    r = proto.parse_wblk(["writeblk 5", "SEND 512", "BLK 5 e7 04 1a2b3c4d 2 12 3"])
+    assert (r.block, r.status, r.soft, r.crc, r.tries, r.fire_us, r.backlog) == (5, 0xE7, 4, 0x1A2B3C4D, 2, 12, 3)
+    with pytest.raises(proto.CaptureError):
+        proto.parse_wblk(["SEND 512"])
+
+
+def test_parse_format_lines():
+    assert proto.parse_fmt("FMT 3 1 2 e7") == (3, 1, 2, 0xE7)
+    assert proto.parse_fmt("FORMAT END 00 81234") is None
+    assert proto.parse_format_end("FORMAT END a7 500") == (0xA7, 500)
+    assert proto.parse_format_end("FMT 3 1 2 e7") is None
+
+
+def test_writeblk_sends_payload_after_prompt():
+    data = (b"\nERR x\nOK\n" * 60)[:512]           # binary that looks like console lines
+    crc = zlib.crc32(data)
+    con = _console([b"writeblk 7\r\nSE", b"ND 512\r\n", b"BLK 7 00 00 %08x 1 9 0\r\nOK\r\n" % crc])
+    lines = con.writeblk(7, data, timeout=2.0)
+    assert con.ser.sent == [b"writeblk 7\n", data]
+    assert proto.parse_wblk(lines).crc == crc
+
+
+def test_writeblk_err_and_length():
+    con = _console([b"SEND 512\r\n", b"ERR timeout\r\n"])
+    with pytest.raises(serialio.ConsoleError):
+        con.writeblk(7, bytes(512), timeout=2.0)
+    with pytest.raises(ValueError):
+        _console([]).writeblk(7, bytes(100), timeout=2.0)
+
+
+def test_cmd_streams_lines():
+    seen = []
+    con = _console([b"format 3 1\r\nFMT 3 1 1 00\r\n", b"FORMAT END 00 410\r\nOK\r\n"])
+    lines = con.cmd("format 3 1", timeout=2.0, on_line=seen.append)
+    assert "FMT 3 1 1 00" in seen and "FORMAT END 00 410" in lines
+
+
+class FakeWriteConsole:
+    instances = []
+
+    def __init__(self, port, fail_block=None, bad_crc_block=None):
+        self.blocks = []
+        self.fail_block, self.bad_crc_block = fail_block, bad_crc_block
+        FakeWriteConsole.instances.append(self)
+
+    def writeblk(self, block, data, timeout=15.0):
+        self.blocks.append(block)
+        st = "a7" if block == self.fail_block else "00"
+        crc = zlib.crc32(data) ^ (1 if block == self.bad_crc_block else 0)
+        return [f"BLK {block} {st} 00 {crc:08x} 1 10 0"]
+
+    def cmd(self, line, timeout=5.0, on_line=None):
+        out = ["FMT 0 0 1 00", "FMT 0 1 2 e7", "FORMAT END e7 900"]
+        for s in out:
+            if on_line:
+                on_line(s)
+        return out
+
+
+def _writedisk(tmp_path, **kw):
+    img = tmp_path / "x.po"
+    img.write_bytes(bytes(range(256)) * 3200)
+    FakeWriteConsole.instances = []
+    with patch("a2m.serialio.Console", lambda port: FakeWriteConsole(port, **kw)):
+        return cli.main(["writedisk", "--port", "p", "--image", str(img)])
+
+
+def test_writedisk_ok(tmp_path):
+    assert _writedisk(tmp_path) == 0
+    assert FakeWriteConsole.instances[0].blocks == list(range(1600))
+
+
+def test_writedisk_stops_on_error(tmp_path):
+    assert _writedisk(tmp_path, fail_block=30) == 1
+    assert FakeWriteConsole.instances[0].blocks[-1] == 30
+
+
+def test_writedisk_crc_mismatch(tmp_path):
+    assert _writedisk(tmp_path, bad_crc_block=5) == 2
+
+
+def test_writedisk_wrong_size(tmp_path):
+    img = tmp_path / "x.po"
+    img.write_bytes(bytes(1000))
+    assert cli.main(["writedisk", "--port", "p", "--image", str(img)]) == 2
+
+
+def test_format_cli(capsys):
+    with patch("a2m.serialio.Console", FakeWriteConsole):
+        assert cli.main(["format", "--port", "p"]) == 0
+    out = capsys.readouterr().out
+    assert "FMT 0 1 2 e7" in out and "status e7" in out
+    assert cli.main(["format", "--port", "p", "--cyl", "3"]) == 2

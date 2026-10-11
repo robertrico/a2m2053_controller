@@ -2,11 +2,13 @@
 import argparse
 import itertools
 import sys
+import time
+import zlib
 from pathlib import Path
 
 from . import gcr
 from .flux import intervals_to_bits, bits_to_nibbles, histogram_lines
-from .proto import parse_capture, CaptureError, parse_disk, parse_blk
+from .proto import parse_capture, CaptureError, parse_disk, parse_blk, parse_wblk, parse_format_end
 from .track import decode_track, TrackResult
 
 
@@ -116,6 +118,16 @@ def main(argv=None) -> int:
     b = sub.add_parser("readblk", help="read one block on the board (M4)")
     b.add_argument("--port", required=True); b.add_argument("--block", type=int, required=True)
     b.add_argument("--compare")
+    w = sub.add_parser("writeblk", help="write one block on the board (M5)")
+    w.add_argument("--port", required=True); w.add_argument("--block", type=int, required=True)
+    g = w.add_mutually_exclusive_group(required=True)
+    g.add_argument("--data", help="file with exactly 512 bytes")
+    g.add_argument("--pattern", type=lambda x: int(x, 0), help="fill byte, e.g. 0xA5")
+    wd = sub.add_parser("writedisk", help="write a whole .po image block by block (M5)")
+    wd.add_argument("--port", required=True); wd.add_argument("--image", required=True)
+    f = sub.add_parser("format", help="low-level format on the board (M5)")
+    f.add_argument("--port", required=True)
+    f.add_argument("--cyl", type=int); f.add_argument("--side", type=int)
     args = ap.parse_args(argv)
 
     if args.cmd == "hist":
@@ -183,6 +195,71 @@ def main(argv=None) -> int:
         except (CaptureError, ConsoleError) as e:
             print(f"readblk failed: {e}")
             return 2
+    if args.cmd == "writeblk":
+        from .serialio import Console, ConsoleError
+        data = Path(args.data).read_bytes() if args.data else bytes([args.pattern & 0xFF]) * 512
+        if len(data) != 512:
+            print("writeblk: data must be exactly 512 bytes")
+            return 2
+        try:
+            r = parse_wblk(Console(args.port).writeblk(args.block, data))
+        except (CaptureError, ConsoleError) as e:
+            print(f"writeblk failed: {e}")
+            return 2
+        if r.block != args.block or r.crc != zlib.crc32(data):
+            print("writeblk: transfer check failed (block or CRC)")
+            return 2
+        print(f"block {r.block}: status {r.status:02x} soft {r.soft:02x} tries {r.tries} "
+              f"fire {r.fire_us} us backlog {r.backlog}")
+        return 0 if r.status in (0x00, 0xE7) else 1
+    if args.cmd == "writedisk":
+        from .serialio import Console, ConsoleError
+        img = Path(args.image).read_bytes()
+        if len(img) != gcr.TOTAL_BLOCKS * 512:
+            print(f"writedisk: {args.image} is {len(img)} bytes, expected {gcr.TOTAL_BLOCKS * 512}")
+            return 2
+        con = Console(args.port)
+        t0, soft, fire_max = time.monotonic(), 0, 0
+        try:
+            for t in range(gcr.TRACKS):
+                for s in range(gcr.SIDES):
+                    for sec in range(gcr.sectors_per_track(t)):
+                        b = gcr.block_number(t, s, sec)
+                        data = img[b * 512:(b + 1) * 512]
+                        r = parse_wblk(con.writeblk(b, data))
+                        if r.block != b or r.crc != zlib.crc32(data):
+                            print(f"writedisk: block {b}: transfer check failed")
+                            return 2
+                        if r.status not in (0x00, 0xE7):
+                            print(f"writedisk: block {b} (t{t} s{s} sec{sec}): status {r.status:02x} after {r.tries} writes")
+                            return 1
+                        soft += r.status == 0xE7
+                        fire_max = max(fire_max, r.fire_us)
+                    print(f"TS {t} {s} ok")
+        except (CaptureError, ConsoleError) as e:
+            print(f"writedisk failed: {e}")
+            return 2
+        print(f"writedisk: {gcr.TOTAL_BLOCKS} blocks in {time.monotonic() - t0:.1f} s, "
+              f"{soft} with soft errors, fire max {fire_max} us")
+        return 0
+    if args.cmd == "format":
+        from .serialio import Console, ConsoleError
+        if (args.cyl is None) != (args.side is None):
+            print("format: give both --cyl and --side, or neither")
+            return 2
+        line = "format" if args.cyl is None else f"format {args.cyl} {args.side}"
+        try:
+            lines = Console(args.port).cmd(line, timeout=900.0,
+                                           on_line=lambda s: print(s) if s.startswith("FMT") else None)
+        except ConsoleError as e:
+            print(f"format failed: {e}")
+            return 2
+        end = next((e for e in map(parse_format_end, lines) if e), None)
+        if end is None:
+            print("format: no FORMAT END line")
+            return 2
+        print(f"format: status {end[0]:02x}, {end[1]} ms")
+        return 0 if end[0] in (0x00, 0xE7) else 1
     return _disk(args)
 
 
