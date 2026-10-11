@@ -19,7 +19,7 @@
 #define PIN_LSTRB        15
 #define PIN_SEL          16
 #define PIN_MECH_ENBL    17   // /ENBL, active low
-#define PIN_MECH_WRTGATE 18   // /WRTGATE, active low. Held high in M0-M3.
+#define PIN_MECH_WRTGATE 18   // /WRTGATE, active low. Driven only by flux_tx.c (M5).
 #define PIN_MECH_WRTDATA 19
 #define PIN_MECH_RD      20   // read data + status (CA0-2/SEL select)
 #define PIN_MECH_OE      21   // U2 + U4 /OE, active low, 10k pull-up to 3V3

@@ -1,0 +1,26 @@
+; Write side of the IWM for the mechanism's WRTDATA and /WRTGATE.
+; One bit cell = 32 PIO cycles (clkdiv sets 2.0425 us). A 1 bit toggles WRTDATA
+; (ERS86 3.2.6: each level change writes a flux transition); a 0 bit leaves it.
+; The CPU puts (bit count - 1) in the TX FIFO, then DMA feeds bytes, MSB first.
+; /WRTGATE goes low one cell before the first possible edge (T3 >= 1.8 us) and
+; high one cell after the last cell (T4 >= 2 us), then the SM parks.
+; /WRTGATE uses `set pins` (side-set would leave 3 delay bits, too few).
+.program flux_tx
+    pull block                ; bit count - 1
+    mov y, osr
+    out null, 32              ; empty the OSR: autopull loads the first data byte
+    set pins, 0 [31]          ; /WRTGATE low, one cell (T3)
+bitloop:
+    out x, 1                  ; 1
+    jmp !x skip               ; 1
+    mov pins, ~pins [28]      ; 29: 1 bit, toggle WRTDATA
+    jmp y-- bitloop           ; 1  -> 32 cycles per cell
+    jmp tail
+skip:
+    nop [28]                  ; 29: 0 bit
+    jmp y-- bitloop           ; 1  -> 32 cycles per cell
+tail:
+    nop [31]                  ; T4: one more cell after the last
+    set pins, 1               ; /WRTGATE high
+public park:
+    jmp park
