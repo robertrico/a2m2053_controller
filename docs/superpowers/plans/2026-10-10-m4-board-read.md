@@ -1173,7 +1173,7 @@ git commit -m "feat(fw): track buffer and lock-free inter-core queues"
 - Produces (exact):
   - `typedef struct { void (*start)(void *ctx); void (*stop)(void *ctx); int (*read)(void *ctx, uint16_t *buf, int max); uint64_t (*now_us)(void *ctx); void *ctx; } flux_src_t;` (`read` returns intervals copied, 0 if none yet, -1 on ring overrun)
   - constants `SRV_REVS_MAX 12`, `SRV_RECAL_AFTER_REVS 6`, `SRV_SEEK_TRIES_MAX 4`, `SRV_REQ_TIMEOUT_MS 5000`, `SRV_IDLE_OFF_MS 1000`, `SRV_BATCH 256`
-  - `typedef struct { uint32_t intervals; uint32_t worst_ns_per_interval; uint32_t fills; } srv_stats_t;`
+  - `typedef struct { uint64_t decode_us; uint32_t intervals; uint32_t fills; } srv_stats_t;`
   - Ruling (spec section 5 said "worst cycles per interval"): measured as the worst nanoseconds per interval over full 256-interval batches, using the microsecond timer, because the M33 cycle counter needs debug-block setup this task doesn't otherwise touch. The pass threshold is under 2000 ns (one interval per 2 us). Same question answered.
   - `mech_server_t`; `void mech_server_init(mech_server_t *s, const mech_bus_t *bus, const flux_src_t *src);` `void mech_server_read(mech_server_t *s, uint16_t block, reply_t *r);` `void mech_server_idle(mech_server_t *s);` `void mech_server_stop(mech_server_t *s);` `const srv_stats_t *mech_server_stats(const mech_server_t *s);`
 - Ruling (tightens spec section 4 step 8): the track buffer is invalidated when the motor idles off and whenever CSTIN reads "no disk", so a swapped disk never returns cached sectors.
@@ -2035,7 +2035,7 @@ git commit -m "feat(fw): core 1 mechanism server, readblk and readdisk over USB"
 
 **Interfaces:**
 - Consumes: the Task 7 wire protocol; `gcr.sectors_per_track`, `gcr.block_number`.
-- Produces: `proto.DiskError(CaptureError)`; `proto.parse_disk(stream: bytes) -> (image: bytes, tracks: list[tuple[int,int,int,int]], worst_ns: int, total_ms: int)` where `tracks` = `(track, side, status, soft)` per track side; `proto.parse_blk(lines: list[str]) -> (block, status, soft, data: bytes)`; `Console.readdisk(timeout=900.0) -> bytes`; `Console.readblk(n) -> list[str]`; CLI subcommands `readdisk --port P --out F [--compare REF]` and `readblk --port P --block N [--compare REF]`.
+- Produces: `proto.DiskError(CaptureError)`; `proto.parse_disk(stream: bytes) -> (image: bytes, tracks: list[tuple[int,int,int,int]], mean_ns: int, backlog_max: int, total_ms: int)` where `tracks` = `(track, side, status, soft)` per track side; `proto.parse_blk(lines: list[str]) -> (block, status, soft, data: bytes)`; `Console.readdisk(timeout=900.0) -> bytes`; `Console.readblk(n) -> list[str]`; CLI subcommands `readdisk --port P --out F [--compare REF]` and `readblk --port P --block N [--compare REF]`.
 
 - [ ] **Step 1: Write the failing tests** (append to `tools/tests/test_proto_cli.py`)
 
@@ -2271,11 +2271,11 @@ Expected: `status 00` and `matches reference` for every block. A status of `e7` 
 ```bash
 .venv/bin/python a2mflux.py readdisk --port /dev/cu.usbmodem114401 --out ../docs/private/ref/m4_driveA.po --compare /Applications/ADTPro-v.r.m/disks/REF800K.po
 ```
-Pass: `0 failed track sides`, `0 blocks differ`, exit code 0. Record the total ms, the worst ns/interval, and how many track sides reported soft errors. Compare the time with M3's 2 min 12 s.
+Pass: `0 failed track sides`, `0 blocks differ`, exit code 0. The `readdisk:` line reports the total ms, the mean decode ns/interval and the max ring backlog (of 8192). Record all three, and how many track sides reported soft errors. Compare the time with M3's 2 min 12 s.
 
 - [ ] **Step 4: Decode headroom**
 
-The worst ns/interval must be under 2000 ns (one interval per 2 us is the worst-case rate). Record the margin. If it is above about 1500 ns, note it as a risk for M5/M7.
+Pass: mean decode under 2000 ns/interval (one interval per 2 us is the worst-case rate) AND max ring backlog under 4096 intervals (half the ring). Record both numbers and the margin. If the mean is above about 1500 ns or the backlog above about 2048, note it as a risk for M5/M7.
 
 - [ ] **Step 5: Drive B**
 
@@ -2287,7 +2287,7 @@ With the server on and no disk: `readblk 0` -> `status af`. Console `readblk 160
 
 - [ ] **Step 7: Record**
 
-`docs/build_log/m4.md`: commands and results for each step, total time, worst ns/interval, soft-error counts, anything surprising. Then:
+`docs/build_log/m4.md`: commands and results for each step, total time, mean ns/interval, max ring backlog, soft-error counts, anything surprising. Then:
 ```bash
 git add docs/build_log/m4.md docs/captures/m4
 git commit -m "docs(m4): blocks read on the board, whole disk byte-identical"

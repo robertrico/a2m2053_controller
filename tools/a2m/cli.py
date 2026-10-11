@@ -143,11 +143,12 @@ def main(argv=None) -> int:
         from .serialio import Console, ConsoleError
         try:
             con = Console(args.port)
-            img, tracks, worst, ms = parse_disk(con.readdisk())
+            img, tracks, mean_ns, backlog, ms = parse_disk(con.readdisk())
             Path(args.out).write_bytes(img)
             bad = [(t, s, st) for (t, s, st, _) in tracks if st not in (0x00, 0xE7)]
             soft = [(t, s) for (t, s, st, _) in tracks if st == 0xE7]
-            print(f"readdisk: {ms} ms, worst decode {worst} ns/interval, "
+            print(f"readdisk: {ms} ms, decode {mean_ns} ns/interval (mean), "
+                  f"ring backlog max {backlog} of 8192, "
                   f"{len(bad)} failed track sides, {len(soft)} with soft errors -> {args.out}")
             if bad:
                 print("failed:", bad[:20])

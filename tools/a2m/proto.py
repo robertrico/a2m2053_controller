@@ -10,7 +10,7 @@ END_RE = re.compile(rb"\r?\nFLUX END ([0-9a-f]{8})\r?\n")
 DISK_BEGIN_RE = re.compile(rb"DISK BEGIN (\d+)\r?\n")
 TS_RE = re.compile(rb"TS (\d+) (\d+) (\d+) ([0-9a-f]{2}) ([0-9a-f]{2})\r?\n")
 TS_END_RE = re.compile(rb"\r?\nTS END ([0-9a-f]{8})\r?\n")
-DISK_END_RE = re.compile(rb"DISK END (\d+) (\d+)\r?\n")
+DISK_END_RE = re.compile(rb"DISK END (\d+) (\d+) (\d+)\r?\n")
 BLK_RE = re.compile(r"BLK (\d+) ([0-9a-f]{2}) ([0-9a-f]{2})")
 
 
@@ -75,7 +75,7 @@ def parse_disk(stream: bytes):
     d = DISK_END_RE.match(stream, pos)
     if not d:
         raise DiskError("no DISK END")
-    return bytes(image), tracks, int(d[1]), int(d[2])
+    return bytes(image), tracks, int(d[1]), int(d[2]), int(d[3])
 
 
 def parse_blk(lines):
@@ -89,6 +89,22 @@ def parse_blk(lines):
     raise CaptureError("no BLK line")
 
 
+def _err_at(buf: bytes, pos: int):
+    """At a header position: None if no ERR there, False if an ERR line is still arriving,
+    else the complete ERR line (stripped)."""
+    while pos < len(buf) and buf[pos] in b"\r\n":
+        pos += 1
+    tail = buf[pos:pos + 3]
+    if not tail:
+        return None
+    if tail == b"ERR":
+        nl = buf.find(b"\n", pos)
+        return False if nl < 0 else buf[pos:nl].decode(errors="replace").strip()
+    if len(tail) < 3 and b"ERR".startswith(tail):
+        return False                    # could still become ERR
+    return None
+
+
 def disk_stream_complete(buf: bytes) -> bool:
     """True once the whole readdisk stream is in buf. Raises DiskError if the
     firmware printed an ERR line where a TS header or DISK END was expected."""
@@ -98,11 +114,11 @@ def disk_stream_complete(buf: bytes) -> bool:
     pos = m.end()
     for t in range(_gcr.TRACKS):
         for s in range(_gcr.SIDES):
-            # Check for ERR before TS header
-            if buf[pos:].startswith(b"ERR") or buf[pos:].startswith(b"\r\nERR") or buf[pos:].startswith(b"\nERR"):
-                err_line = buf[pos:].split(b"\n")[0].decode(errors="replace").strip()
-                raise DiskError(err_line)
-            # Match TS header
+            err = _err_at(buf, pos)
+            if err is False:
+                return False
+            if err is not None:
+                raise DiskError(err)
             h = TS_RE.match(buf, pos)
             if not h:
                 if len(buf) - pos < 64:  # header may be incomplete
@@ -112,18 +128,17 @@ def disk_stream_complete(buf: bytes) -> bool:
             end = h.end() + n * 512
             if len(buf) < end:
                 return False
-            # Match TS END
             e = TS_END_RE.match(buf, end)
             if not e:
                 if len(buf) - end < 32:
                     return False
                 raise DiskError(f"no TS END after TS {t} {s}")
             pos = e.end()
-    # Check for ERR before DISK END
-    if buf[pos:].startswith(b"ERR") or buf[pos:].startswith(b"\r\nERR") or buf[pos:].startswith(b"\nERR"):
-        err_line = buf[pos:].split(b"\n")[0].decode(errors="replace").strip()
-        raise DiskError(err_line)
-    # Match DISK END
+    err = _err_at(buf, pos)
+    if err is False:
+        return False
+    if err is not None:
+        raise DiskError(err)
     d = DISK_END_RE.match(buf, pos)
     if d:
         return True

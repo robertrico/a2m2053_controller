@@ -75,9 +75,15 @@ void flux_stream_stop(void) {
     if (dma_channel_is_busy(dma_ch)) dma_channel_abort(dma_ch);
 }
 
+static volatile uint32_t backlog_max;
+
+uint32_t flux_stream_backlog_max(void) { return backlog_max; }
+void flux_stream_backlog_reset(void) { backlog_max = 0; }
+
 int flux_stream_read(uint16_t *buf, int max) {
     uint32_t written = stream_written();
     uint32_t avail = written - consumed;
+    if (avail > backlog_max) backlog_max = avail;
     if (avail > FLUX_RING_LEN) { consumed = written; return -1; }     // writer lapped us
     int n = avail < (uint32_t)max ? (int)avail : max;
     for (int i = 0; i < n; i++) buf[i] = ring[(consumed + (uint32_t)i) % FLUX_RING_LEN];

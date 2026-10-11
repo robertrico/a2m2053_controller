@@ -178,14 +178,14 @@ def make_disk(image: bytes, bad_crc_at=None, cut=0, fail=()):
             if bad_crc_at == (t, s):
                 crc ^= 1
             out += b"TS %d %d %d %02x %02x\r\n" % (t, s, n, status, 0) + payload + b"\r\nTS END %08x\r\n" % crc
-    out += b"DISK END 812 131000\r\nOK\r\n"
+    out += b"DISK END 812 37 131000\r\nOK\r\n"
     return out[:len(out) - cut] if cut else out
 
 
 def test_parse_disk_ok():
     img = bytes((i * 7) & 0xFF for i in range(1600 * 512))
-    out, tracks, worst, ms = _proto.parse_disk(make_disk(img))
-    assert out == img and len(tracks) == 160 and worst == 812 and ms == 131000
+    out, tracks, mean_ns, backlog, ms = _proto.parse_disk(make_disk(img))
+    assert out == img and len(tracks) == 160 and mean_ns == 812 and backlog == 37 and ms == 131000
     assert all(st == 0 for (_, _, st, _) in tracks)
 
 
@@ -203,7 +203,7 @@ def test_parse_disk_truncated():
 
 def test_parse_disk_reports_failed_track():
     img = bytes(1600 * 512)
-    _, tracks, _, _ = _proto.parse_disk(make_disk(img, fail={(12, 0)}))
+    _, tracks, _, _, _ = _proto.parse_disk(make_disk(img, fail={(12, 0)}))
     assert [(t, s) for (t, s, st, _) in tracks if st == 0xA7] == [(12, 0)]
 
 
@@ -236,10 +236,19 @@ def test_stream_err_mid_disk():
         pos = stream.find(b"TS END", pos) + 1
     # pos is now after the 3rd TS END; find the end of the line
     pos = stream.find(b"\r\n", pos) + 2
-    truncated = stream[:pos] + b"ERR server timeout\r\n"
+    # exactly what the firmware sends: puts("\nERR server timeout") -> "\r\nERR server timeout\r\n"
+    prefix = stream[:pos]
+    err = b"\r\nERR server timeout\r\n"
     with pytest.raises(_proto.DiskError) as exc:
-        _proto.disk_stream_complete(truncated)
-    assert "server timeout" in str(exc.value)
+        _proto.disk_stream_complete(prefix + err)
+    assert str(exc.value) == "ERR server timeout"
+    # partial line: keep waiting, no raise
+    assert _proto.disk_stream_complete(prefix + b"\r\nERR ser") is False
+    for cut in (b"\r\n", b"\r\nE", b"\r\nER", b"\r\nERR"):
+        assert _proto.disk_stream_complete(prefix + cut) is False
+    with pytest.raises(_proto.DiskError) as exc2:
+        _proto.disk_stream_complete(prefix + b"\r\nERR ser" + b"ver timeout\r\n")
+    assert str(exc2.value) == "ERR server timeout"
 
 
 def test_stream_disk_end_in_payload():
@@ -257,7 +266,7 @@ def test_stream_disk_end_in_payload():
     assert _proto.disk_stream_complete(prefix) == False
     # Full stream should return True and parse_disk should return the image with that text in block 0
     assert _proto.disk_stream_complete(stream) == True
-    out, _, _, _ = _proto.parse_disk(stream)
+    out, _, _, _, _ = _proto.parse_disk(stream)
     assert out[0:len(fake_disk_end_text)] == fake_disk_end_text
 
 

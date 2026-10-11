@@ -17,3 +17,5 @@ const uint16_t *flux_data(void);
 void flux_stream_start(void);
 void flux_stream_stop(void);
 int flux_stream_read(uint16_t *buf, int max);   // copied, 0 if none, -1 if the ring overran
+uint32_t flux_stream_backlog_max(void);         // largest unread count seen by flux_stream_read
+void flux_stream_backlog_reset(void);
