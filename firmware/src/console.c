@@ -6,7 +6,7 @@
 typedef struct {
     const char *name;
     con_op_t op;
-    int nargs;          // -1 = zero or one argument
+    int nargs;          // -1 = zero or one argument, -2 = zero or two
     bool onoff;
     long lo[3], hi[3];
 } con_spec_t;
@@ -28,6 +28,8 @@ static const con_spec_t specs[] = {
     {"server",   CON_SERVER,   1, true,  {0},       {0}},
     {"readblk",  CON_READBLK,  1, false, {0},       {1599}},
     {"readdisk", CON_READDISK, 0, false, {0},       {0}},
+    {"writeblk", CON_WRITEBLK, 1, false, {0},       {1599}},
+    {"format",   CON_FORMAT,  -2, false, {0, 0},    {79, 1}},
 };
 
 static bool parse_long(const char *s, long lo, long hi, long *out) {
@@ -61,7 +63,10 @@ con_cmd_t console_parse(const char *line) {
         const con_spec_t *sp = &specs[i];
         if (strcmp(tok[0], sp->name) != 0) continue;
         int given = nt - 1;
-        if (sp->nargs == -1 ? given > 1 : given != sp->nargs) return c;
+        bool count_ok = sp->nargs == -1 ? given <= 1
+                      : sp->nargs == -2 ? (given == 0 || given == 2)
+                      : given == sp->nargs;
+        if (!count_ok) return c;
         for (int k = 0; k < given; k++) {
             bool ok = sp->onoff ? parse_onoff(tok[k + 1], &c.arg[k])
                                 : parse_long(tok[k + 1], sp->lo[k], sp->hi[k], &c.arg[k]);
@@ -77,5 +82,6 @@ con_cmd_t console_parse(const char *line) {
 const char *console_help(void) {
     return "help | oe on|off | enbl on|off | status [0-15] | cmd <0-15> | motor on|off\n"
            "recal | seek <0-79> | head <0|1> | eject | tach | settle <us> | capture <t> <s> <n>\n"
-           "server on|off | readblk <0-1599> | readdisk";
+           "server on|off | readblk <0-1599> | readdisk\n"
+           "writeblk <0-1599> (then 512 raw bytes) | format [<0-79> <0|1>]";
 }

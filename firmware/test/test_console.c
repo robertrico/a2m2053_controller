@@ -48,5 +48,12 @@ int main(void) {
     CHECK(P("readblk 1600").op == CON_BAD && P("readblk -1").op == CON_BAD);
     CHECK(P("readdisk").op == CON_READDISK && P("readdisk 1").op == CON_BAD);
     CHECK(strlen(console_help()) > 20);
+    CHECK(P("writeblk 0").op == CON_WRITEBLK && P("writeblk 1599").arg[0] == 1599);
+    CHECK(P("writeblk 1600").op == CON_BAD && P("writeblk").op == CON_BAD);
+    CHECK(P("format").op == CON_FORMAT && P("format").argc == 0);
+    con_cmd_t f = P("format 79 1");
+    CHECK(f.op == CON_FORMAT && f.argc == 2 && f.arg[0] == 79 && f.arg[1] == 1);
+    CHECK(P("format 80 0").op == CON_BAD && P("format 3 2").op == CON_BAD);
+    CHECK(P("format 3").op == CON_BAD && P("format 1 1 1").op == CON_BAD);
     TEST_END();
 }
