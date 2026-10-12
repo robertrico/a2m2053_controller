@@ -16,7 +16,7 @@ Nothing to do on the bench until they land.
 - No M6 firmware. No M6 spec yet (brainstorming stopped at the host wiring;
   architectural path: spec, then plan).
 - Spare IWMs: one left, on the other dead IF-83.
-- Untracked `blinky/` is not part of this work; leave it alone.
+- `blinky/` (RP2350 bring-up test) is stashed: `stash@{0}: blinky: RP2350 bring-up test`. Its git-ignored `blinky/build/` output stays on disk.
 
 ## Waiting on (Rico)
 
