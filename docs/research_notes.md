@@ -323,6 +323,27 @@ host /ENBL (CN102:14) gated the same way as PH3 (only after we're
 assigned). **[guess]** Firmware has no separate ENBL bit, so the gating is
 likely tied to PH3EN or ENBUS inside the CXD1013.
 
+## Host bus on the Liron card (M6) **[measured]** 2026-10-12
+
+Liron card (820-0117-A) in slot 5, IIe at BASIC, our board on J1. Details and
+captures: `docs/build_log/m6.md`, `docs/captures/m6/`.
+
+- Idle levels at the DB-19 (our pulls in place): PH1 + PH3 high, PH0 + PH2
+  low; /WRREQ and /HSTEN high. -12 V rail -12.16 V, +5 V 4.73 V, +12 V
+  12.38 V.
+- WR idle: about 4.0 V Thevenin through about 1.9k (from 3.40 V with a 10k
+  pull-down and 3.96 V with 100k). WR high during a packet 4.36-4.84 V.
+- `PR#5`: PH0 + PH2 reset pulse, then REQ (PH0) with PH1 + PH3, then
+  /WRREQ low for 879 us (one command packet, about 220 cells).
+- REQ rises 7.7 us before /WRREQ falls; first WR edge 3.95 us after /WRREQ
+  falls. Cell width 3.91 us (7.16 MHz / 28).
+- Packet start decodes (transition = 1): `FF 3F CF F3 FC FF` sync, `C3`
+  packet begin, `81` destination.
+- With ACK pulled high and nobody answering, the Liron sends the packet
+  anyway and the IIe reports no device connected.
+- Our DB-19 to IDC20 cable uses the same flat mapping as the drive's CN102
+  (sec. 10): ACK (DB-19 10) on flat 20, flat 19 no wire.
+
 ## Drive supply requirement [measured] 2026-10-10 (M3)
 
 With +5V at CN104 pin 11 sagging to 4.0-4.8 V under motor load (bench wiring

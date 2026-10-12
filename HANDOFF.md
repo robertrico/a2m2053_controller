@@ -2,7 +2,7 @@
 
 Last updated: 2026-10-12. **M6 active.** Host side rebuilt on the J1 IDC
 breakout and proven at signal level; the Liron's reset and command packet
-reach the Pico. Next: mechanism side on the second breakout, then the M6 spec.
+reach the Pico. Next: the M6 brainstorm and spec. J2 breakout arrives 2026-10-13.
 
 ## Where things stand
 
@@ -27,22 +27,29 @@ reach the Pico. Next: mechanism side on the second breakout, then the M6 spec.
 - Spare IWMs: one left, on the other dead IF-83.
 - `blinky/` (RP2350 bring-up test) is stashed: `stash@{0}: blinky: RP2350 bring-up test`. Its git-ignored `blinky/build/` output stays on disk.
 
+## Waiting on
+
+- J2 breakout (mechanism side) arrives 2026-10-13.
+
 ## Resume order
 
-1. Mechanism side on the second breakout (J2 = CN104, straight IDC ribbon).
-   Ring out the ribbon to the terminals, then isolation checks: +12 V
-   (13/15/17/19) vs RD (16), WRTDATA (18) and every signal. Short heavy +5 V
-   run to pin 11 and GND to 1/3/5/7, bulk caps (4.7 uF, as on the IF-83) at
-   the terminals. Re-run a disk read scan on drive A with the bench at 5.0 V
-   to confirm the IR drop is gone. Check the U2 channel order against
+1. **M6 brainstorm, then the spec** (architectural path: spec, then plan).
+   Topics: FM receiver (WR, 3.91 us cells, sync `FF 3F CF F3 FC FF C3`), the
+   ACK handshake (our pulled-up ACK currently reads as "ready", so the Liron
+   starts sending), RD transmit with U3 /OE as ENBUS, RAM disk content
+   (proposed: ProDOS image in flash plus a RAM write overlay). The spec must
+   also replace the 74LVC1G07 references (spec sec. 1 and 3.5,
+   `level_shifting.md` OE section) with "ACK on U3 with RD". `CLAUDE.md`,
+   `pin_budget.md` and `pins.h` are already updated. Host bus facts:
+   `research_notes.md` "Host bus on the Liron card (M6)".
+2. When J2 lands: mechanism side on the breakout (J2 = CN104, straight IDC
+   ribbon). Ring out the ribbon to the terminals, then isolation checks:
+   +12 V (13/15/17/19) vs RD (16), WRTDATA (18) and every signal. Short heavy
+   +5 V run to pin 11 and GND to 1/3/5/7, bulk caps (4.7 uF, as on the IF-83)
+   at the terminals. Re-run a disk read scan on drive A with the bench at
+   5.0 V to confirm the IR drop is gone. Check the U2 channel order against
    GP12-19 (not recorded in the M0 notes).
-2. Re-format disk 2 with our board (it lost the M5 board-written copy).
-3. Resume M6 brainstorming: FM receiver, ACK handshake (our pulled-up ACK
-   currently reads as "ready", so the Liron starts sending), RAM disk content
-   (proposed: ProDOS image in flash plus a RAM write overlay), then the spec.
-   The spec must also replace the 74LVC1G07 references (spec sec. 1 and 3.5,
-   `level_shifting.md`) with "ACK on U3 with RD". `CLAUDE.md`,
-   `pin_budget.md` and `pins.h` are already updated.
+3. Re-format disk 2 with our board. Not time critical; do it when convenient.
 4. Proposed small firmware addition (not approved yet): a `pins` console
    command that prints the host input levels.
 

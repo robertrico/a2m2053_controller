@@ -117,10 +117,17 @@ optionally U2):
   the drive may tri-state RD when /ENBL is high).
 - Mech /ENBL, /WRTGATE: 10k pull-ups on the B side, so they stay inactive
   while U2 is Hi-Z.
-- Host /WRREQ, /HSTEN: inputs; the host drives them. No pull needed; a weak
-  pull-up is harmless.
-- Host WRPROT/ACK: the bus pull-up lives on the host side (Liron card).
-  Confirm.
+- Host PH0-3: 10k pull-downs on the B side (read 0 with no host).
+- Host /WRREQ, /HSTEN: 10k pull-ups on the B side, so they read inactive with
+  no host (IIe off or cable out).
+- Host WR: **100k** pull-down on the B side (2026-10-12). The Liron idles WR
+  at about 4.0 V through about 1.9k; a 10k pull-down dragged it to 3.40 V,
+  under the 8T245's 3.5 V input-high at VCCB = 5 V. With 100k it idles at
+  3.96 V. **[measured]**
+- Host WRPROT/ACK: 10k pull-up to +5 on the B side. With it, the Liron reads
+  ACK as "ready" and starts sending a command packet. **[measured]**
+- VCCB (bench +5) at 5.00 V, not higher: U3 drives RD and ACK at VCCB and the
+  Liron runs on about 4.73 V.
 
 ## Open items
 
