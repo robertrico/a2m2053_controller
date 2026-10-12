@@ -20,21 +20,31 @@ Nothing to do on the bench until they land.
 
 ## Waiting on (Rico)
 
-- Proper IDC breakouts, ordered, to replace the homemade DB-19 adapter.
+- Proper IDC breakouts (2x10 IDC to screw terminals), two ordered: one for the
+  host side (replaces the homemade DB-19 adapter), one for the mechanism side
+  (replaces the homemade CN104 ribbon tap, same weaknesses).
 
 ## Resume order (when the breakouts land)
 
-1. Rebuild the host side on the IDC breakouts. **Rail-isolation checks before
+1. Ring out each breakout before wiring: all 20 IDC pins to their terminals
+   (don't trust the silk), no neighbour shorts, pin 1 / key matches the ribbon
+   stripe. Ferrules or tinned/solid wire in the clamps; no stray strands.
+2. Rebuild the host side on one breakout. **Rail-isolation checks before
    any Apple power, every time** (each Apple rail position vs its neighbours
    and every signal row). Low current limit on the bench +5 for first connect.
    Wiring plan and pin numbers: `docs/build_log/m6.md`.
-2. Re-format disk 2 with our board (it lost the M5 board-written copy).
-3. Optional: scope `PR#5` with no drive for a baseline of the host bus.
-4. Resume M6 brainstorming: RAM disk content (proposed: ProDOS image in flash
+3. Rebuild the mechanism side on the other breakout (CN104). Same isolation
+   checks: +12 V (13/15/17/19) vs RD (16), WRTDATA (18) and every signal.
+   Use this rework for the owed +5V/GND path fix: short heavy runs to pin 11
+   and GND 1/3/5/7, bulk caps at the terminals. Re-run a disk read scan on
+   drive A at 5.0 V to confirm the IR drop is gone before going on.
+4. Re-format disk 2 with our board (it lost the M5 board-written copy).
+5. Optional: scope `PR#5` with no drive for a baseline of the host bus.
+6. Resume M6 brainstorming: RAM disk content (proposed: ProDOS image in flash
    plus a RAM write overlay), then the spec. The spec must also replace the
    74LVC1G07 references (spec sec. 1 and 3.5, `level_shifting.md`) with "ACK on
    U3 with RD". `CLAUDE.md`, `pin_budget.md` and `pins.h` are already updated.
-5. Proposed small firmware addition (not approved yet): a `pins` console
+7. Proposed small firmware addition (not approved yet): a `pins` console
    command that prints the host input levels.
 
 ## Bench state at shutdown
