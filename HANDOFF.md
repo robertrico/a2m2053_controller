@@ -8,8 +8,9 @@ Last updated: 2026-10-11, M6 paused after a bench failure.
 - M6 started and paused the same day: `docs/build_log/m6.md`. Host-side wiring
   was built and checked; on first Apple connect a loose strand on the homemade
   DB-19 adapter bridged -12 V (strip pos 9) onto /WRREQ (pos 10). U1 burned
-  (replaced), and the **Liron card's IWM WRDATA output (pin 8) is dead**.
-  Pico inputs checked OK over SWD.
+  (replaced) and the Liron card's IWM WRDATA output died. **Liron repaired the
+  same day** with a donor IWM from a dead IF-83; the IIe sees the working
+  UniDisk again (S5,D1, 1600 blocks). Pico inputs checked OK over SWD.
 - No M6 firmware. No M6 spec yet (brainstorming stopped at the host wiring;
   architectural path: spec, then plan).
 - Untracked `blinky/` is not part of this work; leave it alone.
@@ -17,13 +18,12 @@ Last updated: 2026-10-11, M6 paused after a bench failure.
 ## Blocked on (Rico)
 
 - Proper IDC breakouts (ordered) to replace the homemade DB-19 adapter.
-- Liron repair: swap in a donor IWM from a dead IF-83 board (344-0041-B).
-  Confirm the part number match and socketing first; diode-check the donor.
 
 ## Resume order
 
-1. Repaired Liron, no drive: scope `PR#5` (PH0+PH2 reset pulse, FM on WR).
-2. Write test on the working UniDisk through the Liron (save a file).
+1. Write test on the working UniDisk through the repaired Liron (save a
+   file), if not done yet.
+2. Optional: scope `PR#5` with no drive for a baseline of the host bus.
 3. Rebuild the host side on the IDC breakouts. **Rail-isolation checks before
    any Apple power, every time** (each Apple rail position vs its neighbours
    and every signal row). Low current limit on the bench +5 for first connect.
@@ -41,8 +41,7 @@ Last updated: 2026-10-11, M6 paused after a bench failure.
   for M5 because of the IR drop to CN104). Rework the +5V/GND path before the
   mechanism needs to read disks again.
 - New U1 seated; host wiring being cleaned up by Rico.
-- Liron card pulled from the IIe. The working UniDisk stays off it until the
-  repair is tested.
+- Liron card back in slot 5 with the donor IWM; working UniDisk on it.
 - Scope probes: moved off CN104 during M6; reattach per the task.
 - Pico console `/dev/cu.usbmodem114401`, Debug Probe `114202`. GPIO state can
   be read over SWD without halting (`mdw 0xd0000004`, pad registers at
