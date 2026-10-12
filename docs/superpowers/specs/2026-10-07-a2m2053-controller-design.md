@@ -36,7 +36,7 @@ Reference docs: `docs/research_notes.md`, `docs/level_shifting.md`,
    | CN102                                                  | CN104
  [U1 in] --> PIO0: SmartPort FM rx/tx -+       +- PIO1: GCR flux rx/tx <-> [U1 in / U2 out]
  [U3 out] <--   + daisy-chain copy SM  |       |   + CA/SEL/LSTRB via SIO
- [1G07 ACK]                            v       v
+ [U3 ACK]                              v       v
                          CORE 0: SmartPort      CORE 1: mechanism server
                          - bus phases, packets  - status reads (CA/SEL -> RD)
                          - command dispatch     - seek / zone / motor / eject
@@ -62,8 +62,8 @@ Reference docs: `docs/research_notes.md`, `docs/level_shifting.md`,
   up to about 150 ms) out of the bus timing code. Core 0 holds off the host
   with the SmartPort ACK handshake while core 1 works.
 
-Pins and shifters: `docs/pin_budget.md` (25 of 26 GPIO, 5x 8T245 plus
-74LVC1G07 for ACK).
+Pins and shifters: `docs/pin_budget.md` (25 of 26 GPIO, 5x 8T245; ACK
+rides U3 with RD, released with it by U3 /OE).
 
 ### Risks carried
 
@@ -216,7 +216,7 @@ Model of the ROM's gate-array use (PH3EN, ENBUS, LASTONE/):
 - **Pass-through on:** a PIO0 state machine copies host PH3 -> PH3_OUT and
   host /ENBL -> ENBL_OUT.
 - **INIT once we have an ID:** it's for a drive behind us. Ignore it.
-- **Bus drive:** we drive RD (U3 /OE) and ACK (74LVC1G07) only while
+- **Bus drive:** we drive RD and ACK (both on U3, gated by U3 /OE) only while
   answering a packet addressed to us. This is the ROM's ENBUS on (`$88`)
   and off (`$08`).
 - **Unverified (bench, with a real drive behind us):** that /ENBL

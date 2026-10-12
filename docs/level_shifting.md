@@ -62,7 +62,7 @@ the Apple's point of view; careful).
 | /HSTEN (/HstEnbl) | 17 | in | host enable for this drive |
 | WR (host WRDATA) | 19 | in | FM data host -> drive |
 | RD (host RDDATA) | 18 | **out** | FM data drive -> host |
-| WRPROT / ACK | 10 | **out** | SmartPort ACK. PicoPort drives it open-drain. |
+| WRPROT / ACK | 10 | **out** | SmartPort ACK. Push-pull on U3, released with RD by U3 /OE. |
 | +5 / +12 / -12 / GND | 6 / 7,8 / 5 / 1-4 | power | Board + mechanism are powered from here. |
 
 ### Mechanism side (CN104, 20-pin, ERS 699-0321 sec. 3.6)
@@ -99,12 +99,12 @@ optionally U2):
   (SmartPort bus is shared by every device on the chain). Drive U3 OE from
   the RP2350, enabled only while we transmit. RD is low-rate (4 us cells),
   so the 6.4 ns enable time doesn't matter.
-- **ACK is open-drain** on SmartPort (wired-OR on the bus). A push-pull 8T245
-  output can't do wired-OR. Options: (a) give ACK its own 1-bit buffer whose
-  OE the MCU toggles (enable + A=0 = pull low, OE high = release, external
-  pull-up) — the 8T245 has one OE per 8 bits, so it can't share U3 with RD;
-  (b) **simpler: 74LVC1G07 open-drain buffer or one N-MOSFET for ACK**.
-  Recommend (b).
+- **ACK rides U3 with RD** (decided 2026-10-11, M6 bench; no 74LVC1G07).
+  The original drive does the same: its gate array drives RD and ACK onto
+  the bus only while ENBUS is on, and releases both together. Only one
+  device answers at a time, so no wired-OR is needed. With U3 /OE high, the
+  10k pull-up on the B side holds ACK high ("ready"). Firmware sets ACK and
+  RD to the wanted levels before it pulls U3 /OE low (M6 spec sec. 5.3).
 - **U2 OE:** hold high (Hi-Z) through RP2350 reset/boot, so the mechanism
   doesn't see random CA/LSTRB pulses (a stray LSTRB could eject the disk or
   step the head). Add a 10k pull-up on OE, then the MCU drives it low once
