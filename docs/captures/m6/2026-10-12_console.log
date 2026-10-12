@@ -1,0 +1,25 @@
+# 2026-10-12 M6: WR on the host bus during PR#5
+# Rig: Pico 61d4690 (U3 /OE high), bench +5 = 5.00 V, IIe at BASIC, Liron slot 5, J1 breakout.
+# Scope SDS1204X-E, 10x probes, DC, shared ground at J1.5.
+#   CH1 J1.10 /WRREQ  2 V/div, offset +3 V
+#   CH2 J1.18 WR (B side, 10k to GND)  2 V/div, offset -3 V
+#   CH3 J1.2  PH0 (REQ)  2 V/div, offset -8 V
+#   CH4 off
+# Trigger C1 falling 2.52 V, SINGLE. Timebase 500 us/div, delay -3 ms (trigger 1 div from left), 700K pts.
+capture 1: PR#5 at BASIC -> docs/captures/m6/2026-10-12_pr5_wrreq_wr_ph0_500us.png
+capture 1 results (CSV, 700K pts, 10 ns):
+  /WRREQ low 878.8 us (low 0.04 V, high 4.92 V)
+  WR idle before packet: median 3.40 V (3.16..3.64)  <-- below 0.7*VCCB = 3.5 V
+  WR in packet: high median 4.36 V (p1 3.72 V), low median 0.04 V (max 1.48 V)
+  WR edges in packet: 90; intervals 3.87 us (1 cell) .. 31.3 us; about 220 cells = ~27 bytes
+  WR after /WRREQ rise: 4.36 V @50 us, 4.20 @200, 3.88 @500, 3.40 @1 ms (slow decay back to idle)
+  Idle 3.40 V against our 10k to GND => host-side source about 4.7k to +5.
+# WR pull-down on U1 B7 changed 10k -> 100k (to GND).
+# Timebase 20 us/div, delay -120 us (trigger 1 div from left), 140K pts @ 500 MSa/s. Same channels/trigger.
+capture 2: PR#5 at BASIC -> docs/captures/m6/2026-10-12_pr5_packet-start_20us.png
+capture 2 results (CSV 140K pts, 2 ns; note: oscope save_waveform time axis has the delay sign inverted, shifted +240 us here):
+  WR idle pre-trigger (100k to GND): median 3.96 V (3.72..4.28)
+  Host WR source from 10k vs 100k idle: about 4.0 V through about 1.9k (Thevenin)
+  PH0 (REQ) rises 7.69 us before /WRREQ falls; first WR edge 3.95 us after /WRREQ falls
+  WR in packet: high median 4.84 V, low -0.04 V; cell width 3.91 us
+  Decoded start: FF 3F CF F3 FC FF (sync) C3 (PBEGIN) 81 ...
