@@ -49,7 +49,7 @@ Last updated: 2026-10-11, M6 paused after a bench failure.
 
 ## Notes
 
-- bytehamr: last log is M5, published 2026-10-11.
+- bytehamr: M6 log "M6: a loose strand put -12 V on /WRREQ" written 2026-10-11, not published yet; it predates the Liron repair.
 - No Hackaday draft (Rico does Hackaday log by log, once proven).
 - `project_byte_hamr`: three untracked files from 2026-09-14 stashed there as
   `stash@{0}: dino - wip`.
