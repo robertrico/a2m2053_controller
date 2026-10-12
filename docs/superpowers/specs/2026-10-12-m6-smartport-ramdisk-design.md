@@ -119,7 +119,7 @@ p2 = status or control code = block low byte; p3, p4 = block mid, high.
 |---|---|---|---|
 | ACK high before host sends | 540 us (then retry) | ENBUS off at idle: ACK always high | n/a |
 | First WR edge after REQ high | none for us: PIO arms on /WRREQ low | RX SM waits on /WRREQ itself; DMA catches every bit | no CPU latency |
-| Packet end to ACK low | about 105 us after underrun | `C8` complete in RAM <= 7 cells (27 us) after the last cell (PIO autopush), CPU check < 10 us, IRQs off | **about 65 us** [estimate; scope it] |
+| Packet end to ACK low | about 105 us after underrun | fm_rx starts on the first edge (FF's MSB) and every byte is 8 cells, so `C8` always closes a DMA chunk, pushed half a cell **before** the host's last cell ends; then decode + checksum on the CPU (< 10 us), IRQs off. ACK lands about at the underrun (simulated: 1 us before) | **about 100 us** [model; scope it] |
 | Reply start after REQ high | none (host loops on nibbles) | 20 us pause after REQ high, then TX (PicoPort: the card flips Q6 about 6 us after REQ; edges before that are lost) | n/a |
 | Host holds REQ after reply | none | wait 5 ms, then re-send (ROM: about 1 ms) | n/a |
 
@@ -158,8 +158,10 @@ copies each push byte into a linear buffer. The CPU re-arms the SM and DMA
 at the end of every transaction (SM back at the /WRREQ wait, FIFO and
 buffer cleared).
 
-Tolerance: an edge is accepted anywhere in +-0.5 cell of its nominal place
-(+-1.95 us). Edge detection jitter is 1 loop (0.25 us).
+Tolerance: an edge-to-edge gap reads as n cells anywhere in (n - 0.5,
+n + 0.5) cells, i.e. +-1.95 us between consecutive edges, so +-0.97 us per
+edge. The host IWM's edges come off its crystal (ns jitter). Edge detection
+jitter is 1 loop (0.25 us).
 
 ### 5.2 PIO transmit (`fm_tx`)
 
@@ -245,7 +247,8 @@ the card does not check the type). STAT = `$80 | code`. SRC = our ID.
   /WRREQ rises), a re-read after a corrupted reply.
 - `tools/pio_model.py` + `tools/tests/test_fm_pio.py`: executes the
   assembled `fm_rx`/`fm_tx` instruction words cycle by cycle. RX: WR edge
-  trains with +-1.5 us jitter and +-1 % clock error decode to the sent bits.
+  trains with +-0.8 us jitter per edge and +-1 % clock error decode to the
+  sent bits; the window edges sit at 1.5, 2.5, 3.5 cells.
   TX: cell period 3.911 us, low pulse 0.98 us, idle and park high.
 
 ## 8. Console
@@ -280,9 +283,9 @@ ribbon off, U3 present with the ACK pull-up.
 
 ## 10. Risks
 
-1. **ACK latency** (sec. 4): if the scope shows < 30 us margin, lower the RX
-   autopush threshold to 4 bits (halves the worst case) or arm ACK as soon as
-   the first five bits of the expected final byte are `11001`.
+1. **ACK latency** (sec. 4): the model says ACK comes within a few us of the
+   underrun. If the scope shows more than about 50 us, look for CPU stalls
+   (flash XIP misses, IRQs) between DMA and the ACK write.
 2. **Reply not seen by the card**: the 20 us pause and the preamble length
    are from PicoPort and the drive ROM; if the card never finds `C3`, scope RD
    against REQ and adjust the pause.

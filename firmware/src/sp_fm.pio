@@ -1,0 +1,81 @@
+; SmartPort FM on the host bus (M6 spec sec. 5.1, 5.2). Both programs on PIO0: 20 + 12 = 32 words.
+;
+; fm_rx: host WR -> one bit per 3.911 us cell. 48 PIO cycles per cell (clkdiv 12.22 at 150 MHz).
+; A level change on WR is a 1. From each edge the SM polls WR in 3-cycle loops: an edge within
+; 1.5 cells pushes a 1 and restarts the window; none by 1.5 cells pushes a 0, then one 0 per
+; further cell. Y holds 1 (the CPU sets it before each start). Autopush every 8 bits, shift left
+; (earliest bit lands in bit 7); DMA takes each push. The SM starts from `entry`, which waits
+; for /WRREQ low (GP6, host writing), so the CPU never races the first edge.
+.program fm_rx
+.pio_version 0
+public entry:
+    wait 0 gpio 6           ; /WRREQ low (PIN_HOST_WRREQ, checked in sp_hw.c)
+    jmp pin start_high
+    wait 1 pin 0            ; WR low: the first edge rises
+    jmp rise
+start_high:
+    wait 0 pin 0            ; WR high: the first edge falls
+fall:                       ; WR just went low
+    in y, 1
+    set x, 22               ; 23 loops x 3 cycles + 3 = 72 cycles = 1.5 cells
+low_loop:
+    jmp pin rise
+    jmp x-- low_loop [1]
+    in null, 1              ; no edge in this window
+    set x, 14               ; 15 loops x 3 + 3 = 48 cycles = 1 cell
+    jmp low_loop
+rise:                       ; WR just went high
+    in y, 1
+    set x, 22
+high_loop:
+    jmp pin high_ok
+    jmp fall
+high_ok:
+    jmp x-- high_loop [1]
+    in null, 1
+    set x, 14
+    jmp high_loop
+
+% c-sdk {
+static inline pio_sm_config fm_rx_config(uint offset, uint wr_pin, float clkdiv) {
+    pio_sm_config c = fm_rx_program_get_default_config(offset);
+    sm_config_set_in_pins(&c, wr_pin);
+    sm_config_set_jmp_pin(&c, wr_pin);
+    sm_config_set_in_shift(&c, false, true, 8);     // shift left, autopush at 8
+    sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_RX);
+    sm_config_set_clkdiv(&c, clkdiv);
+    return c;
+}
+%}
+
+; fm_tx: bytes -> host RD. 32 PIO cycles per cell (clkdiv 18.33). The CPU puts the bit count - 1
+; in the FIFO, then DMA feeds bytes, MSB first. A 1 drives RD low for 8 cycles (0.98 us): the
+; host IWM counts the falling edge. A 0 leaves RD high. RD idles and parks high.
+.program fm_tx
+.pio_version 0
+    pull block              ; bit count - 1
+    mov y, osr
+    out null, 32            ; empty the OSR: autopull loads the first byte
+bitloop:
+    out x, 1                ; 1
+    jmp !x bit0             ; 1
+    set pins, 0 [7]         ; 8  falling edge
+    set pins, 1 [20]        ; 21
+    jmp y-- bitloop         ; 1  -> 32
+public park:
+    jmp park
+bit0:
+    nop [28]                ; 29
+    jmp y-- bitloop         ; 1  -> 32
+    jmp park
+
+% c-sdk {
+static inline pio_sm_config fm_tx_config(uint offset, uint rd_pin, float clkdiv) {
+    pio_sm_config c = fm_tx_program_get_default_config(offset);
+    sm_config_set_set_pins(&c, rd_pin, 1);
+    sm_config_set_out_shift(&c, false, true, 8);    // MSB first, autopull per byte
+    sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
+    sm_config_set_clkdiv(&c, clkdiv);
+    return c;
+}
+%}
