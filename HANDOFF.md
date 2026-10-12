@@ -1,8 +1,9 @@
 # Handoff
 
-Last updated: 2026-10-12. **M6 active.** Host side rebuilt on the J1 IDC
-breakout and proven at signal level; the Liron's reset and command packet
-reach the Pico. Next: the M6 brainstorm and spec. J2 breakout arrives 2026-10-13.
+Last updated: 2026-10-12 (evening). **M6 active, firmware ready for the
+bench** on branch `m6` (not merged, not flashed). Spec, plan, code and host
+tests done without Rico; the bench is the test. J2 breakout arrives
+2026-10-13.
 
 ## Where things stand
 
@@ -23,7 +24,13 @@ reach the Pico. Next: the M6 brainstorm and spec. J2 breakout arrives 2026-10-13
     because of our 10k pull-down. **WR pull-down on U1 B7 is now 100k**; idle
     3.96 V (host drives about 4.0 V through about 1.9k). Packet start decodes
     `FF 3F CF F3 FC FF C3 81`, cell 3.91 us. Captures in `docs/captures/m6/`.
-- No M6 firmware. No M6 spec yet.
+- M6 firmware on branch `m6`: SmartPort device serving an 800K ProDOS RAM
+  disk (flash image + 384-block RAM overlay). Spec
+  `docs/superpowers/specs/2026-10-12-m6-smartport-ramdisk-design.md`, plan
+  `docs/superpowers/plans/2026-10-12-m6-smartport-ramdisk.md`. Bench steps:
+  `docs/build_log/m6.md` "Firmware ready for the bench".
+- The image `docs/private/ref/m6_boot800k.po` (PRODOS + BASIC.SYSTEM, from
+  ProDOS 2.4.1 via AppleCommander) is git-ignored; CMake links it when present.
 - Spare IWMs: one left, on the other dead IF-83.
 - `blinky/` (RP2350 bring-up test) is stashed: `stash@{0}: blinky: RP2350 bring-up test`. Its git-ignored `blinky/build/` output stays on disk.
 
@@ -33,15 +40,10 @@ reach the Pico. Next: the M6 brainstorm and spec. J2 breakout arrives 2026-10-13
 
 ## Resume order
 
-1. **M6 brainstorm, then the spec** (architectural path: spec, then plan).
-   Topics: FM receiver (WR, 3.91 us cells, sync `FF 3F CF F3 FC FF C3`), the
-   ACK handshake (our pulled-up ACK currently reads as "ready", so the Liron
-   starts sending), RD transmit with U3 /OE as ENBUS, RAM disk content
-   (proposed: ProDOS image in flash plus a RAM write overlay). The spec must
-   also replace the 74LVC1G07 references (spec sec. 1 and 3.5,
-   `level_shifting.md` OE section) with "ACK on U3 with RD". `CLAUDE.md`,
-   `pin_budget.md` and `pins.h` are already updated. Host bus facts:
-   `research_notes.md` "Host bus on the Liron card (M6)".
+1. **M6 bench test** (`docs/build_log/m6.md`, "Bench steps"): flash `m6`,
+   `sp`, IIe on, expect INIT/STATUS/READ in the `SPL` log and the `]` prompt;
+   scope /WRREQ rise to ACK low (model: about 1 us before); BASIC save/load.
+   Design choices marked **[choice]** in the spec are Rico's to overrule.
 2. When J2 lands: mechanism side on the breakout (J2 = CN104, straight IDC
    ribbon). Ring out the ribbon to the terminals, then isolation checks:
    +12 V (13/15/17/19) vs RD (16), WRTDATA (18) and every signal. Short heavy
@@ -49,9 +51,9 @@ reach the Pico. Next: the M6 brainstorm and spec. J2 breakout arrives 2026-10-13
    at the terminals. Re-run a disk read scan on drive A with the bench at
    5.0 V to confirm the IR drop is gone. Check the U2 channel order against
    GP12-19 (not recorded in the M0 notes).
-3. Re-format disk 2 with our board. Not time critical; do it when convenient.
-4. Proposed small firmware addition (not approved yet): a `pins` console
-   command that prints the host input levels.
+3. After M6 passes: merge `m6`, bytehamr log, then M7 (floppy back end behind
+   the same SmartPort engine).
+4. Re-format disk 2 with our board. Not time critical.
 
 ## Bench state at shutdown
 
@@ -76,8 +78,10 @@ reach the Pico. Next: the M6 brainstorm and spec. J2 breakout arrives 2026-10-13
 - Console tail window: open on the laptop screen as a normal window, not full
   screen (iTerm default profile is full screen).
 - bytehamr: published 2026-10-12 "M6: the Liron's first packet reaches my
-  board". The project page Hardware table still lists the 74LVC1G07 (fix with
-  the M6 spec).
+  board". The project page Hardware table still lists the 74LVC1G07 (the
+  repo docs are fixed; the page is not).
+- The `pins` console command proposal is folded into `sp` (prints the host
+  input levels).
 - Publish only full-resolution screen captures (no `--downscale-to-native`).
 - No Hackaday draft (Rico does Hackaday log by log, once proven).
 - `project_byte_hamr`: three untracked files from 2026-09-14 stashed there as

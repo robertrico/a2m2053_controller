@@ -344,6 +344,40 @@ captures: `docs/build_log/m6.md`, `docs/captures/m6/`.
 - Our DB-19 to IDC20 cable uses the same flat mapping as the drive's CN102
   (sec. 10): ACK (DB-19 10) on flat 20, flat 19 no wire.
 
+## SmartPort handshake from the two ROMs **[fw]** 2026-10-12
+
+Card = `liron-if.asm` (host, 65C02 at 1.023 MHz); drive = `liron.asm`.
+Used by the M6 spec (sec. 3, 4).
+
+- ACK is the card IWM's SENSE (status bit 7): 1 = deasserted/ready.
+- Card send: wait for ACK high, 50 polls x 11 cycles (about 540 us), else the
+  whole send is retried (3000x via `Sca8a`; INIT in `Scded` only once). REQ
+  on, `FF` then `3F CF F3 FC FF C3`, packet, `C8`; wait for underrun; then 9
+  polls x 12 cycles (about 105 us) for ACK low, else REQ off and retry.
+- Card read: wait for ACK high with **no timeout** (the device's hold-off),
+  REQ on, `C3` within 30 nibbles (nibble waits have no timeout), checksum and
+  `C8`; then wait for ACK low (no timeout), REQ off. A bad reply returns with
+  REQ still high; `smartport_bus_read_packet_with_retries` waits 1 ms, drops
+  REQ and reads again (5 tries).
+- Drive receive (`Sea29`): ENBUS off, wait REQ, hunt `C3`, filter the
+  destination (any while IDs are unassigned), check the type, checksum, `C8`;
+  then `ph_0_off` (ACK low) and ENBUS on, wait REQ low. No ACK for a bad
+  packet.
+- Drive reply (`spb_send_packet`): ACK high, wait REQ (about 0.5 s), `FF`
+  + `3F CF F3 FC FF 3F CF F3 FC FF C3`, packet with type `$81` whatever the
+  content, `C8`, ACK low, wait REQ low (about 1 ms, else send again).
+- WRITEBLOCK and CONTROL: the drive receives a data packet (type `$82`)
+  before it works; ENBUS off lets ACK float high, which tells the card to
+  send it.
+- INIT reply status `$40` when LASTONE/ is high (nothing behind); the card's
+  `Scded` loop stops on a non-zero status.
+- Bus reset (PH0+PH2, 80 ms) resets the drive in hardware (RSTCAP).
+- The host IWM counts falling RDDATA edges only (IWM spec 1982 p. 9); the
+  card writes WR as a level change per 1.
+- Checksum = XOR of the seven header bytes as sent and the decoded data;
+  sent as `c | $AA`, `(c >> 1) | $AA`. GRP7CNT and ODDCNT are 7-bit, so a
+  packet carries at most 127 x 7 + 6 = 895 data bytes.
+
 ## Drive supply requirement [measured] 2026-10-10 (M3)
 
 With +5V at CN104 pin 11 sagging to 4.0-4.8 V under motor load (bench wiring
