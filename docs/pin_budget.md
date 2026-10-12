@@ -36,7 +36,7 @@ No SD card: the media is the floppy.
 | GP8 | host WR (FM data in) | in | U1 |
 | GP9 | ACK | out | U3 (with host RD), 10k pull-up to +5 on B |
 | GP10 | host RD (FM data out) | out | U3 |
-| GP11 | U3 /OE (host RD release) | out | none |
+| GP11 | U3 /OE (host RD + ACK release) | out | none (10k pull-up to 3V3, fitted M6: Hi-Z through reset and SWD flash) |
 | GP12 | CA0 | out | U2 |
 | GP13 | CA1 | out | U2 |
 | GP14 | CA2 | out | U2 |

@@ -290,7 +290,8 @@ static void print_sp(void) {
     printf("SP ack_us");
     print_us("last", s->ack_us_last);
     print_us("max", s->ack_us_max);
-    printf("\n");
+    print_us("data_max", s->data_ack_us_max);
+    printf(" late=%lu late_entry=%lu\n", (unsigned long)s->late, (unsigned long)s->late_entry);
     uint32_t other = 0;
     for (int i = SP_INIT + 1; i <= SP_NCMDS; i++) other += spdev.cmds[i];
     printf("SP cmds status=%lu readblk=%lu writeblk=%lu format=%lu control=%lu init=%lu other=%lu\n",
@@ -308,7 +309,7 @@ static void print_sp(void) {
 
 // One transaction log line, only when the USB buffer has room (never blocks the bus loop).
 static void splog_poll(void) {
-    static const char *const kind[] = { "CMD", "IGN", "CKSUM", "BAD", "TIMEOUT", "RESET", "REREAD" };
+    static const char *const kind[] = { "CMD", "IGN", "CKSUM", "BAD", "TIMEOUT", "RESET", "REREAD", "LATE" };
     if (!splog || !tud_cdc_connected() || tud_cdc_write_available() < 96) return;
     sp_log_t e;
     if (!sp_bus_log_pop(&spbus, &e)) return;
@@ -316,7 +317,7 @@ static void splog_poll(void) {
     if (e.kind == SP_LOG_CMD || e.kind == SP_LOG_IGNORED || e.kind == SP_LOG_TIMEOUT)
         printf(" dest=%u cmd=%02x blk=%lu st=%02x", e.dest, e.cmd, (unsigned long)e.block, e.stat);
     if (e.kind == SP_LOG_TIMEOUT) printf(" stage=%u", e.stage);
-    if (e.kind == SP_LOG_CMD) print_us("ack_us", e.ack_us);
+    if (e.kind == SP_LOG_CMD || e.kind == SP_LOG_LATE) print_us("ack_us", e.ack_us);
     printf("\n");
 }
 

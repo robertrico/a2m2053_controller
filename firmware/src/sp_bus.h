@@ -43,9 +43,11 @@ typedef struct {
 #define SP_T_TX_PAUSE      20u      // REQ high to first reply edge (card flips Q6 about 6 us after REQ)
 #define SP_T_REPLY_DONE    50000u   // host drops REQ after the reply
 #define SP_T_REREAD        200u     // REQ high, no write, this long: host re-reads our reply
+#define SP_T_ACK_LATE      90u      // no ACK this long after the underrun (card's last poll: about 105 us)
 
 typedef enum {
     SP_LOG_CMD, SP_LOG_IGNORED, SP_LOG_CKSUM, SP_LOG_BAD, SP_LOG_TIMEOUT, SP_LOG_RESET, SP_LOG_REREAD,
+    SP_LOG_LATE,
 } sp_log_kind_t;
 
 typedef struct {
@@ -59,7 +61,10 @@ typedef struct {
 
 typedef struct {
     uint32_t packets, acks, cksum, bad, ignored, timeouts, resets, rereads, replies;
-    int32_t ack_us_max, ack_us_last;         // INT32_MIN = none yet
+    uint32_t late;                           // good packet, but too late to ACK: not answered
+    uint32_t late_entry;                     // ACKed, but receive started after the underrun
+    int32_t ack_us_max, ack_us_last;         // command packets; INT32_MIN = none yet
+    int32_t data_ack_us_max;                 // data packets (WRITEBLOCK)
 } sp_stats_t;
 
 typedef struct {

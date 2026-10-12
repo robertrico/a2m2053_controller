@@ -53,7 +53,7 @@ void sp_bus_init(sp_bus_t *b, const sp_hal_t *hal, sp_dev_t *dev) {
     memset(b, 0, sizeof *b);
     b->hal = hal;
     b->dev = dev;
-    b->st.ack_us_last = b->st.ack_us_max = INT32_MIN;
+    b->st.ack_us_last = b->st.ack_us_max = b->st.data_ack_us_max = INT32_MIN;
     release(b);
     hal->rx_arm(hal->ctx);
 }
@@ -76,13 +76,15 @@ static wait_t wait_req(sp_bus_t *b, bool high, uint32_t timeout_us) {
 }
 
 // Collect one packet from the fm_rx buffer. t_up gets the time /WRREQ was seen going high
-// (the host's write underrun); 0 if not seen.
-static rxres_t receive(sp_bus_t *b, uint8_t want_type, uint64_t *t_up) {
+// (the host's write underrun), 0 if not seen; *wr_seen says /WRREQ was seen low at all (false:
+// we started after the underrun and cannot tell how late we are).
+static rxres_t receive(sp_bus_t *b, uint8_t want_type, uint64_t *t_up, bool *wr_seen) {
     sp_rx_init(&b->rx);
     size_t idx = 0;
     uint64_t t0 = NOW();
     bool wr_low = false;
     *t_up = 0;
+    *wr_seen = false;
     sp_rx_status_t st = SP_RX_MORE;
     for (;;) {
         uint32_t in = INPUTS();
@@ -91,7 +93,7 @@ static rxres_t receive(sp_bus_t *b, uint8_t want_type, uint64_t *t_up) {
         else if (wr_low && !*t_up) *t_up = NOW();
         size_t n = H->rx_count(H->ctx);
         while (idx < n && st == SP_RX_MORE) st = sp_rx_chunk(&b->rx, H->rx_buf[idx++]);
-        if (st == SP_RX_DONE) break;
+        if (st == SP_RX_DONE) { *wr_seen = wr_low; break; }
         if (st == SP_RX_BAD) { b->st.bad++; log_push(b, SP_LOG_BAD, 0, INT32_MIN); return RX_ABORT; }
         if (!(in & SP_IN_PH0)) return RX_ABORT;                // host dropped REQ: it gave up
         if (n >= H->rx_cap || NOW() - t0 > SP_T_RX_MAX) return RX_ABORT;
@@ -107,9 +109,11 @@ static rxres_t receive(sp_bus_t *b, uint8_t want_type, uint64_t *t_up) {
               : b->hdr.type == SP_TYPE_DATA && b->dev->id != 0 && b->hdr.dest == b->dev->id;
     if (!ours) {
         b->st.ignored++;
-        b->cmd_len = b->hdr.len < SP_CMD_LEN ? b->hdr.len : SP_CMD_LEN;
-        memcpy(b->cmd, b->data, b->cmd_len);
-        b->reply.stat = 0;
+        if (want_type == SP_TYPE_CMD) {             // inside get_data b->cmd is the pending command
+            b->cmd_len = b->hdr.len < SP_CMD_LEN ? b->hdr.len : SP_CMD_LEN;
+            memcpy(b->cmd, b->data, b->cmd_len);
+            b->reply.stat = 0;
+        }
         log_push(b, SP_LOG_IGNORED, 0, INT32_MIN);
         return RX_IGNORE;
     }
@@ -121,6 +125,28 @@ static void ack_low(sp_bus_t *b) {
     H->set_ack(H->ctx, false);
     H->set_enbus(H->ctx, true);
     b->st.acks++;
+}
+
+// ACK a good packet only while the card can still take it: REQ high and, when we saw the
+// underrun, less than SP_T_ACK_LATE after it. A late ACK would land in the card's retry.
+// Returns false (nothing driven) when late. *ack_us: /WRREQ rise to ACK, negative when ACK came
+// first; INT32_MIN when we started after the underrun.
+static bool ack_if_in_time(sp_bus_t *b, uint64_t t_up, bool wr_seen, int32_t *ack_us) {
+    uint32_t in = INPUTS();
+    if (!(in & SP_IN_PH0) || (t_up && NOW() - t_up > SP_T_ACK_LATE)) {
+        b->st.late++;
+        log_push(b, SP_LOG_LATE, 0, t_up ? (int32_t)(NOW() - t_up) : INT32_MIN);
+        return false;
+    }
+    ack_low(b);
+    uint64_t t_ack = NOW();
+    // C8's last 0 is decided half a cell before the cell ends, so ACK can come just before the
+    // host's underrun (/WRREQ rise): then measure the rise afterwards.
+    while (wr_seen && !t_up && NOW() - t_ack < 1000u)
+        if (INPUTS() & SP_IN_WRREQ) t_up = NOW();
+    if (!wr_seen) b->st.late_entry++;
+    *ack_us = wr_seen && t_up ? (int32_t)((int64_t)t_ack - (int64_t)t_up) : INT32_MIN;
+    return true;
 }
 
 // A packet we do not answer: let the host finish and give up, then listen again.
@@ -150,10 +176,13 @@ static bool get_data(sp_bus_t *b, size_t *dlen) {
         }
         uint32_t irq = H->irq_off(H->ctx);
         uint64_t t_up;
-        rxres_t r = receive(b, SP_TYPE_DATA, &t_up);
+        bool wr_seen;
+        int32_t ack_us;
+        rxres_t r = receive(b, SP_TYPE_DATA, &t_up, &wr_seen);
+        if (r == RX_GOOD && !ack_if_in_time(b, t_up, wr_seen, &ack_us)) r = RX_IGNORE;
         if (r == RX_GOOD) {
-            ack_low(b);
             H->irq_restore(H->ctx, irq);
+            if (ack_us != INT32_MIN && ack_us > b->st.data_ack_us_max) b->st.data_ack_us_max = ack_us;
             *dlen = b->hdr.len;
             wait_t w = wait_req(b, false, SP_T_REQ_FALL);
             if (w == W_RESET) { bus_reset(b); return false; }
@@ -196,20 +225,17 @@ static void send_reply(sp_bus_t *b, bool encode) {
 static void transaction(sp_bus_t *b) {
     uint32_t irq = H->irq_off(H->ctx);
     uint64_t t_up;
-    rxres_t r = receive(b, SP_TYPE_CMD, &t_up);
+    bool wr_seen;
+    int32_t ack_us = INT32_MIN;
+    rxres_t r = receive(b, SP_TYPE_CMD, &t_up, &wr_seen);
+    if (r == RX_GOOD && !ack_if_in_time(b, t_up, wr_seen, &ack_us)) r = RX_IGNORE;
     if (r != RX_GOOD) {
         H->irq_restore(H->ctx, irq);
         skip_packet(b, r);
         return;
     }
-    ack_low(b);
-    uint64_t t_ack = NOW();
     H->irq_restore(H->ctx, irq);
-    // C8's last 0 is decided half a cell before the cell ends, so ACK can come just before the
-    // host's underrun (/WRREQ rise). Then the latency is negative.
-    while (!t_up && NOW() - t_ack < 1000u)
-        if (INPUTS() & SP_IN_WRREQ) t_up = NOW();
-    int32_t ack_us = t_up ? (int32_t)((int64_t)t_ack - (int64_t)t_up) : INT32_MIN;
+    b->tx_valid = false;                        // a new command: the old reply is never re-sent
     b->st.ack_us_last = ack_us;
     if (ack_us != INT32_MIN && ack_us > b->st.ack_us_max) b->st.ack_us_max = ack_us;
 

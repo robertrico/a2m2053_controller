@@ -143,6 +143,53 @@ def test_rx_either_idle_level(progs, wr_idle):
     assert after_c3(iwm_frame(bits))[:len(pl)] == pl
 
 
+def test_rx_slow_rising_edges(progs):
+    """WR crosses the 3.5 V threshold late on rising edges (about 1.9k against the input
+    capacitance, idle 3.96 V): every rising edge 0.8 us late still decodes."""
+    rng = random.Random(11)
+    pl = payload(rng, 60)
+    data = card_stream(pl)
+    edges, t_end = wr_edges(data, 24e-6, CELL, 0.0, rng)
+    # edge k leaves WR at level 1 ^ ((k + 1) & 1) with idle high: odd-numbered edges rise
+    edges = [e + (0.8e-6 if k % 2 == 1 else 0.0) for k, e in enumerate(edges)]
+    bits = rx_from_edges(progs, edges, t_end)
+    assert after_c3(iwm_frame(bits))[:len(pl)] == pl
+
+
+def test_rx_ringing_is_blanked(progs):
+    """A 0.2 us bounce right after an edge (two extra level changes) is not a 1."""
+    rng = random.Random(12)
+    pl = payload(rng, 60)
+    data = card_stream(pl)
+    edges, t_end = wr_edges(data, 24e-6, CELL, 0.0, rng)
+    bounced = []
+    for e in edges:
+        bounced += [e, e + 0.15e-6, e + 0.3e-6]
+    bits = rx_from_edges(progs, bounced, t_end)
+    assert after_c3(iwm_frame(bits))[:len(pl)] == pl
+
+
+def rx_from_edges(progs, edges, t_end, t_wrreq=20e-6):
+    def gpio(pin, t):
+        if pin == WRREQ:
+            return 0 if t_wrreq <= t < t_end else 1
+        if pin == WR:
+            return 1 ^ (bisect.bisect_right(edges, t) & 1)
+        return 0
+
+    rx = progs["fm_rx"]
+    sm = pio_model.SM(rx["code"], RX_HZ, gpio_in=gpio, in_base=WR, jmp_pin=WR,
+                      autopush=True, push_thresh=8, fifo_depth=8, pc=rx["labels"]["entry"])
+    sm.y = 1
+    chunks = []
+    while sm.t < t_end + 20 * CELL:
+        sm.step()
+        if sm.rx:
+            chunks.extend(sm.rx)
+            sm.rx.clear()
+    return [(c >> k) & 1 for c in chunks for k in range(7, -1, -1)]
+
+
 def test_rx_long_zero_runs(progs):
     # $80 bytes: 7 zero cells in a row between edges
     pl = [0x80] * 30 + [0x81, 0xC0, 0x80]

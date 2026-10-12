@@ -294,7 +294,12 @@ static void h_rx_arm(void *c) {
     (void)c; advance(T_CALL);
     rx_chunks = 0; rx_started = false; rx_arm_t = t; rx_isr = 0; rx_nbits = 0;
 }
-static size_t h_rx_count(void *c) { (void)c; advance(T_CALL); rx_run(t); return rx_chunks; }
+static double stall_us;                 // one main-loop stall when the first chunk shows up
+static size_t h_rx_count(void *c) {
+    (void)c; advance(T_CALL); rx_run(t);
+    if (rx_chunks && stall_us > 0) { double d = stall_us; stall_us = 0; advance(d); rx_run(t); }
+    return rx_chunks;
+}
 static void h_tx_start(void *c, const uint8_t *buf, size_t len) {
     (void)c; advance(T_CALL);
     if (cur >= nops || ops[cur].k != OP_READ || sub != 2 || !(phases & SP_IN_PH0) || !enbus) proto_err++;
@@ -496,6 +501,47 @@ int main(void) {
     run_script(2e6);
     CHECK(wd2->ok && wd2->attempts == 2 && wr2->ok && wr2->h.stat == 0);
     CHECK(rd.map[7] != 0 && proto_err == 0);
+
+    // 10. Main loop stalls 1.1 ms into a command packet: the card has given up (REQ low) by the
+    // time we look. No ACK, nothing answered; the card's retry is served.
+    sim_reset();
+    op(OP_RESET);
+    send_cmd(1, SP_INIT, 2, 0, 0, 1);
+    read_reply();
+    op_t *lt = send_cmd(1, SP_STATUS, 3, 0, 0, 3000);
+    op_t *lt_r = read_reply();
+    // arm the stall once INIT is done (ops 0-2: reset, INIT, its reply)
+    while (cur < 3 && t < 1e6) sp_bus_poll(&bus);
+    stall_us = 1100;
+    run_script(2e6);
+    CHECK(lt->ok && lt->attempts == 2 && lt_r->ok && lt_r->h.len == 4);
+    CHECK(bus.st.acks == 2 && bus.st.replies == 2 && proto_err == 0);
+    CHECK(bus.st.late == 0 || bus.st.late == 1);    // seen late, or skipped on REQ low
+
+    // 11. Stall that ends 30 us after the underrun, REQ still high: ACK, counted as late_entry
+    sim_reset();
+    op(OP_RESET);
+    send_cmd(1, SP_INIT, 2, 0, 0, 1);
+    read_reply();
+    op_t *le = send_cmd(1, SP_STATUS, 3, 0, 0, 3000);
+    op_t *le_r = read_reply();
+    while (cur < 3 && t < 1e6) sp_bus_poll(&bus);
+    stall_us = 875;                             // 28-byte packet: 876 us; first chunk at +31 us
+    run_script(2e6);
+    CHECK(le->ok && le->attempts == 1 && le_r->ok);
+    CHECK(bus.st.late_entry == 1 && bus.st.late == 0 && proto_err == 0);
+
+    // 12. Command retried while we wait for WRITEBLOCK data must not replace the command
+    sim_reset();
+    op(OP_RESET);
+    send_cmd(1, SP_INIT, 2, 0, 0, 1);
+    read_reply();
+    send_cmd(1, SP_WRITEBLOCK, 3, 6, 0, 3000);
+    send_cmd(1, SP_READBLOCK, 3, 0, 0, 1);      // stray command where data is expected
+    send_data(1, blk, 512);
+    op_t *w12 = read_reply();
+    run_script(2e6);
+    CHECK(w12->ok && w12->h.stat == 0 && rd.map[6] != 0 && dev.cmds[SP_READBLOCK] == 0);
 
     // 9. sp off: nothing is ACKed, the bus stays released
     sim_reset();

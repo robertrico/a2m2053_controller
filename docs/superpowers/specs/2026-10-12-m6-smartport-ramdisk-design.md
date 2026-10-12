@@ -121,7 +121,8 @@ p2 = status or control code = block low byte; p3, p4 = block mid, high.
 | First WR edge after REQ high | none for us: PIO arms on /WRREQ low | RX SM waits on /WRREQ itself; DMA catches every bit | no CPU latency |
 | Packet end to ACK low | about 105 us after underrun | fm_rx starts on the first edge (FF's MSB) and every byte is 8 cells, so `C8` always closes a DMA chunk, pushed half a cell **before** the host's last cell ends; then decode + checksum on the CPU (< 10 us), IRQs off. ACK lands about at the underrun (simulated: 1 us before) | **about 100 us** [model; scope it] |
 | Reply start after REQ high | none (host loops on nibbles) | 20 us pause after REQ high, then TX (PicoPort: the card flips Q6 about 6 us after REQ; edges before that are lost) | n/a |
-| Host holds REQ after reply | none | wait 5 ms, then re-send (ROM: about 1 ms) | n/a |
+| Host holds REQ after reply | none | wait up to 50 ms, release; a card re-read (REQ high, no write, 200 us) gets the reply again (ROM: re-sends after about 1 ms) | n/a |
+| Late packet (main loop stalled) | card retries after 105 us | ACK only while REQ is high and less than 90 us after the seen underrun; otherwise no ACK, the card's retry is served | n/a |
 
 The critical number is the second-to-last row. Bench check: CH1 /WRREQ,
 CH2 ACK (J1.20), trigger /WRREQ rising, `measure_delay` rise to fall.
@@ -157,6 +158,10 @@ cells pushes a 0, then a 0 per further cell. Autopush every 8 bits; DMA
 copies each push byte into a linear buffer. The CPU re-arms the SM and DMA
 at the end of every transaction (SM back at the /WRREQ wait, FIFO and
 buffer cleared).
+
+Blanking: WR is not polled for 6 cycles (0.49 us) after an edge, so ringing or
+a slow threshold crossing is not a second edge (the loop counts are cut to
+keep 72 and 48 cycles).
 
 Tolerance: an edge-to-edge gap reads as n cells anywhere in (n - 0.5,
 n + 0.5) cells, i.e. +-1.95 us between consecutive edges, so +-0.97 us per
@@ -291,5 +296,7 @@ ribbon off, U3 present with the ACK pull-up.
    against REQ and adjust the pause.
 3. **WR idle margin**: WR idles at 3.96 V against a 3.5 V threshold. PIO only
    looks at WR after /WRREQ falls, so idle noise does not create packets.
-4. **USB IRQs**: IRQs are off from the first received bit to ACK (up to
+4. **Pico boot after the IIe**: the card sends INIT once, about 90 ms into
+   its boot. Power the Pico (USB) before the IIe, or `PR#5` after.
+5. **USB IRQs**: IRQs are off from the first received bit to ACK (up to
    about 20 ms for a 512-byte data packet). USB tolerates this.
