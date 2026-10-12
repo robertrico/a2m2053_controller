@@ -26,9 +26,9 @@ Nothing to do on the bench until they land.
 
 ## Resume order (when the breakouts land)
 
-1. Ring out each breakout before wiring: all 20 IDC pins to their terminals
-   (don't trust the silk), no neighbour shorts, pin 1 / key matches the ribbon
-   stripe. Ferrules or tinned/solid wire in the clamps; no stray strands.
+1. Quick ring-out of each assembly with its ribbon plugged in (end connector to
+   terminals): catches a bad crimp or a flipped ribbon, and pin 1 / key matches
+   the stripe. Ferrules or tinned/solid wire in the clamps; no stray strands.
 2. Rebuild the host side on one breakout. **Rail-isolation checks before
    any Apple power, every time** (each Apple rail position vs its neighbours
    and every signal row). Low current limit on the bench +5 for first connect.
