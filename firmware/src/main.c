@@ -13,6 +13,12 @@
 #include "gcr.h"
 #include "flux_tx.h"
 #include "wtrack.h"
+#include "ramdisk.h"
+#include "sp_dev.h"
+#include "sp_bus.h"
+#include "sp_hw.h"
+#include "pins.h"
+#include "tusb.h"
 
 static mech_state_t ms;
 static bool oe_on, enbl_on, motor_on;
@@ -21,6 +27,14 @@ static ipc_t ipc;
 static mech_server_t srv;
 static atomic_bool srv_run, srv_running;
 static bool srv_wedged;
+
+// M6 SmartPort RAM disk (spec sec. 6.2): 384 overlay slots = 192 KB.
+#define RD_SLOTS 384
+static uint8_t rd_slots[RD_SLOTS][RD_BLOCK_LEN];
+static ramdisk_t rd;
+static sp_dev_t spdev;
+static sp_bus_t spbus;
+static bool splog = true;
 
 static void hw_src_start(void *c) { (void)c; flux_stream_start(); }
 static void hw_src_stop(void *c)  { (void)c; flux_stream_stop(); }
@@ -226,34 +240,84 @@ static void do_readdisk(void) {
     puts("OK");
 }
 
-static bool read_line(char *buf, size_t len) {
-    size_t n = 0;
-    bool overflow = false;
-    for (;;) {
-        int ch = getchar_timeout_us(100000);
-        if (ch == PICO_ERROR_TIMEOUT) continue;
-        if (ch == '\r' || ch == '\n') {
-            if (n == 0 && !overflow) continue;
-            buf[n] = 0;
-            fputs("\r\n", stdout);
-            fflush(stdout);
-            return !overflow;
-        }
-        if (ch == 0x08 || ch == 0x7F) {
-            if (n > 0 && !overflow) {
-                n--;
-                fputs("\b \b", stdout);
-                fflush(stdout);
-            }
-            continue;
-        }
-        if (ch < 0x20) continue;
-        if (n + 1 < len) {
-            buf[n++] = (char)ch;
-            putchar(ch);
-            fflush(stdout);
-        } else overflow = true;
+// Console line editor, polled from the main loop so the SmartPort bus keeps being served.
+static char line[CON_LINE_MAX];
+static size_t line_n;
+static bool line_over;
+
+// One character at most per call. True when a whole line is in `line` (or it overflowed).
+static bool line_poll(void) {
+    int ch = getchar_timeout_us(0);
+    if (ch == PICO_ERROR_TIMEOUT) return false;
+    if (ch == '\r' || ch == '\n') {
+        if (line_n == 0 && !line_over) return false;
+        line[line_n] = 0;
+        fputs("\r\n", stdout);
+        fflush(stdout);
+        return true;
     }
+    if (ch == 0x08 || ch == 0x7F) {
+        if (line_n > 0 && !line_over) {
+            line_n--;
+            fputs("\b \b", stdout);
+            fflush(stdout);
+        }
+        return false;
+    }
+    if (ch < 0x20) return false;
+    if (line_n + 1 < sizeof line) {
+        line[line_n++] = (char)ch;
+        putchar(ch);
+        fflush(stdout);
+    } else line_over = true;
+    return false;
+}
+
+static void print_us(const char *name, int32_t v) {
+    if (v == INT32_MIN) printf(" %s=-", name);
+    else printf(" %s=%ld", name, (long)v);
+}
+
+static void print_sp(void) {
+    const sp_stats_t *s = &spbus.st;
+    printf("SP %s id=%u last=%d pass=%d img=%lu ovl=%u/%u\n", spbus.enabled ? "on" : "off",
+           spdev.id, spdev.last, spdev.passthrough, (unsigned long)(sp_image_end - sp_image),
+           rd.used, rd.nslots);
+    printf("SP pkts=%lu acks=%lu cksum=%lu bad=%lu ign=%lu tmo=%lu resets=%lu rereads=%lu replies=%lu\n",
+           (unsigned long)s->packets, (unsigned long)s->acks, (unsigned long)s->cksum, (unsigned long)s->bad,
+           (unsigned long)s->ignored, (unsigned long)s->timeouts, (unsigned long)s->resets,
+           (unsigned long)s->rereads, (unsigned long)s->replies);
+    printf("SP ack_us");
+    print_us("last", s->ack_us_last);
+    print_us("max", s->ack_us_max);
+    printf("\n");
+    uint32_t other = 0;
+    for (int i = SP_INIT + 1; i <= SP_NCMDS; i++) other += spdev.cmds[i];
+    printf("SP cmds status=%lu readblk=%lu writeblk=%lu format=%lu control=%lu init=%lu other=%lu\n",
+           (unsigned long)spdev.cmds[SP_STATUS], (unsigned long)spdev.cmds[SP_READBLOCK],
+           (unsigned long)spdev.cmds[SP_WRITEBLOCK], (unsigned long)spdev.cmds[SP_FORMAT],
+           (unsigned long)spdev.cmds[SP_CONTROL], (unsigned long)spdev.cmds[SP_INIT], (unsigned long)other);
+    uint32_t g = sp_hw_pins();
+    printf("SP pins PH0=%lu PH1=%lu PH2=%lu PH3=%lu WRREQ=%lu HSTEN=%lu WR=%lu LASTONE=%lu\n",
+           (unsigned long)((g >> PIN_PH0) & 1), (unsigned long)((g >> PIN_PH1) & 1),
+           (unsigned long)((g >> PIN_PH2) & 1), (unsigned long)((g >> PIN_PH3) & 1),
+           (unsigned long)((g >> PIN_HOST_WRREQ) & 1), (unsigned long)((g >> PIN_HOST_HSTEN) & 1),
+           (unsigned long)((g >> PIN_HOST_WR) & 1), (unsigned long)((g >> PIN_LASTONE) & 1));
+    puts("OK");
+}
+
+// One transaction log line, only when the USB buffer has room (never blocks the bus loop).
+static void splog_poll(void) {
+    static const char *const kind[] = { "CMD", "IGN", "CKSUM", "BAD", "TIMEOUT", "RESET", "REREAD" };
+    if (!splog || !tud_cdc_connected() || tud_cdc_write_available() < 96) return;
+    sp_log_t e;
+    if (!sp_bus_log_pop(&spbus, &e)) return;
+    printf("SPL %s", e.kind < sizeof kind / sizeof kind[0] ? kind[e.kind] : "?");
+    if (e.kind == SP_LOG_CMD || e.kind == SP_LOG_IGNORED || e.kind == SP_LOG_TIMEOUT)
+        printf(" dest=%u cmd=%02x blk=%lu st=%02x", e.dest, e.cmd, (unsigned long)e.block, e.stat);
+    if (e.kind == SP_LOG_TIMEOUT) printf(" stage=%u", e.stage);
+    if (e.kind == SP_LOG_CMD) print_us("ack_us", e.ack_us);
+    printf("\n");
 }
 
 static bool need_mech(void) {
@@ -323,6 +387,14 @@ static void execute(const con_cmd_t *c) {
     case CON_FORMAT:
         if (!atomic_load(&srv_run)) { puts("ERR server off"); return; }
         do_format(c);
+        return;
+    case CON_SP:
+        if (c->argc) sp_bus_enable(&spbus, c->arg[0]);
+        print_sp();
+        return;
+    case CON_SPLOG:
+        splog = c->arg[0];
+        puts("OK");
         return;
     case CON_NONE:
         return;
@@ -429,13 +501,23 @@ int main(void) {
     atomic_init(&srv_running, false);
     multicore_reset_core1();            // after an SWD flash/reset core 1 may not be in its boot-ROM wait
     multicore_launch_core1(core1_main);
-    char line[CON_LINE_MAX];
+    sp_hw_init();
+    ramdisk_init(&rd, sp_image, (size_t)(sp_image_end - sp_image), rd_slots, RD_SLOTS);
+    sp_dev_init(&spdev, &rd, sp_hw_lastone, NULL);
+    sp_bus_init(&spbus, sp_hw_hal(), &spdev);
+    sp_bus_enable(&spbus, true);        // serve the Liron card from power-on
     for (;;) {
-        if (!read_line(line, sizeof line)) {
-            puts("ERR line too long");
-            continue;
+        sp_bus_poll(&spbus);
+        if (line_poll()) {
+            if (line_over) puts("ERR line too long");
+            else {
+                con_cmd_t c = console_parse(line);
+                execute(&c);
+            }
+            line_n = 0;
+            line_over = false;
+        } else {
+            splog_poll();
         }
-        con_cmd_t c = console_parse(line);
-        execute(&c);
     }
 }

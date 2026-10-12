@@ -30,6 +30,8 @@ static const con_spec_t specs[] = {
     {"readdisk", CON_READDISK, 0, false, {0},       {0}},
     {"writeblk", CON_WRITEBLK, 1, false, {0},       {1599}},
     {"format",   CON_FORMAT,  -2, false, {0, 0},    {79, 1}},
+    {"sp",       CON_SP,      -1, true,  {0},       {0}},
+    {"splog",    CON_SPLOG,    1, true,  {0},       {0}},
 };
 
 static bool parse_long(const char *s, long lo, long hi, long *out) {
@@ -83,5 +85,6 @@ const char *console_help(void) {
     return "help | oe on|off | enbl on|off | status [0-15] | cmd <0-15> | motor on|off\n"
            "recal | seek <0-79> | head <0|1> | eject | tach | settle <us> | capture <t> <s> <n>\n"
            "server on|off | readblk <0-1599> | readdisk\n"
-           "writeblk <0-1599> (then 512 raw bytes) | format [<0-79> <0|1>] (any key stops)";
+           "writeblk <0-1599> (then 512 raw bytes) | format [<0-79> <0|1>] (any key stops)\n"
+           "sp [on|off] (SmartPort RAM disk: status, or serve/leave the bus) | splog on|off";
 }

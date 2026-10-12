@@ -37,6 +37,13 @@ int main(void) {
     CHECK(P("capture 3 2 5").op == CON_BAD);
     CHECK(P("capture 3 1 100001").op == CON_BAD);
     CHECK(P("capture 3 1").op == CON_BAD);
+    CHECK(P("sp").op == CON_SP && P("sp").argc == 0);
+    CHECK(P("sp on").op == CON_SP && P("sp on").argc == 1 && P("sp on").arg[0] == 1);
+    CHECK(P("sp off").arg[0] == 0);
+    CHECK(P("sp 1").op == CON_BAD);
+    CHECK(P("sp on off").op == CON_BAD);
+    CHECK(P("splog off").op == CON_SPLOG && P("splog off").arg[0] == 0);
+    CHECK(P("splog").op == CON_BAD);
     char longline[200];
     memset(longline, 'a', sizeof longline - 1);
     longline[sizeof longline - 1] = 0;

@@ -105,7 +105,14 @@ static rxres_t receive(sp_bus_t *b, uint8_t want_type, uint64_t *t_up) {
     bool ours = want_type == SP_TYPE_CMD
               ? sp_dev_accepts(b->dev, &b->hdr, b->data[0]) && bus_enabled(INPUTS())
               : b->hdr.type == SP_TYPE_DATA && b->dev->id != 0 && b->hdr.dest == b->dev->id;
-    if (!ours) { b->st.ignored++; return RX_IGNORE; }
+    if (!ours) {
+        b->st.ignored++;
+        b->cmd_len = b->hdr.len < SP_CMD_LEN ? b->hdr.len : SP_CMD_LEN;
+        memcpy(b->cmd, b->data, b->cmd_len);
+        b->reply.stat = 0;
+        log_push(b, SP_LOG_IGNORED, 0, INT32_MIN);
+        return RX_IGNORE;
+    }
     return RX_GOOD;
 }
 

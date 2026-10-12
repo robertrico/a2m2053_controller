@@ -11,7 +11,7 @@ static const pin_level_t idle_outputs[] = {
     {PIN_MECH_WRTGATE, 1},
     {PIN_MECH_WRTDATA, 0},
     {PIN_PH3_OUT, 0}, {PIN_ENBL_OUT, 1}, {PIN_LED, 0},
-    {PIN_HOST_RD, 0}, {PIN_ACK, 1},
+    {PIN_HOST_RD, 1}, {PIN_ACK, 1},      // host bus idle levels (RD idles high, M6); U3 off
 };
 
 static const unsigned input_pins[] = {
