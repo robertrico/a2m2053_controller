@@ -187,7 +187,7 @@ on unwritten Apple behaviour (e.g. ignoring a CONTROL data packet for codes
 | `$01` READBLOCK | no | 512 bytes, or `$2D` if block >= 1600 |
 | `$02` WRITEBLOCK | yes, 512 bytes | `$00`, `$2D` bad block, `$27` overlay full |
 | `$03` FORMAT | no | `$00`; every block reads zero afterwards |
-| `$04` CONTROL | yes, any length up to 1 KB | `$00` for code `$00` (reset) and `$04` (eject: no-op in M6); `$21` otherwise |
+| `$04` CONTROL | yes, any length up to 895 bytes (format limit: 127 groups + 6) | `$00` for code `$00` (reset) and `$04` (eject: no-op in M6); `$21` otherwise |
 | `$05` INIT | no | sec. 6.1 |
 | `$06`, `$07`, `$08` | no | `$01` |
 | `$09` WRITE | yes | `$01` (data swallowed) |
