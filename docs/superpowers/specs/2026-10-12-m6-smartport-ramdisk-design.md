@@ -202,11 +202,15 @@ the card does not check the type). STAT = `$80 | code`. SRC = our ID.
 
 ### 6.1 INIT and ID
 
-- No ID: any destination is accepted. INIT takes the destination as our ID.
+- No ID: INIT to any destination is accepted (the card walks the chain) and
+  takes the destination as our ID.
   LASTONE/ (GP1, internal pull-up while U5 is not fitted) high -> status
   `$40` ("last device"), so the card stops its INIT loop. Then pass-through
   would turn on (ROM `$44`); in M6 it only sets a flag shown by `sp`.
-- No ID and not INIT: ignore (no ACK).
+- No ID and not INIT: ignore (no ACK). The ROM answers these; we do not,
+  so a board reset under a running IIe can never answer for a drive behind
+  it (M8). The card recovers by itself: 3000 failed tries, then bus reset
+  and INIT.
 - ID set: only packets to our ID; INIT to our ID replies `$00` and keeps
   the ID.
 - Bus reset clears the ID.

@@ -39,8 +39,9 @@ typedef struct {
 
 void sp_dev_init(sp_dev_t *d, ramdisk_t *rd, bool (*lastone_high)(void *), void *ctx);
 void sp_dev_bus_reset(sp_dev_t *d);
-// Is this command packet for us? Without an ID every destination is (INIT); with one, ours only.
-bool sp_dev_accepts(const sp_dev_t *d, const sp_hdr_t *h);
+// Is this command packet for us? Without an ID only INIT, to any destination (the card walks
+// the chain); with one, every command to our ID. cmd = first data byte (command code).
+bool sp_dev_accepts(const sp_dev_t *d, const sp_hdr_t *h, uint8_t cmd);
 // Does the host follow this command with a data packet? (ROM expected_param_count_tab MSB.)
 bool sp_dev_needs_data(uint8_t cmd);
 // Run one command. cmd is the decoded command packet (len bytes, padded with zeros to 9);

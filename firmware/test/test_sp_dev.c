@@ -27,19 +27,26 @@ int main(void) {
     ramdisk_init(&rd, base, sizeof base, slots, 2);
     sp_dev_init(&dev, &rd, lastone_cb, NULL);
 
-    // no ID: any destination is accepted (INIT walks the chain); data packets never are
+    // no ID: INIT to any destination (the card walks the chain), nothing else; data never
     sp_hdr_t h = hdr(7, SP_TYPE_CMD);
-    CHECK(sp_dev_accepts(&dev, &h));
+    CHECK(sp_dev_accepts(&dev, &h, SP_INIT));
+    CHECK(!sp_dev_accepts(&dev, &h, SP_READBLOCK));
+    CHECK(!sp_dev_accepts(&dev, &h, SP_STATUS));
     h = hdr(1, SP_TYPE_DATA);
-    CHECK(!sp_dev_accepts(&dev, &h));
+    CHECK(!sp_dev_accepts(&dev, &h, SP_INIT));
+    h = hdr(1, SP_TYPE_CMD);
+    h.len = 0;
+    CHECK(!sp_dev_accepts(&dev, &h, SP_INIT));
 
     // INIT with LASTONE/ high: ID taken, status $40, pass-through on
     run(1, SP_INIT, 2, 0, 0, 0, NULL, 0);
     CHECK(dev.id == 1 && r.stat == SP_E_LAST && r.len == 0 && dev.passthrough && dev.last);
     h = hdr(1, SP_TYPE_CMD);
-    CHECK(sp_dev_accepts(&dev, &h));
+    CHECK(sp_dev_accepts(&dev, &h, SP_READBLOCK));
+    CHECK(sp_dev_accepts(&dev, &h, SP_INIT));
     h = hdr(2, SP_TYPE_CMD);
-    CHECK(!sp_dev_accepts(&dev, &h));
+    CHECK(!sp_dev_accepts(&dev, &h, SP_READBLOCK));
+    CHECK(!sp_dev_accepts(&dev, &h, SP_INIT));
     // INIT again to our ID: OK, ID kept
     run(1, SP_INIT, 2, 0, 0, 0, NULL, 0);
     CHECK(dev.id == 1 && r.stat == SP_E_OK);

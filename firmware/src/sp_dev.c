@@ -24,9 +24,9 @@ void sp_dev_bus_reset(sp_dev_t *d) {
     d->passthrough = false;
 }
 
-bool sp_dev_accepts(const sp_dev_t *d, const sp_hdr_t *h) {
-    if (h->type != SP_TYPE_CMD) return false;
-    return d->id == 0 || h->dest == d->id;
+bool sp_dev_accepts(const sp_dev_t *d, const sp_hdr_t *h, uint8_t cmd) {
+    if (h->type != SP_TYPE_CMD || h->len == 0) return false;
+    return d->id == 0 ? cmd == SP_INIT : h->dest == d->id;
 }
 
 bool sp_dev_needs_data(uint8_t cmd) {
