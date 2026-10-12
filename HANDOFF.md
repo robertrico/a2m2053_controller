@@ -1,6 +1,6 @@
 # Handoff
 
-Last updated: 2026-10-11, M6 paused after a bench failure.
+Last updated: 2026-10-11, M6 paused; Liron repaired and write-tested.
 
 ## Where things stand
 
@@ -21,8 +21,8 @@ Last updated: 2026-10-11, M6 paused after a bench failure.
 
 ## Resume order
 
-1. Write test on the working UniDisk through the repaired Liron (save a
-   file), if not done yet.
+1. Liron write test done (ADTPro REF800K onto disk 2 through the working
+   UniDisk). Disk 2 lost its M5 board-written copy: re-format it with our board.
 2. Optional: scope `PR#5` with no drive for a baseline of the host bus.
 3. Rebuild the host side on the IDC breakouts. **Rail-isolation checks before
    any Apple power, every time** (each Apple rail position vs its neighbours
@@ -49,7 +49,9 @@ Last updated: 2026-10-11, M6 paused after a bench failure.
 
 ## Notes
 
-- bytehamr: M6 log "M6: a loose strand put -12 V on /WRREQ" written 2026-10-11, not published yet; it predates the Liron repair.
+- bytehamr: published 2026-10-11, "M6: a loose strand put -12 V on /WRREQ" and
+  "The Liron card runs on a UniDisk's IWM now". Hardware table on the project
+  page still lists the 74LVC1G07 (fix with the M6 spec).
 - No Hackaday draft (Rico does Hackaday log by log, once proven).
 - `project_byte_hamr`: three untracked files from 2026-09-14 stashed there as
   `stash@{0}: dino - wip`.
