@@ -55,6 +55,8 @@ Research digest: `docs/research_notes.md`. Start there.
 | `docs/private/` | Third-party docs, datasheets and photos. **Git-ignored, never in history.** Where to get each one: `docs/SOURCES.md` |
 | `docs/superpowers/specs/` | Design spec(s) |
 | `docs/build_log/` | Per-milestone notes and measurements (create as we go) |
+| `hardware/kicad/` | KiCad project for the PCB (outline only so far) |
+| `FABRICATION.md` | PCB phase: hand-solder rule, 8T245 package, board requirements from the bench |
 
 Tag every new fact in `research_notes.md` with its source. Mark guesses
 `[guess]` until bench-confirmed, then change the tag to `[measured]`.

@@ -12,8 +12,9 @@ Status: **approved** by Rico on 2026-10-07 (written spec).
   **oracle**: we check our sequencing, status, errors and timing against it,
   and match its behaviour at the protocol level only.
 - Phase 1: perfboard prototype on a Pico 2 (RP2350A) with Rico's 8T245
-  shifter boards. Phase 2: a low-cost drop-in PCB (the only spare board on
-  eBay has sat unsold at $150 for 7 months).
+  shifter boards. Phase 2: a low-cost, hand-solderable drop-in PCB (the
+  only spare board on eBay has sat unsold at $150 for 7 months). PCB
+  requirements and part choices: `FABRICATION.md`.
 - Full parity for **Apple II use**: read, write, format, eject, LED, daisy
   chain out the rear port. ProDOS/Apple II 800K disks.
 - **Out of scope: Macintosh disks** (524-byte blocks, Mac interleave). This

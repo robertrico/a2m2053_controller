@@ -1,0 +1,7 @@
+# KiCad scratch files
+*.lck
+_autosave-*
+*-backups/
+fp-info-cache
+*.kicad_prl
+fit-check/
