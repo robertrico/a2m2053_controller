@@ -67,7 +67,7 @@ int main(void) {
     CHECK(st.read(st.ctx, 40, b) == SP_E_OK && memcmp(b, w, 512) == 0);
     uint8_t u[8];
     st.unistat(st.ctx, u);
-    CHECK(u[0] == 0 && u[3] == 0);
+    CHECK(u[0] == 0 && u[3] == 0 && u[7] == 0xFF);
 
     // head lands on the wrong cylinder once (ROM Z57 case): $67 with the data
     setup();

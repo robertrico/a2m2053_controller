@@ -43,6 +43,7 @@ typedef struct {
 #define SP_T_TX_PAUSE      20u      // REQ high to first reply edge (card flips Q6 about 6 us after REQ)
 #define SP_T_REPLY_DONE    50000u   // host drops REQ after the reply
 #define SP_T_REREAD        200u     // REQ high, no write, this long: host re-reads our reply
+#define SP_REREAD_MAX      5        // re-sends per reply (the card reads a reply at most 5 times)
 #define SP_T_ACK_LATE      90u      // no ACK this long after the underrun (card's last poll: about 105 us)
 
 typedef enum {
@@ -77,6 +78,7 @@ typedef struct {
     uint64_t reread_t;
     uint64_t t_low_last;                     // last time receive() saw /WRREQ low
     bool tx_valid;
+    uint8_t rereads_left;                    // re-sends still allowed for the current reply
     size_t tx_len;
     sp_hdr_t hdr;
     sp_stats_t st;

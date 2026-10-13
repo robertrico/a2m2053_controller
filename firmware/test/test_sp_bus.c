@@ -45,7 +45,7 @@ static size_t card_packet(uint8_t *out, uint8_t dest, uint8_t type, const uint8_
 }
 
 // ---------------------------------------------------------------- card script
-typedef enum { OP_RESET, OP_SEND, OP_READ, OP_WAIT, OP_END } opk_t;
+typedef enum { OP_RESET, OP_SEND, OP_READ, OP_WAIT, OP_HOLDREQ, OP_END } opk_t;
 
 typedef struct {
     opk_t k;
@@ -183,6 +183,11 @@ static void sim_update(double now) {
         case OP_END: return;
         case OP_WAIT:
             if (sub == 0) { sub = 1; ev += o->us; break; }
+            op_finish(true);
+            break;
+        case OP_HOLDREQ:                // REQ high with the bus enabled, never reads (brown-out)
+            if (sub == 0) { phases = SP_IN_PH0 | SP_IN_PH1 | SP_IN_PH3; sub = 1; ev += o->us; break; }
+            phases = SP_IN_PH1 | SP_IN_PH3;
             op_finish(true);
             break;
         case OP_RESET:                  // reset_smartport_bus: PH0+PH2 80 ms, all off 10 ms
@@ -548,6 +553,18 @@ int main(void) {
     op_t *w12 = read_reply();
     run_script(2e6);
     CHECK(w12->ok && w12->h.stat == 0 && rd.map[6] != 0 && dev.cmds[SP_READBLOCK] == 0);
+
+    // 13. REQ stuck high after a good reply (the M7 brown-out): at most SP_REREAD_MAX re-sends
+    sim_reset();
+    op(OP_RESET);
+    send_cmd(1, SP_INIT, 2, 0, 0, 1);
+    read_reply();
+    send_cmd(1, SP_STATUS, 3, 0, 0, 3000);
+    read_reply();
+    op_t *hold = op(OP_HOLDREQ);
+    hold->us = 2e6;
+    run_script(5e6);
+    CHECK(bus.st.rereads == SP_REREAD_MAX && !enbus);
 
     // 9. sp off: nothing is ACKed, the bus stays released
     sim_reset();

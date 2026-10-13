@@ -213,6 +213,7 @@ static void send_reply(sp_bus_t *b, bool encode) {
     if (encode) {
         b->tx_len = sp_encode(b->tx, b->dev->id, SP_TYPE_STATUS, b->reply.stat, b->reply.data, b->reply.len);
         b->tx_valid = true;
+        b->rereads_left = SP_REREAD_MAX;
     }
     H->set_ack(H->ctx, true);
     H->set_enbus(H->ctx, true);
@@ -298,6 +299,8 @@ void sp_bus_poll(sp_bus_t *b) {
         if (!b->reread_t) b->reread_t = now ? now : 1;
         else if (now - b->reread_t > SP_T_REREAD) {
             b->reread_t = 0;
+            if (!b->rereads_left) { b->tx_valid = false; return; }   // REQ stuck high (brown-out): stop
+            b->rereads_left--;
             b->st.rereads++;
             log_push(b, SP_LOG_REREAD, 0, INT32_MIN);
             send_reply(b, false);

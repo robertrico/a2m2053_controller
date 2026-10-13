@@ -84,12 +84,15 @@ static sp_media_t fs_media(void *c) {
          : f->rp.status == ST_WRPROT ? SP_MEDIA_WRPROT : SP_MEDIA_OK;
 }
 
-// STATUS $05 (ROM Led96, $56-$5D): byte 1 = soft flags, byte 2 = tries of the last command.
+// STATUS $05 (ROM Led96, $56-$5D). The working UniDisk returns 00 x 7 then $FF
+// (M7 bench, SPCOMPARE): byte 7 ($5D) is $FF. Bytes 1-2 carry our soft flags and tries
+// of the last command; they are 0 on a clean read, as on the UniDisk.
 static void fs_unistat(void *c, uint8_t out[8]) {
     fstore_t *f = c;
     memset(out, 0, 8);
     out[1] = f->last_soft;
     out[2] = f->last_tries;
+    out[7] = 0xFF;
 }
 
 void fstore_init(fstore_t *f, fs_transact_t transact, void *ctx) {
