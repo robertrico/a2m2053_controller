@@ -3,8 +3,9 @@
 Last updated: 2026-10-12 (night). **M6 passed on the bench** and is merged
 to main: ProDOS boots from the board's RAM disk through the Liron card,
 saves and loads files, ACK 5.3 us after /WRREQ rises (card window about
-105 us). Next: M7 (floppy behind the SmartPort engine): design and build can
-start now; its bench test waits for the J2 breakout (arrives 2026-10-13).
+105 us). **M7 firmware is built and host-tested on branch `m7`** (not
+merged, not flashed): the floppy behind the SmartPort engine. Its bench test
+waits for the J2 breakout (arrives 2026-10-13) and the mechanism rework.
 
 ## Where things stand
 
@@ -42,37 +43,33 @@ start now; its bench test waits for the J2 breakout (arrives 2026-10-13).
 
 ## Resume order
 
-**M7 status: ready to design and build; bench blocked on J2.** Software
-prerequisites are done: the SmartPort engine (M6, `sp_bus`/`sp_dev`) and the
-mechanism server on core 1 with its request queue (M4/M5, `ipc`,
-`mech_server`, `REQ_READ`/`REQ_WRITE`/`REQ_FORMAT_TS`). The card's reply wait
-has no timeout (`smartport_bus_read_packet` Lc97d), so ACK held low covers any
-seek. The hardware is not ready: the mechanism ribbon is unplugged (it loads
-the bench +5 on the old tap) and reads need about 5 V at CN104 pin 11 (M3).
+**M7 status: firmware ready on branch `m7`; bench blocked on J2.** Spec
+`docs/superpowers/specs/2026-10-12-m7-floppy-behind-smartport-design.md`,
+plan `docs/superpowers/plans/2026-10-12-m7-floppy-behind-smartport.md`,
+bench steps `docs/build_log/m7.md`. Choices marked **[choice]** in the spec
+are Rico's to overrule (floppy at boot, eject button off by default, no
+eject on a failed FORMAT, STATUS `$05` content, `imgcopy`).
 
-1. **M7 brainstorm, spec, plan, firmware** (can start now, host tests only):
-   - `sp_dev` back end: `ramdisk` swapped for core-1 requests (keep the RAM disk
-     as a console-selectable fallback for host-side debugging).
-   - Busy hold-off: ACK low while core 1 works. Measure the worst case
-     (recalibrate + seek + zone change + read retries); the card waits.
-   - Disk-in / write-protect / offline into STATUS `$00` (`$E8` no disk, `$FC`
-     write-protected, as `Leda3`) and errors `$2F`, `$2B`, `$27`.
-   - Motor/LED idle timeout, eject on CONTROL `$04`, server started from boot.
-   - Oracle comparison program against the working UniDisk (parent spec 4.1).
-2. **When J2 lands (2026-10-13), before any M7 bench work:** mechanism side on
+1. **When J2 lands (2026-10-13), before any M7 bench work:** mechanism side on
    the breakout (J2 = CN104, straight IDC ribbon). Ring out the ribbon to the
    terminals, then isolation checks: +12 V (13/15/17/19) vs RD (16), WRTDATA
    (18) and every signal. Short heavy +5 V run to pin 11 and GND to 1/3/5/7,
    bulk caps (4.7 uF, as on the IF-83) at the terminals. Re-run a disk read
-   scan on drive A with the bench at 5.0 V to confirm the IR drop is gone.
-   Check the U2 channel order against GP12-19 (not recorded in the M0 notes).
-3. M7 bench: ProDOS boots from a real 800K floppy (REF800K, write-protected)
-   through the board; comparison program matches the working UniDisk.
-4. Re-format disk 2 with our board. Not time critical.
+   scan on drive A with the bench at 5.0 V to confirm the IR drop is gone
+   (`server off` first: M5 console commands need it). Check the U2 channel
+   order against GP12-19 (not recorded in the M0 notes).
+2. **M7 bench** (`docs/build_log/m7.md`): flash `m7`, REF800K read through
+   SmartPort (expect "UNABLE TO LOAD PRODOS" and good reads in `SPL`),
+   `imgcopy` onto disk 2, boot it with `PR#5`, scope the hold-off, SPCOMPARE
+   on both drives, eject, Ctrl-Reset during a seek, a save that survives a
+   power cycle.
+3. After M7 passes: merge `m7`, bytehamr log, then M8 (daisy chain).
+4. Open: GP22 eject button wiring (direct or via U5, `pin_budget.md`).
 
 ## Bench state at shutdown
 
-- Pico 2 flashed with `2e7311a` (M6). Power order: Pico, board (bench +5 at
+- Pico 2 flashed with `2e7311a` (M6). `m7` is not flashed; with M7 the
+  mechanism server (and U2/U4) is on from boot. Power order: Pico, board (bench +5 at
   5.00 V), IIe; at shutdown everything off, Pico included (a Pico left
   running across an IIe power cycle twice left the IIe not starting).
 - Bench +12 off. Mechanism ribbon unplugged.
