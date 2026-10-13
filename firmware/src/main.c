@@ -307,18 +307,35 @@ static void print_sp(void) {
     puts("OK");
 }
 
-// One transaction log line, only when the USB buffer has room (never blocks the bus loop).
+// One transaction log line, only when the USB buffer has room for all of it (the CDC TX buffer
+// is 64 bytes): never blocks the bus loop. A line that does not fit waits for the next call.
 static void splog_poll(void) {
     static const char *const kind[] = { "CMD", "IGN", "CKSUM", "BAD", "TIMEOUT", "RESET", "REREAD", "LATE" };
-    if (!splog || !tud_cdc_connected() || tud_cdc_write_available() < 96) return;
-    sp_log_t e;
-    if (!sp_bus_log_pop(&spbus, &e)) return;
-    printf("SPL %s", e.kind < sizeof kind / sizeof kind[0] ? kind[e.kind] : "?");
-    if (e.kind == SP_LOG_CMD || e.kind == SP_LOG_IGNORED || e.kind == SP_LOG_TIMEOUT)
-        printf(" dest=%u cmd=%02x blk=%lu st=%02x", e.dest, e.cmd, (unsigned long)e.block, e.stat);
-    if (e.kind == SP_LOG_TIMEOUT) printf(" stage=%u", e.stage);
-    if (e.kind == SP_LOG_CMD || e.kind == SP_LOG_LATE) print_us("ack_us", e.ack_us);
-    printf("\n");
+    static char pend[64];
+    static int pend_len;
+    if (!splog || !tud_cdc_connected()) return;
+    if (!pend_len) {
+        sp_log_t e;
+        if (!sp_bus_log_pop(&spbus, &e)) return;
+        int n = snprintf(pend, sizeof pend, "SPL %s", e.kind < sizeof kind / sizeof kind[0] ? kind[e.kind] : "?");
+        if (e.kind == SP_LOG_CMD || e.kind == SP_LOG_IGNORED || e.kind == SP_LOG_TIMEOUT)
+            n += snprintf(pend + n, sizeof pend - n, " d=%u c=%02x b=%lu s=%02x", e.dest, e.cmd,
+                          (unsigned long)e.block, e.stat);
+        if (e.kind == SP_LOG_TIMEOUT && n < (int)sizeof pend)
+            n += snprintf(pend + n, sizeof pend - n, " stage=%u", e.stage);
+        if ((e.kind == SP_LOG_CMD || e.kind == SP_LOG_LATE) && n < (int)sizeof pend) {
+            if (e.ack_us == INT32_MIN) n += snprintf(pend + n, sizeof pend - n, " ack=-");
+            else n += snprintf(pend + n, sizeof pend - n, " ack=%ld", (long)e.ack_us);
+        }
+        if (n > (int)sizeof pend - 2) n = (int)sizeof pend - 2;
+        pend[n++] = '\n';
+        pend[n] = 0;
+        pend_len = n;
+    }
+    if ((int)tud_cdc_write_available() < pend_len) return;
+    fputs(pend, stdout);
+    fflush(stdout);
+    pend_len = 0;
 }
 
 static bool need_mech(void) {

@@ -21,7 +21,10 @@ test:
 	$(MAKE) -C test
 
 # Rico only (hardware actions):
+# Rescue reset first: with core 1 running from flash, erasing the 864 KB image (M6 RAM disk)
+# timed out ("failed erasing sectors"); after a rescue reset it programs cleanly (2026-10-12).
 flash: all
+	$(OPENOCD) -f interface/cmsis-dap.cfg -c "set RESCUE 1" -c "set USE_CORE 0" -f target/rp2350.cfg -c "adapter speed 5000" -c "init; exit"
 	$(OPENOCD) $(OCD_CFG) -c "program $(ELF) verify reset exit"
 
 reset:
