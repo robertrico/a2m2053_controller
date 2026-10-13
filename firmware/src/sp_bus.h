@@ -53,6 +53,7 @@ typedef enum {
 typedef struct {
     uint8_t kind, cmd, dest, stat, stage;   // stage: which wait timed out (SP_LOG_TIMEOUT)
     uint32_t block;
+    uint16_t ms;                             // time in sp_dev_execute (store call), ms
     int32_t ack_us;                          // /WRREQ rise to ACK low (negative: ACK first);
                                              // INT32_MIN = not measured
 } sp_log_t;
@@ -65,6 +66,7 @@ typedef struct {
     uint32_t late_entry;                     // ACKed, but receive started after the underrun
     int32_t ack_us_max, ack_us_last;         // command packets; INT32_MIN = none yet
     int32_t data_ack_us_max;                 // data packets (WRITEBLOCK)
+    uint32_t exec_ms_last, exec_ms_max;      // store call time: how long the card was held off
 } sp_stats_t;
 
 typedef struct {

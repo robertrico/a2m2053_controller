@@ -8,7 +8,7 @@ pico_sdk_init()
 add_executable(a2m_bringup
     src/main.c src/hw.c src/crc32.c src/mech.c src/mech_addr.c src/console.c src/flux.c
     src/gcr.c src/flux_dec.c src/trackbuf.c src/ipc.c src/mech_server.c src/wtrack.c src/flux_tx.c
-    src/sp_wire.c src/sp_dev.c src/ramdisk.c src/sp_bus.c src/sp_hw.c src/sp_image.S)
+    src/sp_wire.c src/sp_dev.c src/ramdisk.c src/sp_bus.c src/sp_hw.c src/sp_image.S src/fstore.c)
 pico_generate_pio_header(a2m_bringup ${CMAKE_CURRENT_LIST_DIR}/src/flux_rx.pio)
 pico_generate_pio_header(a2m_bringup ${CMAKE_CURRENT_LIST_DIR}/src/flux_tx.pio)
 pico_generate_pio_header(a2m_bringup ${CMAKE_CURRENT_LIST_DIR}/src/sp_fm.pio)

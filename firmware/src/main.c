@@ -17,6 +17,7 @@
 #include "sp_dev.h"
 #include "sp_bus.h"
 #include "sp_hw.h"
+#include "fstore.h"
 #include "pins.h"
 #include "tusb.h"
 
@@ -36,6 +37,9 @@ static sp_store_t rd_store;
 static sp_dev_t spdev;
 static sp_bus_t spbus;
 static bool splog = true;
+static fstore_t fl;
+static sp_store_t fl_store;
+static bool disk_floppy;
 
 static void hw_src_start(void *c) { (void)c; flux_stream_start(); }
 static void hw_src_stop(void *c)  { (void)c; flux_stream_stop(); }
@@ -53,6 +57,8 @@ static const flux_tx_t hw_tx = { hw_tx_load, hw_tx_fire, hw_tx_busy, hw_tx_abort
 
 static void core1_main(void) {
     mech_server_init(&srv, hw_mech_bus(), &hw_src, &hw_tx);
+    mech_server_set_button(&srv, hw_eject_pressed, NULL);
+    bool led = false;
     for (;;) {
         if (!atomic_load(&srv_run)) {
             if (atomic_load(&srv_running)) { mech_server_stop(&srv); atomic_store(&srv_running, false); }
@@ -66,12 +72,16 @@ static void core1_main(void) {
             switch (rq.op) {
             case REQ_READ:      mech_server_read(&srv, rq.block, &rp); break;
             case REQ_WRITE:     mech_server_write(&srv, rq.block, rq.data, &rp); break;
-            case REQ_FORMAT_TS: mech_server_format_ts(&srv, rq.cyl, rq.side, &rp); rp.block = rq.block; break;
+            case REQ_FORMAT_TS: mech_server_format_ts(&srv, rq.cyl, rq.side, &rp); break;
+            case REQ_MEDIA:     mech_server_media(&srv, &rp); break;
+            case REQ_EJECT:     mech_server_eject(&srv, &rp); break;
             }
+            rp.block = rq.block;                        // core 0 matches replies by this tag
             while (!ipc_reply_push(&ipc, &rp)) tight_loop_contents();
         } else {
             mech_server_idle(&srv);
         }
+        if (srv.motor_on != led) { led = srv.motor_on; hw_led(led); }   // LED = "in use", as the motor
     }
 }
 
@@ -121,6 +131,19 @@ static bool request(const req_t *rq, reply_t *r, uint32_t timeout_ms) {
         if (time_reached(until)) { srv_wedged = true; return false; }
         tight_loop_contents();
     }
+}
+
+// Floppy store -> core 1. No server (off, stopping or wedged): no reply, the store reports
+// offline / $27.
+static bool fs_transact(void *ctx, const req_t *rq, reply_t *rp, uint32_t timeout_ms) {
+    (void)ctx;
+    if (!atomic_load(&srv_run) || !atomic_load(&srv_running) || srv_wedged) return false;
+    return request(rq, rp, timeout_ms);
+}
+
+static void sp_set_disk(bool floppy) {
+    disk_floppy = floppy;
+    spdev.store = floppy ? &fl_store : &rd_store;
 }
 
 static bool read_request(uint16_t block, reply_t *r) {
@@ -284,6 +307,10 @@ static void print_sp(void) {
     printf("SP %s id=%u last=%d pass=%d img=%lu ovl=%u/%u\n", spbus.enabled ? "on" : "off",
            spdev.id, spdev.last, spdev.passthrough, (unsigned long)(sp_image_end - sp_image),
            rd.used, rd.nslots);
+    printf("SP disk=%s server=%s wedged=%d exec_ms last=%lu max=%lu mech st=%02x soft=%02x tries=%u\n",
+           disk_floppy ? "floppy" : "ram", atomic_load(&srv_run) ? "on" : "off", srv_wedged,
+           (unsigned long)s->exec_ms_last, (unsigned long)s->exec_ms_max, fl.last_status, fl.last_soft,
+           fl.last_tries);
     printf("SP pkts=%lu acks=%lu cksum=%lu bad=%lu ign=%lu tmo=%lu resets=%lu rereads=%lu replies=%lu\n",
            (unsigned long)s->packets, (unsigned long)s->acks, (unsigned long)s->cksum, (unsigned long)s->bad,
            (unsigned long)s->ignored, (unsigned long)s->timeouts, (unsigned long)s->resets,
@@ -328,6 +355,8 @@ static void splog_poll(void) {
             if (e.ack_us == INT32_MIN) n += snprintf(pend + n, sizeof pend - n, " ack=-");
             else n += snprintf(pend + n, sizeof pend - n, " ack=%ld", (long)e.ack_us);
         }
+        if (e.kind == SP_LOG_CMD && e.ms && n < (int)sizeof pend)
+            n += snprintf(pend + n, sizeof pend - n, " ms=%u", e.ms);
         if (n > (int)sizeof pend - 2) n = (int)sizeof pend - 2;
         pend[n++] = '\n';
         pend[n] = 0;
@@ -337,6 +366,36 @@ static void splog_poll(void) {
     fputs(pend, stdout);
     fflush(stdout);
     pend_len = 0;
+}
+
+// imgcopy: the flash ProDOS image onto the floppy, block by block (REQ_WRITE, verified).
+// Makes a bootable test floppy (M7 spec sec. 11). The bus is not served meanwhile.
+static void do_imgcopy(void) {
+    static req_t rq;
+    static reply_t r;
+    size_t len = (size_t)(sp_image_end - sp_image);
+    if (len < (size_t)GCR_BLOCKS * GCR_DATA_LEN) { puts("ERR no 800K image in flash"); return; }
+    if (srv_wedged) { puts("ERR server wedged (server off, then on)"); return; }
+    uint64_t t0 = time_us_64();
+    uint8_t status = ST_OK;
+    int done = 0;
+    for (int b = 0; b < GCR_BLOCKS; b++) {
+        if (getchar_timeout_us(0) != PICO_ERROR_TIMEOUT) { puts("IMGCOPY STOPPED"); status = ST_IOERR; break; }
+        memset(&rq, 0, sizeof rq);
+        rq.op = REQ_WRITE;
+        rq.block = (uint16_t)b;
+        memcpy(rq.data + GCR_TAG_LEN, sp_image + (size_t)b * GCR_DATA_LEN, GCR_DATA_LEN);
+        if (!request(&rq, &r, SRV_REQ_TIMEOUT_MS + 3000)) { puts("ERR server timeout"); return; }
+        if (r.status != ST_OK && r.status != ST_SOFT) {
+            printf("IMG %d %02x\n", b, r.status);
+            status = r.status;
+            break;
+        }
+        done = b + 1;
+        if (done % 100 == 0) { printf("IMG %d\n", done); stdio_flush(); }
+    }
+    printf("IMGCOPY END %02x %d %lu\n", status, done, (unsigned long)((time_us_64() - t0) / 1000u));
+    puts("OK");
 }
 
 static bool need_mech(void) {
@@ -410,6 +469,15 @@ static void execute(const con_cmd_t *c) {
     case CON_SP:
         if (c->argc) sp_bus_enable(&spbus, c->arg[0]);
         print_sp();
+        return;
+    case CON_SPDISK:
+        sp_set_disk(c->arg[0]);
+        if (c->arg[0] && !atomic_load(&srv_run) && !server_set(true)) { puts("ERR server did not start"); return; }
+        print_sp();
+        return;
+    case CON_IMGCOPY:
+        if (!atomic_load(&srv_run)) { puts("ERR server off"); return; }
+        do_imgcopy();
         return;
     case CON_SPLOG:
         splog = c->arg[0];
@@ -523,7 +591,11 @@ int main(void) {
     sp_hw_init();
     ramdisk_init(&rd, sp_image, (size_t)(sp_image_end - sp_image), rd_slots, RD_SLOTS);
     rd_store = ramdisk_store(&rd);
+    fstore_init(&fl, fs_transact, NULL);
+    fl_store = fstore_store(&fl);
     sp_dev_init(&spdev, &rd_store, sp_hw_lastone, NULL);
+    server_set(true);                   // M7: the mechanism server runs from boot
+    sp_set_disk(true);                  // the floppy is the disk (sp disk ram for the M6 RAM disk)
     sp_bus_init(&spbus, sp_hw_hal(), &spdev);
     sp_bus_enable(&spbus, true);        // serve the Liron card from power-on
     for (;;) {

@@ -44,6 +44,12 @@ int main(void) {
     CHECK(P("sp on off").op == CON_BAD);
     CHECK(P("splog off").op == CON_SPLOG && P("splog off").arg[0] == 0);
     CHECK(P("splog").op == CON_BAD);
+    CHECK(P("sp disk ram").op == CON_SPDISK && P("sp disk ram").arg[0] == 0);
+    CHECK(P("sp disk floppy").op == CON_SPDISK && P("sp disk floppy").arg[0] == 1);
+    CHECK(P("sp disk").op == CON_BAD);
+    CHECK(P("sp disk tape").op == CON_BAD);
+    CHECK(P("imgcopy").op == CON_IMGCOPY);
+    CHECK(P("imgcopy 3").op == CON_BAD);
     char longline[200];
     memset(longline, 'a', sizeof longline - 1);
     longline[sizeof longline - 1] = 0;

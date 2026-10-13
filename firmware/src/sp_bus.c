@@ -23,6 +23,7 @@ static void SP_RAM(log_push)(sp_bus_t *b, sp_log_kind_t kind, uint8_t stage, int
     e->stat = b->reply.stat;
     e->block = b->cmd_len >= 7 ? (uint32_t)b->cmd[4] | ((uint32_t)b->cmd[5] << 8) | ((uint32_t)b->cmd[6] << 16) : 0;
     e->ack_us = ack_us;
+    e->ms = (uint16_t)(b->st.exec_ms_last > 0xFFFFu ? 0xFFFFu : b->st.exec_ms_last);
     b->log_wr = wr + 1;
 }
 
@@ -255,7 +256,10 @@ static void transaction(sp_bus_t *b) {
     if (b->cmd_len && sp_dev_needs_data(b->cmd[0])) {
         if (!get_data(b, &dlen)) return;
     }
+    uint64_t t_exec = NOW();
     sp_dev_execute(b->dev, dest, b->cmd, b->cmd_len, b->data, dlen, &b->reply);
+    b->st.exec_ms_last = (uint32_t)((NOW() - t_exec) / 1000u);
+    if (b->st.exec_ms_last > b->st.exec_ms_max) b->st.exec_ms_max = b->st.exec_ms_last;
     b->hdr.dest = dest;
     send_reply(b, true);
     log_push(b, SP_LOG_CMD, 0, ack_us);

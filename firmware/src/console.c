@@ -32,6 +32,7 @@ static const con_spec_t specs[] = {
     {"format",   CON_FORMAT,  -2, false, {0, 0},    {79, 1}},
     {"sp",       CON_SP,      -1, true,  {0},       {0}},
     {"splog",    CON_SPLOG,    1, true,  {0},       {0}},
+    {"imgcopy",  CON_IMGCOPY,  0, false, {0},       {0}},
 };
 
 static bool parse_long(const char *s, long lo, long hi, long *out) {
@@ -61,6 +62,11 @@ con_cmd_t console_parse(const char *line) {
         tok[nt++] = t;
     }
     if (nt == 0) { c.op = CON_NONE; return c; }
+    if (strcmp(tok[0], "sp") == 0 && nt >= 2 && strcmp(tok[1], "disk") == 0) {   // sp disk ram|floppy
+        if (nt == 3 && strcmp(tok[2], "ram") == 0) { c.op = CON_SPDISK; c.argc = 1; c.arg[0] = 0; }
+        else if (nt == 3 && strcmp(tok[2], "floppy") == 0) { c.op = CON_SPDISK; c.argc = 1; c.arg[0] = 1; }
+        return c;
+    }
     for (size_t i = 0; i < sizeof specs / sizeof specs[0]; i++) {
         const con_spec_t *sp = &specs[i];
         if (strcmp(tok[0], sp->name) != 0) continue;
@@ -86,5 +92,6 @@ const char *console_help(void) {
            "recal | seek <0-79> | head <0|1> | eject | tach | settle <us> | capture <t> <s> <n>\n"
            "server on|off | readblk <0-1599> | readdisk\n"
            "writeblk <0-1599> (then 512 raw bytes) | format [<0-79> <0|1>] (any key stops)\n"
-           "sp [on|off] (SmartPort RAM disk: status, or serve/leave the bus) | splog on|off";
+           "sp [on|off] (SmartPort: status, or serve/leave the bus) | sp disk ram|floppy | splog on|off\n"
+           "imgcopy (write the flash ProDOS image to the floppy; any key stops)";
 }

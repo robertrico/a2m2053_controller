@@ -41,6 +41,7 @@ void hw_init_safe(void) {
 void hw_mech_outputs_enable(bool on) { gpio_put(PIN_MECH_OE, !on); }
 void hw_mech_enbl(bool on) { gpio_put(PIN_MECH_ENBL, !on); }
 void hw_led(bool on) { gpio_put(PIN_LED, on); }
+bool hw_eject_pressed(void *ctx) { (void)ctx; return !gpio_get(PIN_EJECT_BTN); }
 bool hw_mech_rd(void) { return gpio_get(PIN_MECH_RD); }
 
 #include "pico/stdlib.h"
