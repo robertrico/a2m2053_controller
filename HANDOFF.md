@@ -77,9 +77,9 @@ saves and loads files, ACK 5.3 us after /WRREQ rises (card window about
   Correct by hand (shift by -2 x delay) until fixed.
 - Console tail window: open on the laptop screen as a normal window, not full
   screen (iTerm default profile is full screen).
-- bytehamr: published 2026-10-12 "M6: the Liron's first packet reaches my
-  board". The project page Hardware table still lists the 74LVC1G07 (the
-  repo docs are fixed; the page is not).
+- bytehamr: "M6: ProDOS boots from my board" written 2026-10-12 (local commit
+  in byte-hamr-labs, not published). Current state and the Hardware table
+  (74LVC1G07 row gone) updated with it.
 - The `pins` console command proposal is folded into `sp` (prints the host
   input levels).
 - Publish only full-resolution screen captures (no `--downscale-to-native`).
