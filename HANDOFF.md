@@ -3,9 +3,11 @@
 Last updated: 2026-10-12 (night). **M6 passed on the bench** and is merged
 to main: ProDOS boots from the board's RAM disk through the Liron card,
 saves and loads files, ACK 5.3 us after /WRREQ rises (card window about
-105 us). **M7 firmware is built and host-tested on branch `m7`** (not
-merged, not flashed): the floppy behind the SmartPort engine. Its bench test
-waits for the J2 breakout (arrives 2026-10-13) and the mechanism rework.
+105 us). **M7 passed on the bench** and is merged: ProDOS boots from a real
+800K floppy through the board (sentinel disk written by the UniDisk, checksums
+out to track 72), Copy II Plus writes through it, and SPCOMPARE matches the
+working UniDisk byte for byte with a disk, write-protected and with no disk.
+Next: J2 breakout rework, then M8 (daisy chain).
 
 ## Where things stand
 
@@ -43,42 +45,40 @@ waits for the J2 breakout (arrives 2026-10-13) and the mechanism rework.
 
 ## Resume order
 
-**M7 status: firmware ready on branch `m7`; bench blocked on J2.** Spec
-`docs/superpowers/specs/2026-10-12-m7-floppy-behind-smartport-design.md`,
-plan `docs/superpowers/plans/2026-10-12-m7-floppy-behind-smartport.md`,
-bench steps `docs/build_log/m7.md`. Choices marked **[choice]** in the spec
-are Rico's to overrule (floppy at boot, eject button off by default, no
-eject on a failed FORMAT, STATUS `$05` content, `imgcopy`).
-
-1. **When J2 lands (2026-10-13), before any M7 bench work:** mechanism side on
-   the breakout (J2 = CN104, straight IDC ribbon). Ring out the ribbon to the
-   terminals, then isolation checks: +12 V (13/15/17/19) vs RD (16), WRTDATA
-   (18) and every signal. Short heavy +5 V run to pin 11 and GND to 1/3/5/7,
-   bulk caps (4.7 uF, as on the IF-83) at the terminals. Re-run a disk read
-   scan on drive A with the bench at 5.0 V to confirm the IR drop is gone
-   (`server off` first: M5 console commands need it). Check the U2 channel
-   order against GP12-19 (not recorded in the M0 notes).
-2. **M7 bench** (`docs/build_log/m7.md`): flash `m7`, REF800K read through
-   SmartPort (expect "UNABLE TO LOAD PRODOS" and good reads in `SPL`),
-   `imgcopy` onto disk 2, boot it with `PR#5`, scope the hold-off, SPCOMPARE
-   on both drives, eject, Ctrl-Reset during a seek, a save that survives a
-   power cycle.
-3. After M7 passes: merge `m7`, bytehamr log, then M8 (daisy chain).
-4. Open: GP22 eject button wiring (direct or via U5, `pin_budget.md`).
+1. **J2 breakout** (arrives 2026-10-13): mechanism side on the breakout
+   (J2 = CN104, straight IDC ribbon). Ring out the ribbon to the terminals,
+   then isolation checks: +12 V (13/15/17/19) vs RD (16), WRTDATA (18) and
+   every signal. Short heavy +5 V run to pin 11 and GND to 1/3/5/7, bulk caps
+   (4.7 uF, as on the IF-83) at the terminals. Re-run a disk read scan on
+   drive A with the bench at 5.0 V (`server off` first). Check the U2 channel
+   order against GP12-19 (not recorded in the M0 notes). M7 ran on the old tap.
+2. **M8 brainstorm and spec: daisy chain.** Our board in front of the working
+   UniDisk, then behind it. PH3_OUT / ENBL_OUT (U4) and LASTONE/ (U5): check
+   what is actually wired (`pin_budget.md`), and the /ENBL pass-through rule
+   (parent spec 3.5, unverified).
+3. Open: the GP22 eject button wiring (direct or via U5); firmware ignores it
+   until `ejbtn on`.
+4. Re-format disk 2 with our board (`imgcopy` puts the M6 image on it). Not
+   time critical.
 
 ## Bench state at shutdown
 
-- Pico 2 flashed with `2e7311a` (M6). `m7` is not flashed; with M7 the
-  mechanism server (and U2/U4) is on from boot. Power order: Pico, board (bench +5 at
-  5.00 V), IIe; at shutdown everything off, Pico included (a Pico left
-  running across an IIe power cycle twice left the IIe not starting).
-- Bench +12 off. Mechanism ribbon unplugged.
-- Our DB-19 cable is on the Liron card (slot 5). A Disk II in slot 6 boots
-  first on a cold start; `PR#5` boots our board.
+- Pico 2 flashed with `f54d07d` (M7). The mechanism server and U2/U4 are on
+  from boot; the floppy is the SmartPort disk (`sp disk ram` for the M6 RAM
+  disk).
+- Supply limits for mechanism work: about 0.5 A on +5, 1.0 A on +12. Lower
+  limits brown the board out at motor start (M7).
+- Power order: Pico, bench +5, +12, IIe. Shutdown: IIe, +12, +5, Pico USB.
+- Mechanism on the old CN104 tap; test disk 1 = `/M7TEST` (window open =
+  write-protected at the end of the session).
+- Our DB-19 cable on the Liron card (slot 5); the working UniDisk is off the
+  card. A Disk II in slot 6 boots first on a cold start; `PR#5` boots our
+  board.
 - Scope probes on J1: CH1 J1.10 /WRREQ, CH2 J1.20 ACK, CH3 J1.2 PH0 (REQ),
   ground J1.5.
 - Pico console `/dev/cu.usbmodem114401`, Debug Probe `114202`. `make flash`
-  does an OpenOCD rescue reset, then programs (the 864 KB image needs it).
+  does an OpenOCD rescue reset, then programs. If OpenOCD cannot find the
+  CMSIS-DAP device, replug the Debug Probe.
 
 ## Notes
 
@@ -89,9 +89,11 @@ eject on a failed FORMAT, STATUS `$05` content, `imgcopy`).
   Correct by hand (shift by -2 x delay) until fixed.
 - Console tail window: open on the laptop screen as a normal window, not full
   screen (iTerm default profile is full screen).
-- bytehamr: "M6: ProDOS boots from my board" written 2026-10-12 (local commit
-  in byte-hamr-labs, not published). Current state and the Hardware table
-  (74LVC1G07 row gone) updated with it.
+- bytehamr: "M6: ProDOS boots from my board" and the M7 log written
+  2026-10-12 (local commits in byte-hamr-labs, not published).
+- Test disks: `tools/apple/mkimage.sh` (M6 image, flash) and
+  `tools/apple/mktest.sh` (M7 sentinel disk). Images in `docs/private/ref/`;
+  `M7TEST.po` also in ADTPro's disks folder.
 - The `pins` console command proposal is folded into `sp` (prints the host
   input levels).
 - Publish only full-resolution screen captures (no `--downscale-to-native`).

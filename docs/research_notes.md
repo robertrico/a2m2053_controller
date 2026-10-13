@@ -381,6 +381,25 @@ Used by the M6 spec (sec. 3, 4).
   rises, and the card drops REQ 9-23 us after ACK. The card accepted every
   ACK in that range (no retries in 193 packets).
 
+## UniDisk STATUS replies **[measured]** 2026-10-12 (M7)
+
+From SPCOMPARE on the working UniDisk (slot 5 unit 1), `/M7TEST` disk:
+
+- STATUS `$00`: `F8 40 06 00` writable, `FC 40 06 00` write-protected,
+  `E8 40 06 00` no disk; the call returns `$00` in all three.
+- STATUS `$03`: those 4 bytes + `08 "DISK 3.5" + 8 spaces, 01 00 00 10`.
+- STATUS `$05`: `00 00 00 00 00 00 00 FF` (byte 7, ROM `$5D`, is `$FF`).
+- STATUS `$01`: error `$21`. READBLOCK 1600: `$2D` with a disk, `$2F` with
+  none (the disk check comes before the block range, ROM `Le8b2`).
+- Our board (M7, `f54d07d`) returns the same bytes in all three states.
+
+## Mechanism supply on the bench **[measured]** 2026-10-12 (M7)
+
+With the bench +5 limited to 0.03-0.05 A (fine for the host side alone),
+the motor start pulls the rail into current limit: READY never comes (spin-up
+timeout), the Pico's USB drops and U1 browns out. Limits of about 0.5 A
+(+5) and 1.0 A (+12) work.
+
 ## Drive supply requirement [measured] 2026-10-10 (M3)
 
 With +5V at CN104 pin 11 sagging to 4.0-4.8 V under motor load (bench wiring

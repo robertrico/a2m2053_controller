@@ -1,6 +1,7 @@
 # M7: the floppy behind SmartPort (design)
 
-Status: draft, 2026-10-12. Written without Rico in the loop, built as if the
+Status: implemented and passed on the bench 2026-10-12 (`docs/build_log/m7.md`).
+Written without Rico in the loop, built as if the
 J2 mechanism breakout is wired (it lands 2026-10-13). **[choice]** marks
 calls that are Rico's to overrule. His brief, as for M6: functionality,
 timing, does it work; the bench is the test.

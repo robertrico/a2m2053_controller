@@ -1,0 +1,1177 @@
+# M7 firmware 525d050 first bench run (old CN104 tap, test disk 1 = /M7TEST written by the working UniDisk via ADTPro). Console /dev/cu.usbmodem114401.
+19:44:10 --- console open /dev/cu.usbmodem114401
+19:44:13 > sp
+19:44:13 sp
+19:44:13 SP on id=0 last=0 pass=0 img=819200 ovl=0/384
+19:44:13 SP disk=floppy server=on wedged=0 exec_ms last=0 max=0 mech st=00 soft=00 tries=0
+19:44:13 SP pkts=0 acks=0 cksum=0 bad=0 ign=0 tmo=0 resets=0 rereads=0 replies=0
+19:44:13 SP ack_us last=- max=- data_max=- late=0 late_entry=0
+19:44:13 SP cmds status=0 readblk=0 writeblk=0 format=0 control=0 init=0 other=0
+19:44:13 SP pins PH0=0 PH1=0 PH2=0 PH3=0 WRREQ=1 HSTEN=1 WR=0 LASTONE=1
+19:44:13 OK
+--- USB dropped (Rico powering bench/IIe); reconnect
+19:45:02 --- console open /dev/cu.usbmodem114401
+19:45:04 > sp
+19:45:04 sp
+19:45:04 SP on id=0 last=0 pass=0 img=819200 ovl=0/384
+19:45:04 SP disk=floppy server=on wedged=0 exec_ms last=0 max=0 mech st=00 soft=00 tries=0
+19:45:04 SP pkts=0 acks=0 cksum=0 bad=0 ign=0 tmo=0 resets=0 rereads=0 replies=0
+19:45:04 SP ack_us last=- max=- data_max=- late=0 late_entry=0
+19:45:04 SP cmds status=0 readblk=0 writeblk=0 format=0 control=0 init=0 other=0
+19:45:04 SP pins PH0=1 PH1=1 PH2=1 PH3=1 WRREQ=1 HSTEN=1 WR=1 LASTONE=1
+19:45:04 OK
+19:45:26 SPL RESET
+19:45:26 SPL CMD d=1 c=05 b=0 s=40 ack=6
+19:45:26 SPL CMD d=1 c=00 b=0 s=00 ack=5
+19:45:38 SPL RESET
+19:45:38 SPL CMD d=1 c=05 b=3407872 s=40 ack=4
+19:45:40 SPL CMD d=1 c=01 b=0 s=27 ack=4 ms=2000
+19:46:05 SPL RESET
+19:46:05 SPL CMD d=1 c=05 b=3407872 s=40 ack=4
+19:46:07 SPL CMD d=1 c=01 b=0 s=27 ack=4 ms=2000
+19:46:21 > sp
+19:46:21 sp
+19:46:21 SP on id=1 last=1 pass=1 img=819200 ovl=0/384
+19:46:21 SP disk=floppy server=on wedged=0 exec_ms last=2000 max=2000 mech st=a7 soft=00 tries=0
+19:46:21 SP pkts=6 acks=6 cksum=0 bad=0 ign=0 tmo=0 resets=3 rereads=0 replies=6
+19:46:21 SP ack_us last=4 max=6 data_max=- late=0 late_entry=0
+19:46:21 SP cmds status=1 readblk=2 writeblk=0 format=0 control=0 init=3 other=0
+19:46:21 SP pins PH0=0 PH1=0 PH2=0 PH3=0 WRREQ=1 HSTEN=1 WR=0 LASTONE=1
+19:46:21 OK
+19:46:25 SPL REREAD
+19:46:25 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:25 SPL REREAD
+19:46:25 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:25 SPL REREAD
+19:46:25 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:25 SPL REREAD
+19:46:25 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:26 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:26 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:26 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:26 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:26 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:26 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:26 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:26 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:26 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:26 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:26 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:26 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:26 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:26 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:26 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:26 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:26 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:26 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:26 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:26 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:27 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:27 SPL REREAD
+19:46:28 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:28 SPL REREAD
+19:46:28 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:28 SPL REREAD
+19:46:28 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:28 SPL REREAD
+19:46:28 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:28 SPL REREAD
+19:46:28 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:28 SPL REREAD
+19:46:28 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:28 SPL REREAD
+19:46:28 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:28 SPL REREAD
+19:46:28 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:28 SPL REREAD
+19:46:28 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:28 SPL REREAD
+19:46:28 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:28 SPL REREAD
+19:46:28 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:28 SPL REREAD
+19:46:28 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:28 SPL REREAD
+19:46:28 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:28 SPL REREAD
+19:46:28 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:28 SPL REREAD
+19:46:28 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:28 SPL REREAD
+19:46:28 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:28 SPL REREAD
+19:46:28 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:28 SPL REREAD
+19:46:28 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:28 SPL REREAD
+19:46:28 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:28 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:29 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:29 SPL REREAD
+19:46:30 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:30 SPL REREAD
+19:46:30 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:30 SPL REREAD
+19:46:30 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:30 SPL REREAD
+19:46:30 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:30 SPL REREAD
+19:46:30 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:30 SPL REREAD
+19:46:30 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:30 SPL REREAD
+19:46:30 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:30 SPL REREAD
+19:46:30 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:30 SPL REREAD
+19:46:30 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:30 SPL REREAD
+19:46:30 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:30 SPL REREAD
+19:46:30 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:30 SPL REREAD
+19:46:30 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:30 SPL REREAD
+19:46:30 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:30 SPL REREAD
+19:46:30 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:30 SPL REREAD
+19:46:30 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:30 SPL REREAD
+19:46:30 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:30 SPL REREAD
+19:46:30 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:30 SPL REREAD
+19:46:30 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:30 SPL REREAD
+19:46:30 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:30 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:31 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:31 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:31 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:31 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:31 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:31 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:31 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:31 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:31 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:31 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:31 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:31 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:31 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:31 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:31 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:31 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:31 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:31 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:31 SPL REREAD
+19:46:31 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:32 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:32 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:32 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:32 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:32 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:32 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:32 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:32 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:32 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:32 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:32 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:32 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:32 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:32 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:32 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:32 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:32 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:32 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:32 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:32 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:33 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:33 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:34 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:34 SPL REREAD
+19:46:35 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:35 SPL REREAD
+19:46:35 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:35 SPL REREAD
+19:46:35 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:35 SPL REREAD
+19:46:35 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:35 SPL REREAD
+19:46:35 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:35 SPL REREAD
+19:46:35 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:35 SPL REREAD
+19:46:35 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:35 SPL REREAD
+19:46:35 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:35 SPL REREAD
+19:46:35 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:35 SPL REREAD
+19:46:35 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:35 SPL REREAD
+19:46:35 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:35 SPL REREAD
+19:46:35 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:35 SPL REREAD
+19:46:35 SPL TIMEOUT d=1 c=01 b=0 s=27 stage=6
+19:46:35 SPL REREAD
+19:48:21 SPL RESET
+19:48:21 SPL CMD d=1 c=05 b=0 s=40 ack=4
+19:48:21 SPL CMD d=1 c=00 b=0 s=00 ack=4
+19:48:33 SPL RESET
+19:48:33 SPL CMD d=1 c=05 b=3407872 s=40 ack=5
+19:48:34 SPL CMD d=1 c=01 b=0 s=00 ack=5 ms=370
+19:48:34 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:48:34 SPL CMD d=1 c=01 b=3 s=00 ack=4
+19:48:34 SPL CMD d=1 c=01 b=4 s=00 ack=4
+19:48:34 SPL CMD d=1 c=01 b=5 s=00 ack=5
+19:48:34 SPL CMD d=1 c=01 b=8 s=00 ack=4
+19:48:34 SPL CMD d=1 c=01 b=7 s=00 ack=4
+19:48:34 SPL CMD d=1 c=01 b=9 s=00 ack=4
+19:48:34 SPL CMD d=1 c=01 b=10 s=00 ack=5
+19:48:34 SPL CMD d=1 c=01 b=11 s=00 ack=4
+19:48:34 SPL CMD d=1 c=01 b=12 s=00 ack=4 ms=161
+19:48:34 SPL CMD d=1 c=01 b=13 s=00 ack=5
+19:48:34 SPL CMD d=1 c=01 b=14 s=00 ack=4
+19:48:34 SPL CMD d=1 c=01 b=15 s=00 ack=4
+19:48:34 SPL CMD d=1 c=01 b=16 s=00 ack=4
+19:48:34 SPL CMD d=1 c=01 b=17 s=00 ack=4
+19:48:34 SPL CMD d=1 c=01 b=18 s=00 ack=4
+19:48:34 SPL CMD d=1 c=01 b=19 s=00 ack=4
+19:48:34 SPL CMD d=1 c=01 b=20 s=00 ack=4
+19:48:34 SPL CMD d=1 c=01 b=21 s=00 ack=4
+19:48:34 SPL CMD d=1 c=01 b=22 s=00 ack=4
+19:48:35 SPL CMD d=1 c=01 b=23 s=00 ack=5
+19:48:35 SPL CMD d=1 c=01 b=24 s=00 ack=4 ms=189
+19:48:35 SPL CMD d=1 c=01 b=25 s=00 ack=5
+19:48:35 SPL CMD d=1 c=01 b=26 s=00 ack=4
+19:48:35 SPL CMD d=1 c=01 b=27 s=00 ack=4
+19:48:35 SPL CMD d=1 c=01 b=28 s=00 ack=4
+19:48:35 SPL CMD d=1 c=01 b=29 s=00 ack=4
+19:48:35 SPL CMD d=1 c=01 b=30 s=00 ack=4
+19:48:35 SPL CMD d=1 c=01 b=31 s=00 ack=5
+19:48:35 SPL CMD d=1 c=01 b=32 s=00 ack=5
+19:48:35 SPL CMD d=1 c=01 b=33 s=00 ack=4
+19:48:35 SPL CMD d=1 c=01 b=34 s=00 ack=4
+19:48:35 SPL CMD d=1 c=01 b=35 s=00 ack=4
+19:48:35 SPL CMD d=1 c=01 b=36 s=00 ack=4 ms=154
+19:48:35 SPL CMD d=1 c=01 b=37 s=00 ack=4
+19:48:35 SPL CMD d=1 c=01 b=38 s=00 ack=4
+19:48:35 SPL CMD d=1 c=01 b=39 s=00 ack=4
+19:48:35 SPL CMD d=1 c=01 b=40 s=00 ack=4
+19:48:35 SPL CMD d=1 c=01 b=41 s=00 ack=5
+19:48:35 SPL CMD d=1 c=00 b=0 s=00 ack=4
+19:48:36 SPL CMD d=1 c=01 b=2 s=00 ack=5 ms=187
+19:48:36 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:48:36 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:48:36 SPL CMD d=1 c=01 b=3 s=00 ack=4
+19:48:36 SPL CMD d=1 c=01 b=4 s=00 ack=4
+19:48:36 SPL CMD d=1 c=01 b=5 s=00 ack=4
+19:48:36 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:48:36 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:48:36 SPL CMD d=1 c=01 b=43 s=00 ack=4 ms=187
+19:48:36 SPL CMD d=1 c=01 b=42 s=00 ack=4
+19:48:36 SPL CMD d=1 c=01 b=44 s=00 ack=4
+19:48:36 SPL CMD d=1 c=01 b=45 s=00 ack=4
+19:48:36 SPL CMD d=1 c=01 b=46 s=00 ack=4
+19:48:36 SPL CMD d=1 c=01 b=47 s=00 ack=5
+19:48:37 SPL CMD d=1 c=01 b=48 s=00 ack=4 ms=189
+19:48:37 SPL CMD d=1 c=01 b=49 s=00 ack=5
+19:48:37 SPL CMD d=1 c=01 b=50 s=00 ack=4
+19:48:37 SPL CMD d=1 c=01 b=51 s=00 ack=5
+19:48:37 SPL CMD d=1 c=01 b=52 s=00 ack=4
+19:48:37 SPL CMD d=1 c=01 b=53 s=00 ack=5
+19:48:37 SPL CMD d=1 c=01 b=54 s=00 ack=5
+19:48:37 SPL CMD d=1 c=01 b=55 s=00 ack=4
+19:48:37 SPL CMD d=1 c=01 b=56 s=00 ack=4
+19:48:37 SPL CMD d=1 c=01 b=57 s=00 ack=4
+19:48:37 SPL CMD d=1 c=01 b=58 s=00 ack=5
+19:48:37 SPL CMD d=1 c=01 b=59 s=00 ack=5
+19:48:37 SPL CMD d=1 c=01 b=60 s=00 ack=4 ms=155
+19:48:37 SPL CMD d=1 c=01 b=61 s=00 ack=4
+19:48:37 SPL CMD d=1 c=01 b=62 s=00 ack=5
+19:48:37 SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=196
+19:48:37 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:48:37 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:48:37 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:48:37 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:48:38 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:48:38 SPL CMD d=1 c=01 b=63 s=00 ack=4 ms=192
+19:48:38 SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=197
+19:48:38 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:48:38 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:48:39 SPL CMD d=1 c=01 b=69 s=00 ack=4 ms=198
+19:48:39 SPL CMD d=1 c=01 b=68 s=00 ack=4
+19:48:39 SPL CMD d=1 c=01 b=70 s=00 ack=4
+19:48:39 SPL CMD d=1 c=01 b=71 s=00 ack=4
+19:48:39 SPL CMD d=1 c=01 b=72 s=00 ack=5 ms=194
+19:48:39 SPL CMD d=1 c=01 b=73 s=00 ack=5
+19:48:39 SPL CMD d=1 c=01 b=74 s=00 ack=5
+19:48:39 SPL CMD d=1 c=01 b=75 s=00 ack=4
+19:48:39 SPL CMD d=1 c=01 b=76 s=00 ack=4
+19:48:39 SPL CMD d=1 c=01 b=77 s=00 ack=4
+19:48:39 SPL CMD d=1 c=01 b=78 s=00 ack=5
+19:48:39 SPL CMD d=1 c=01 b=79 s=00 ack=5
+19:48:39 SPL CMD d=1 c=01 b=80 s=00 ack=4
+19:48:39 SPL CMD d=1 c=01 b=81 s=00 ack=4
+19:48:39 SPL CMD d=1 c=01 b=82 s=00 ack=4
+19:48:39 SPL CMD d=1 c=01 b=83 s=00 ack=5
+19:48:39 SPL CMD d=1 c=01 b=84 s=00 ack=4 ms=155
+19:48:39 SPL CMD d=1 c=01 b=85 s=00 ack=5
+19:48:39 SPL CMD d=1 c=01 b=86 s=00 ack=4
+19:48:40 SPL CMD d=1 c=01 b=87 s=00 ack=4
+19:48:40 SPL CMD d=1 c=01 b=88 s=00 ack=5
+19:48:40 SPL CMD d=1 c=01 b=89 s=00 ack=4
+19:48:40 SPL CMD d=1 c=01 b=90 s=00 ack=4
+19:48:40 SPL CMD d=1 c=01 b=91 s=00 ack=4
+19:48:40 SPL CMD d=1 c=01 b=92 s=00 ack=4
+19:48:40 SPL CMD d=1 c=01 b=93 s=00 ack=5
+19:48:40 SPL CMD d=1 c=01 b=94 s=00 ack=4
+19:48:40 SPL CMD d=1 c=01 b=95 s=00 ack=4
+19:48:40 SPL CMD d=1 c=01 b=96 s=00 ack=4 ms=185
+19:48:40 SPL CMD d=1 c=01 b=97 s=00 ack=4
+19:48:40 SPL CMD d=1 c=01 b=98 s=00 ack=5
+19:48:40 SPL CMD d=1 c=01 b=99 s=00 ack=4
+19:48:40 SPL CMD d=1 c=01 b=100 s=00 ack=4
+19:48:41 SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=213
+19:48:41 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:48:41 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:48:41 SPL CMD d=1 c=01 b=102 s=00 ack=5 ms=203
+19:48:41 SPL CMD d=1 c=01 b=101 s=00 ack=4
+19:48:41 SPL CMD d=1 c=01 b=103 s=00 ack=5
+19:48:41 SPL CMD d=1 c=01 b=104 s=00 ack=4
+19:48:41 SPL CMD d=1 c=01 b=105 s=00 ack=5
+19:48:41 SPL CMD d=1 c=01 b=106 s=00 ack=4
+19:48:41 SPL CMD d=1 c=01 b=107 s=00 ack=4
+19:48:41 SPL CMD d=1 c=01 b=108 s=00 ack=5 ms=158
+19:48:41 SPL CMD d=1 c=01 b=109 s=00 ack=4
+19:48:41 SPL CMD d=1 c=01 b=110 s=00 ack=4
+19:48:41 SPL CMD d=1 c=01 b=111 s=00 ack=4
+19:48:41 SPL CMD d=1 c=01 b=112 s=00 ack=4
+19:48:41 SPL CMD d=1 c=01 b=113 s=00 ack=4
+19:48:41 SPL CMD d=1 c=01 b=114 s=00 ack=4
+19:48:41 SPL CMD d=1 c=01 b=115 s=00 ack=5
+19:48:41 SPL CMD d=1 c=01 b=116 s=00 ack=4
+19:48:41 SPL CMD d=1 c=01 b=117 s=00 ack=5
+19:48:41 SPL CMD d=1 c=01 b=118 s=00 ack=4
+19:48:42 SPL CMD d=1 c=01 b=119 s=00 ack=4
+19:48:42 SPL CMD d=1 c=01 b=120 s=00 ack=5 ms=187
+19:48:42 SPL CMD d=1 c=01 b=121 s=00 ack=5
+19:48:42 SPL CMD d=1 c=01 b=122 s=00 ack=5
+19:48:42 SPL CMD d=1 c=01 b=123 s=00 ack=4
+19:48:42 SPL CMD d=1 c=01 b=124 s=00 ack=4
+19:48:42 SPL CMD d=1 c=01 b=125 s=00 ack=4
+19:48:42 SPL CMD d=1 c=01 b=126 s=00 ack=5
+19:48:42 SPL CMD d=1 c=01 b=127 s=00 ack=4
+19:48:42 SPL CMD d=1 c=01 b=128 s=00 ack=4
+19:48:42 SPL CMD d=1 c=01 b=129 s=00 ack=5
+19:48:42 SPL CMD d=1 c=01 b=130 s=00 ack=4
+19:48:42 SPL CMD d=1 c=01 b=131 s=00 ack=4
+19:48:42 SPL CMD d=1 c=01 b=132 s=00 ack=5 ms=155
+19:48:42 SPL CMD d=1 c=01 b=133 s=00 ack=4
+19:48:43 SPL CMD d=1 c=01 b=2 s=00 ack=5 ms=214
+19:48:43 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:48:43 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:48:43 SPL CMD d=1 c=01 b=135 s=00 ack=4 ms=216
+19:48:43 SPL CMD d=1 c=01 b=134 s=00 ack=4
+19:48:43 SPL CMD d=1 c=01 b=136 s=00 ack=4
+19:48:43 SPL CMD d=1 c=01 b=137 s=00 ack=4
+19:48:43 SPL CMD d=1 c=01 b=138 s=00 ack=4
+19:48:43 SPL CMD d=1 c=01 b=139 s=00 ack=4
+19:48:43 SPL CMD d=1 c=01 b=140 s=00 ack=4
+19:48:43 SPL CMD d=1 c=01 b=141 s=00 ack=4
+19:48:43 SPL CMD d=1 c=01 b=142 s=00 ack=4
+19:48:43 SPL CMD d=1 c=01 b=143 s=00 ack=4
+19:48:44 SPL CMD d=1 c=01 b=144 s=00 ack=4 ms=188
+19:48:44 SPL CMD d=1 c=01 b=145 s=00 ack=4
+19:48:44 SPL CMD d=1 c=01 b=146 s=00 ack=5
+19:48:44 SPL CMD d=1 c=01 b=147 s=00 ack=4
+19:48:44 SPL CMD d=1 c=01 b=148 s=00 ack=4
+19:48:44 SPL CMD d=1 c=01 b=149 s=00 ack=5
+19:48:44 SPL CMD d=1 c=01 b=150 s=00 ack=4
+19:48:44 SPL CMD d=1 c=01 b=151 s=00 ack=5
+19:48:44 SPL CMD d=1 c=01 b=152 s=00 ack=4
+19:48:44 SPL CMD d=1 c=01 b=153 s=00 ack=5
+19:48:44 SPL CMD d=1 c=01 b=154 s=00 ack=5
+19:48:44 SPL CMD d=1 c=01 b=155 s=00 ack=4
+19:48:44 SPL CMD d=1 c=01 b=156 s=00 ack=5 ms=153
+19:48:44 SPL CMD d=1 c=01 b=157 s=00 ack=4
+19:48:44 SPL CMD d=1 c=01 b=158 s=00 ack=4
+19:48:44 SPL CMD d=1 c=01 b=159 s=00 ack=4
+19:48:44 SPL CMD d=1 c=01 b=160 s=00 ack=5
+19:48:44 SPL CMD d=1 c=01 b=161 s=00 ack=4
+19:48:44 SPL CMD d=1 c=01 b=162 s=00 ack=5
+19:48:44 SPL CMD d=1 c=01 b=163 s=00 ack=5
+19:48:44 SPL CMD d=1 c=01 b=164 s=00 ack=4
+19:48:44 SPL CMD d=1 c=01 b=165 s=00 ack=4
+19:48:44 SPL CMD d=1 c=01 b=166 s=00 ack=4
+19:48:45 SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=221
+19:48:45 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:48:45 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:48:46 SPL CMD d=1 c=01 b=1475 s=00 ack=5 ms=536
+19:48:46 SPL CMD d=1 c=01 b=1474 s=00 ack=5
+19:48:46 SPL CMD d=1 c=01 b=1476 s=00 ack=4
+19:48:46 SPL CMD d=1 c=01 b=1477 s=00 ack=4
+19:48:46 SPL CMD d=1 c=01 b=1478 s=00 ack=4
+19:48:46 SPL CMD d=1 c=01 b=1479 s=00 ack=4
+19:48:46 SPL CMD d=1 c=01 b=1480 s=00 ack=5 ms=107
+19:48:46 SPL CMD d=1 c=01 b=1481 s=00 ack=5
+19:48:46 SPL CMD d=1 c=01 b=1482 s=00 ack=5
+19:48:46 SPL CMD d=1 c=01 b=1483 s=00 ack=4
+19:48:46 SPL CMD d=1 c=01 b=1484 s=00 ack=4
+19:48:46 SPL CMD d=1 c=01 b=1485 s=00 ack=4
+19:48:46 SPL CMD d=1 c=01 b=1486 s=00 ack=4
+19:48:46 SPL CMD d=1 c=01 b=1487 s=00 ack=5
+19:48:46 SPL CMD d=1 c=01 b=1488 s=00 ack=4 ms=135
+19:48:46 SPL CMD d=1 c=01 b=1489 s=00 ack=5
+19:48:46 SPL CMD d=1 c=01 b=1490 s=00 ack=5
+19:48:46 SPL CMD d=1 c=01 b=1491 s=00 ack=5
+19:48:46 SPL CMD d=1 c=01 b=1492 s=00 ack=4
+19:48:46 SPL CMD d=1 c=01 b=1493 s=00 ack=4
+19:48:46 SPL CMD d=1 c=01 b=1494 s=00 ack=5
+19:48:46 SPL CMD d=1 c=01 b=1495 s=00 ack=5
+19:48:46 SPL CMD d=1 c=01 b=1496 s=00 ack=4 ms=105
+19:48:46 SPL CMD d=1 c=01 b=1497 s=00 ack=5
+19:48:46 SPL CMD d=1 c=01 b=1498 s=00 ack=5
+19:48:46 SPL CMD d=1 c=01 b=1499 s=00 ack=4
+19:48:46 SPL CMD d=1 c=01 b=1500 s=00 ack=4
+19:48:47 SPL CMD d=1 c=01 b=1501 s=00 ack=4
+19:48:47 SPL CMD d=1 c=01 b=1502 s=00 ack=4
+19:48:47 SPL CMD d=1 c=01 b=1503 s=00 ack=4
+19:48:47 SPL CMD d=1 c=01 b=1504 s=00 ack=4 ms=137
+19:48:47 SPL CMD d=1 c=01 b=1505 s=00 ack=5
+19:48:47 SPL CMD d=1 c=01 b=1506 s=00 ack=4
+19:49:07 > sp
+19:49:07 sp
+19:49:07 SP on id=1 last=1 pass=1 img=819200 ovl=0/384
+19:49:07 SP disk=floppy server=on wedged=0 exec_ms last=0 max=2000 mech st=00 soft=00 tries=0
+19:49:07 SP pkts=230 acks=230 cksum=0 bad=0 ign=0 tmo=193 resets=5 rereads=194 replies=424
+19:49:07 SP ack_us last=4 max=6 data_max=- late=0 late_entry=0
+19:49:07 SP cmds status=3 readblk=222 writeblk=0 format=0 control=0 init=5 other=0
+19:49:07 SP pins PH0=0 PH1=1 PH2=0 PH3=1 WRREQ=1 HSTEN=1 WR=1 LASTONE=1
+19:49:07 OK
+19:49:39 SPL CMD d=1 c=00 b=0 s=00 ack=5
+19:50:29 SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=842
+19:50:29 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:50:29 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:50:29 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:50:29 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:50:29 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:50:29 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:50:29 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:50:29 SPL CMD d=1 c=01 b=3 s=00 ack=4
+19:50:29 SPL CMD d=1 c=01 b=4 s=00 ack=5
+19:50:29 SPL CMD d=1 c=01 b=5 s=00 ack=4
+19:50:30 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:50:31 SPL CMD d=1 c=01 b=2 s=00 ack=5 ms=337
+19:50:31 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:50:31 SPL CMD d=1 c=00 b=0 s=00 ack=5
+19:50:31 SPL CMD d=1 c=01 b=6 s=00 ack=4
+19:50:32 SPL CMD d=1 c=02 b=1507 s=00 ack=4 ms=560
+19:50:33 SPL CMD d=1 c=01 b=2 s=00 ack=5 ms=603
+19:50:33 SPL CMD d=1 c=02 b=2 s=00 ack=4 ms=309
+19:50:33 SPL CMD d=1 c=02 b=6 s=00 ack=4 ms=203
+19:50:33 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:50:34 SPL CMD d=1 c=01 b=1507 s=00 ack=4 ms=546
+19:50:34 SPL CMD d=1 c=00 b=0 s=00 ack=4
+19:50:34 SPL CMD d=1 c=02 b=1507 s=00 ack=4 ms=184
+19:50:35 SPL CMD d=1 c=01 b=6 s=00 ack=4 ms=600
+19:50:35 SPL CMD d=1 c=02 b=6 s=00 ack=4 ms=220
+19:50:35 SPL CMD d=1 c=02 b=1508 s=00 ack=4 ms=563
+19:50:36 SPL CMD d=1 c=01 b=6 s=00 ack=4 ms=595
+19:50:37 SPL CMD d=1 c=02 b=1509 s=00 ack=4 ms=618
+19:50:37 SPL CMD d=1 c=02 b=1510 s=00 ack=4 ms=119
+19:50:38 SPL CMD d=1 c=02 b=6 s=00 ack=4 ms=725
+19:50:38 SPL CMD d=1 c=02 b=1508 s=00 ack=4 ms=562
+19:50:39 SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=595
+19:50:39 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:50:39 SPL CMD d=1 c=02 b=2 s=00 ack=4 ms=198
+19:50:39 SPL CMD d=1 c=01 b=6 s=00 ack=4
+19:50:40 SPL CMD d=1 c=01 b=1508 s=00 ack=5 ms=545
+19:50:40 SPL CMD d=1 c=02 b=1508 s=00 ack=4 ms=114
+19:50:40 SPL CMD d=1 c=01 b=1510 s=00 ack=4
+19:50:40 SPL CMD d=1 c=02 b=1510 s=00 ack=4 ms=162
+19:50:40 SPL CMD d=1 c=01 b=1508 s=00 ack=4
+19:50:40 SPL CMD d=1 c=01 b=1510 s=00 ack=5
+19:50:41 SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=600
+19:50:41 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:50:41 SPL CMD d=1 c=02 b=2 s=00 ack=4 ms=260
+19:50:41 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:50:41 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:50:41 SPL CMD d=1 c=02 b=2 s=00 ack=4 ms=231
+19:50:41 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:50:41 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:50:41 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:50:42 SPL CMD d=1 c=02 b=2 s=00 ack=4 ms=201
+19:50:49 SPL CMD d=1 c=01 b=2 s=00 ack=5 ms=345
+19:50:49 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:50:49 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:50:49 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:50:49 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:50:49 SPL CMD d=1 c=01 b=3 s=00 ack=4
+19:50:49 SPL CMD d=1 c=01 b=4 s=00 ack=5
+19:50:49 SPL CMD d=1 c=01 b=5 s=00 ack=4
+19:50:49 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:50:49 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:50:49 SPL CMD d=1 c=01 b=3 s=00 ack=4
+19:50:49 SPL CMD d=1 c=01 b=4 s=00 ack=4
+19:50:49 SPL CMD d=1 c=01 b=5 s=00 ack=5
+19:50:49 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:50:49 SPL CMD d=1 c=01 b=6 s=00 ack=5
+19:51:18 > sp
+19:51:19 sp
+19:51:19 SP on id=1 last=1 pass=1 img=819200 ovl=0/384
+19:51:19 SP disk=floppy server=on wedged=0 exec_ms last=0 max=2000 mech st=00 soft=00 tries=0
+19:51:19 SP pkts=314 acks=314 cksum=0 bad=0 ign=0 tmo=193 resets=5 rereads=194 replies=492
+19:51:19 SP ack_us last=5 max=6 data_max=34 late=0 late_entry=0
+19:51:19 SP cmds status=6 readblk=271 writeblk=16 format=0 control=0 init=5 other=0
+19:51:19 SP pins PH0=0 PH1=1 PH2=0 PH3=1 WRREQ=1 HSTEN=1 WR=1 LASTONE=1
+19:51:19 OK
+19:51:39 SPL CMD d=1 c=01 b=2 s=00 ack=5 ms=339
+19:51:39 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:51:39 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:51:39 SPL CMD d=1 c=01 b=3 s=00 ack=4
+19:51:39 SPL CMD d=1 c=01 b=4 s=00 ack=4
+19:51:39 SPL CMD d=1 c=01 b=5 s=00 ack=4
+19:51:43 SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=342
+19:51:43 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:51:44 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:51:44 SPL CMD d=1 c=01 b=43 s=00 ack=4 ms=190
+19:51:44 SPL CMD d=1 c=01 b=42 s=00 ack=4
+19:51:44 SPL CMD d=1 c=01 b=44 s=00 ack=5
+19:51:44 SPL CMD d=1 c=01 b=45 s=00 ack=4
+19:51:44 SPL CMD d=1 c=01 b=46 s=00 ack=4
+19:51:44 SPL CMD d=1 c=01 b=47 s=00 ack=4
+19:51:44 SPL CMD d=1 c=01 b=48 s=00 ack=4 ms=190
+19:51:44 SPL CMD d=1 c=01 b=49 s=00 ack=5
+19:51:44 SPL CMD d=1 c=01 b=50 s=00 ack=4
+19:51:44 SPL CMD d=1 c=01 b=51 s=00 ack=5
+19:51:44 SPL CMD d=1 c=01 b=52 s=00 ack=4
+19:51:44 SPL CMD d=1 c=01 b=53 s=00 ack=4
+19:51:44 SPL CMD d=1 c=01 b=54 s=00 ack=5
+19:51:44 SPL CMD d=1 c=01 b=55 s=00 ack=5
+19:51:44 SPL CMD d=1 c=01 b=56 s=00 ack=4
+19:51:44 SPL CMD d=1 c=01 b=57 s=00 ack=4
+19:51:44 SPL CMD d=1 c=01 b=58 s=00 ack=4
+19:51:44 SPL CMD d=1 c=01 b=59 s=00 ack=4
+19:51:44 SPL CMD d=1 c=01 b=60 s=00 ack=4 ms=153
+19:51:45 SPL CMD d=1 c=01 b=61 s=00 ack=4
+19:51:45 SPL CMD d=1 c=01 b=62 s=00 ack=4
+19:51:45 SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=192
+19:51:45 SPL CMD d=1 c=01 b=2 s=00 ack=5
+19:51:45 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:51:45 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:51:45 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:51:45 SPL CMD d=1 c=01 b=2 s=00 ack=4
+19:51:45 SPL CMD d=1 c=01 b=65 s=00 ack=5 ms=194
+19:51:45 SPL CMD d=1 c=01 b=64 s=00 ack=4
+19:51:45 SPL CMD d=1 c=01 b=66 s=00 ack=5
+19:51:45 SPL CMD d=1 c=01 b=67 s=00 ack=4
+19:51:46 SPL CMD d=1 c=00 b=5526784 s=00 ack=5
+19:51:46 SPL CMD d=1 c=00 b=5526787 s=00 ack=4
+19:51:47 SPL CMD d=1 c=00 b=5526789 s=00 ack=4
+19:51:48 SPL CMD d=1 c=00 b=5526785 s=21 ack=4
+19:51:48 SPL CMD d=1 c=01 b=0 s=00 ack=4 ms=378
+19:51:52 SPL CMD d=1 c=01 b=1 s=00 ack=5 ms=344
+19:51:56 SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=344
+19:52:00 SPL CMD d=1 c=01 b=1600 s=2d ack=5
+19:52:49 SPL REREAD
+19:52:49 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:49 SPL REREAD
+19:52:49 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:49 SPL REREAD
+19:52:49 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:49 SPL REREAD
+19:52:49 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:49 SPL REREAD
+19:52:49 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:49 SPL REREAD
+19:52:49 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:49 SPL REREAD
+19:52:49 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:49 SPL REREAD
+19:52:49 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:49 SPL REREAD
+19:52:49 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:49 SPL REREAD
+19:52:49 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:49 SPL REREAD
+19:52:49 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:49 SPL REREAD
+19:52:49 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:49 SPL REREAD
+19:52:49 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:49 SPL REREAD
+19:52:49 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:49 SPL REREAD
+19:52:49 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:49 SPL REREAD
+19:52:49 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:49 SPL REREAD
+19:52:50 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:50 SPL REREAD
+19:52:50 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:50 SPL REREAD
+19:52:50 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:50 SPL REREAD
+19:52:50 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:50 SPL REREAD
+19:52:50 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:50 SPL REREAD
+19:52:50 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:50 SPL REREAD
+19:52:50 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:50 SPL REREAD
+19:52:50 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:50 SPL REREAD
+19:52:50 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:50 SPL REREAD
+19:52:50 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:50 SPL REREAD
+19:52:50 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:50 SPL REREAD
+19:52:50 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:50 SPL REREAD
+19:52:50 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:50 SPL REREAD
+19:52:50 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:50 SPL REREAD
+19:52:50 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:50 SPL REREAD
+19:52:50 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:50 SPL REREAD
+19:52:50 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+19:52:50 SPL REREAD
+19:52:50 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+--- firmware f54d07d (ST5 $FF, re-send cap); swap back to our board for SPCOMPARE runs
+20:01:14 --- console open /dev/cu.usbmodem114401
+20:01:14 
+20:01:14 SPL CMD d=1 c=01 b=61 s=00 ack=6
+20:01:14 SPL CMD d=1 c=01 b=62 s=00 ack=5
+20:01:16 > sp
+20:01:16 sp
+20:01:16 SP on id=1 last=1 pass=1 img=819200 ovl=0/384
+20:01:16 SP disk=floppy server=on wedged=0 exec_ms last=0 max=534 mech st=00 soft=00 tries=0
+20:01:16 SP pkts=182 acks=182 cksum=0 bad=0 ign=0 tmo=0 resets=1 rereads=0 replies=182
+20:01:16 SP ack_us last=4 max=7 data_max=- late=0 late_entry=0
+20:01:16 SP cmds status=1 readblk=180 writeblk=0 format=0 control=0 init=1 other=0
+20:01:16 SP pins PH0=0 PH1=1 PH2=0 PH3=1 WRREQ=1 HSTEN=1 WR=1 LASTONE=1
+20:01:16 OK
+20:01:21 SPL RESET
+20:01:21 SPL CMD d=1 c=05 b=0 s=40 ack=5
+20:01:22 SPL CMD d=1 c=01 b=0 s=00 ack=5 ms=836
+20:01:22 SPL CMD d=1 c=01 b=2 s=00 ack=5
+20:01:22 SPL CMD d=1 c=01 b=3 s=00 ack=5
+20:01:22 SPL CMD d=1 c=01 b=4 s=00 ack=4
+20:01:22 SPL CMD d=1 c=01 b=5 s=00 ack=4
+20:01:22 SPL CMD d=1 c=01 b=8 s=00 ack=4
+20:01:22 SPL CMD d=1 c=01 b=7 s=00 ack=4
+20:01:22 SPL CMD d=1 c=01 b=9 s=00 ack=5
+20:01:22 SPL CMD d=1 c=01 b=10 s=00 ack=5
+20:01:22 SPL CMD d=1 c=01 b=11 s=00 ack=4
+20:01:22 SPL CMD d=1 c=01 b=12 s=00 ack=4 ms=163
+20:01:22 SPL CMD d=1 c=01 b=13 s=00 ack=6
+20:01:22 SPL CMD d=1 c=01 b=14 s=00 ack=4
+20:01:22 SPL CMD d=1 c=01 b=15 s=00 ack=5
+20:01:22 SPL CMD d=1 c=01 b=16 s=00 ack=5
+20:01:22 SPL CMD d=1 c=01 b=17 s=00 ack=4
+20:01:22 SPL CMD d=1 c=01 b=18 s=00 ack=4
+20:01:22 SPL CMD d=1 c=01 b=19 s=00 ack=5
+20:01:22 SPL CMD d=1 c=01 b=20 s=00 ack=5
+20:01:22 SPL CMD d=1 c=01 b=21 s=00 ack=4
+20:01:22 SPL CMD d=1 c=01 b=22 s=00 ack=5
+20:01:22 SPL CMD d=1 c=01 b=23 s=00 ack=5
+20:01:22 SPL CMD d=1 c=01 b=24 s=00 ack=4 ms=186
+20:01:22 SPL CMD d=1 c=01 b=25 s=00 ack=5
+20:01:22 SPL CMD d=1 c=01 b=26 s=00 ack=4
+20:01:22 SPL CMD d=1 c=01 b=27 s=00 ack=5
+20:01:22 SPL CMD d=1 c=01 b=28 s=00 ack=5
+20:01:23 SPL CMD d=1 c=01 b=29 s=00 ack=4
+20:01:23 SPL CMD d=1 c=01 b=30 s=00 ack=4
+20:01:23 SPL CMD d=1 c=01 b=31 s=00 ack=4
+20:01:23 SPL CMD d=1 c=01 b=32 s=00 ack=4
+20:01:23 SPL CMD d=1 c=01 b=33 s=00 ack=5
+20:01:23 SPL CMD d=1 c=01 b=34 s=00 ack=4
+20:01:23 SPL CMD d=1 c=01 b=35 s=00 ack=4
+20:01:23 SPL CMD d=1 c=01 b=36 s=00 ack=4 ms=156
+20:01:23 SPL CMD d=1 c=01 b=37 s=00 ack=5
+20:01:23 SPL CMD d=1 c=01 b=38 s=00 ack=4
+20:01:23 SPL CMD d=1 c=01 b=39 s=00 ack=4
+20:01:23 SPL CMD d=1 c=01 b=40 s=00 ack=4
+20:01:23 SPL CMD d=1 c=01 b=41 s=00 ack=4
+20:01:23 SPL CMD d=1 c=00 b=0 s=00 ack=4
+20:01:23 SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=187
+20:01:23 SPL CMD d=1 c=01 b=2 s=00 ack=5
+20:01:24 SPL CMD d=1 c=01 b=2 s=00 ack=4
+20:01:24 SPL CMD d=1 c=01 b=3 s=00 ack=5
+20:01:24 SPL CMD d=1 c=01 b=4 s=00 ack=4
+20:01:24 SPL CMD d=1 c=01 b=5 s=00 ack=5
+20:01:24 SPL CMD d=1 c=01 b=2 s=00 ack=5
+20:01:24 SPL CMD d=1 c=01 b=2 s=00 ack=4
+20:01:24 SPL CMD d=1 c=01 b=43 s=00 ack=5 ms=187
+20:01:24 SPL CMD d=1 c=01 b=42 s=00 ack=5
+20:01:24 SPL CMD d=1 c=01 b=44 s=00 ack=4
+20:01:24 SPL CMD d=1 c=01 b=45 s=00 ack=4
+20:01:24 SPL CMD d=1 c=01 b=46 s=00 ack=4
+20:01:24 SPL CMD d=1 c=01 b=47 s=00 ack=5
+20:01:24 SPL CMD d=1 c=01 b=48 s=00 ack=5 ms=186
+20:01:24 SPL CMD d=1 c=01 b=49 s=00 ack=6
+20:01:24 SPL CMD d=1 c=01 b=50 s=00 ack=4
+20:01:24 SPL CMD d=1 c=01 b=51 s=00 ack=5
+20:01:24 SPL CMD d=1 c=01 b=52 s=00 ack=4
+20:01:24 SPL CMD d=1 c=01 b=53 s=00 ack=4
+20:01:24 SPL CMD d=1 c=01 b=54 s=00 ack=4
+20:01:24 SPL CMD d=1 c=01 b=55 s=00 ack=5
+20:01:24 SPL CMD d=1 c=01 b=56 s=00 ack=4
+20:01:24 SPL CMD d=1 c=01 b=57 s=00 ack=4
+20:01:24 SPL CMD d=1 c=01 b=58 s=00 ack=5
+20:01:24 SPL CMD d=1 c=01 b=59 s=00 ack=4
+20:01:25 SPL CMD d=1 c=01 b=60 s=00 ack=4 ms=155
+20:01:25 SPL CMD d=1 c=01 b=61 s=00 ack=4
+20:01:25 SPL CMD d=1 c=01 b=62 s=00 ack=5
+20:01:25 SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=196
+20:01:25 SPL CMD d=1 c=01 b=2 s=00 ack=5
+20:01:25 SPL CMD d=1 c=01 b=2 s=00 ack=5
+20:01:25 SPL CMD d=1 c=01 b=2 s=00 ack=4
+20:01:25 SPL CMD d=1 c=01 b=2 s=00 ack=4
+20:01:25 SPL CMD d=1 c=01 b=2 s=00 ack=4
+20:01:25 SPL CMD d=1 c=01 b=63 s=00 ack=4 ms=192
+20:01:26 SPL CMD d=1 c=01 b=2 s=00 ack=5 ms=199
+20:01:26 SPL CMD d=1 c=01 b=2 s=00 ack=5
+20:01:26 SPL CMD d=1 c=01 b=2 s=00 ack=4
+20:01:26 SPL CMD d=1 c=01 b=69 s=00 ack=4 ms=198
+20:01:26 SPL CMD d=1 c=01 b=68 s=00 ack=5
+20:01:26 SPL CMD d=1 c=01 b=70 s=00 ack=5
+20:01:26 SPL CMD d=1 c=01 b=71 s=00 ack=4
+20:01:27 SPL CMD d=1 c=01 b=72 s=00 ack=4 ms=192
+20:01:27 SPL CMD d=1 c=01 b=73 s=00 ack=5
+20:01:27 SPL CMD d=1 c=01 b=74 s=00 ack=5
+20:01:27 SPL CMD d=1 c=01 b=75 s=00 ack=4
+20:01:27 SPL CMD d=1 c=01 b=76 s=00 ack=4
+20:01:27 SPL CMD d=1 c=01 b=77 s=00 ack=4
+20:01:27 SPL CMD d=1 c=01 b=78 s=00 ack=5
+20:01:27 SPL CMD d=1 c=01 b=79 s=00 ack=4
+20:01:27 SPL CMD d=1 c=01 b=80 s=00 ack=5
+20:01:27 SPL CMD d=1 c=01 b=81 s=00 ack=4
+20:01:27 SPL CMD d=1 c=01 b=82 s=00 ack=4
+20:01:27 SPL CMD d=1 c=01 b=83 s=00 ack=4
+20:01:27 SPL CMD d=1 c=01 b=84 s=00 ack=5 ms=155
+20:01:27 SPL CMD d=1 c=01 b=85 s=00 ack=6
+20:01:27 SPL CMD d=1 c=01 b=86 s=00 ack=5
+20:01:27 SPL CMD d=1 c=01 b=87 s=00 ack=5
+20:01:27 SPL CMD d=1 c=01 b=88 s=00 ack=5
+20:01:27 SPL CMD d=1 c=01 b=89 s=00 ack=4
+20:01:27 SPL CMD d=1 c=01 b=90 s=00 ack=4
+20:01:27 SPL CMD d=1 c=01 b=91 s=00 ack=4
+20:01:27 SPL CMD d=1 c=01 b=92 s=00 ack=4
+20:01:27 SPL CMD d=1 c=01 b=93 s=00 ack=4
+20:01:27 SPL CMD d=1 c=01 b=94 s=00 ack=5
+20:01:27 SPL CMD d=1 c=01 b=95 s=00 ack=4
+20:01:28 SPL CMD d=1 c=01 b=96 s=00 ack=5 ms=187
+20:01:28 SPL CMD d=1 c=01 b=97 s=00 ack=5
+20:01:28 SPL CMD d=1 c=01 b=98 s=00 ack=4
+20:01:28 SPL CMD d=1 c=01 b=99 s=00 ack=4
+20:01:28 SPL CMD d=1 c=01 b=100 s=00 ack=4
+20:01:28 SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=211
+20:01:28 SPL CMD d=1 c=01 b=2 s=00 ack=5
+20:01:28 SPL CMD d=1 c=01 b=2 s=00 ack=5
+20:01:29 SPL CMD d=1 c=01 b=102 s=00 ack=4 ms=205
+20:01:29 SPL CMD d=1 c=01 b=101 s=00 ack=5
+20:01:29 SPL CMD d=1 c=01 b=103 s=00 ack=4
+20:01:29 SPL CMD d=1 c=01 b=104 s=00 ack=4
+20:01:29 SPL CMD d=1 c=01 b=105 s=00 ack=4
+20:01:29 SPL CMD d=1 c=01 b=106 s=00 ack=4
+20:01:29 SPL CMD d=1 c=01 b=107 s=00 ack=4
+20:01:29 SPL CMD d=1 c=01 b=108 s=00 ack=4 ms=158
+20:01:29 SPL CMD d=1 c=01 b=109 s=00 ack=6
+20:01:29 SPL CMD d=1 c=01 b=110 s=00 ack=4
+20:01:29 SPL CMD d=1 c=01 b=111 s=00 ack=5
+20:01:29 SPL CMD d=1 c=01 b=112 s=00 ack=4
+20:01:29 SPL CMD d=1 c=01 b=113 s=00 ack=5
+20:01:29 SPL CMD d=1 c=01 b=114 s=00 ack=4
+20:01:29 SPL CMD d=1 c=01 b=115 s=00 ack=5
+20:01:29 SPL CMD d=1 c=01 b=116 s=00 ack=4
+20:01:29 SPL CMD d=1 c=01 b=117 s=00 ack=4
+20:01:29 SPL CMD d=1 c=01 b=118 s=00 ack=4
+20:01:29 SPL CMD d=1 c=01 b=119 s=00 ack=4
+20:01:29 SPL CMD d=1 c=01 b=120 s=00 ack=4 ms=185
+20:01:29 SPL CMD d=1 c=01 b=121 s=00 ack=5
+20:01:29 SPL CMD d=1 c=01 b=122 s=00 ack=4
+20:01:29 SPL CMD d=1 c=01 b=123 s=00 ack=5
+20:01:29 SPL CMD d=1 c=01 b=124 s=00 ack=4
+20:01:30 SPL CMD d=1 c=01 b=125 s=00 ack=5
+20:01:30 SPL CMD d=1 c=01 b=126 s=00 ack=5
+20:01:30 SPL CMD d=1 c=01 b=127 s=00 ack=5
+20:01:30 SPL CMD d=1 c=01 b=128 s=00 ack=4
+20:01:30 SPL CMD d=1 c=01 b=129 s=00 ack=4
+20:01:30 SPL CMD d=1 c=01 b=130 s=00 ack=4
+20:01:30 SPL CMD d=1 c=01 b=131 s=00 ack=5
+20:01:30 SPL CMD d=1 c=01 b=132 s=00 ack=4 ms=155
+20:01:30 SPL CMD d=1 c=01 b=133 s=00 ack=5
+20:01:31 SPL CMD d=1 c=01 b=2 s=00 ack=5 ms=216
+20:01:31 SPL CMD d=1 c=01 b=2 s=00 ack=6
+20:01:31 SPL CMD d=1 c=01 b=2 s=00 ack=5
+20:01:31 SPL CMD d=1 c=01 b=135 s=00 ack=6 ms=216
+20:01:31 SPL CMD d=1 c=01 b=134 s=00 ack=5
+20:01:31 SPL CMD d=1 c=01 b=136 s=00 ack=4
+20:01:31 SPL CMD d=1 c=01 b=137 s=00 ack=4
+20:01:31 SPL CMD d=1 c=01 b=138 s=00 ack=4
+20:01:31 SPL CMD d=1 c=01 b=139 s=00 ack=4
+20:01:31 SPL CMD d=1 c=01 b=140 s=00 ack=4
+20:01:31 SPL CMD d=1 c=01 b=141 s=00 ack=5
+20:01:31 SPL CMD d=1 c=01 b=142 s=00 ack=4
+20:01:31 SPL CMD d=1 c=01 b=143 s=00 ack=5
+20:01:31 SPL CMD d=1 c=01 b=144 s=00 ack=4 ms=186
+20:01:31 SPL CMD d=1 c=01 b=145 s=00 ack=5
+20:01:31 SPL CMD d=1 c=01 b=146 s=00 ack=4
+20:01:31 SPL CMD d=1 c=01 b=147 s=00 ack=5
+20:01:31 SPL CMD d=1 c=01 b=148 s=00 ack=4
+20:01:31 SPL CMD d=1 c=01 b=149 s=00 ack=5
+20:01:31 SPL CMD d=1 c=01 b=150 s=00 ack=4
+20:01:31 SPL CMD d=1 c=01 b=151 s=00 ack=4
+20:01:31 SPL CMD d=1 c=01 b=152 s=00 ack=4
+20:01:31 SPL CMD d=1 c=01 b=153 s=00 ack=4
+20:01:31 SPL CMD d=1 c=01 b=154 s=00 ack=4
+20:01:31 SPL CMD d=1 c=01 b=155 s=00 ack=4
+20:01:32 SPL CMD d=1 c=01 b=156 s=00 ack=4 ms=155
+20:01:32 SPL CMD d=1 c=01 b=157 s=00 ack=6
+20:01:32 SPL CMD d=1 c=01 b=158 s=00 ack=4
+20:01:32 SPL CMD d=1 c=01 b=159 s=00 ack=5
+20:01:32 SPL CMD d=1 c=01 b=160 s=00 ack=4
+20:01:32 SPL CMD d=1 c=01 b=161 s=00 ack=4
+20:01:32 SPL CMD d=1 c=01 b=162 s=00 ack=4
+20:01:32 SPL CMD d=1 c=01 b=163 s=00 ack=4
+20:01:32 SPL CMD d=1 c=01 b=164 s=00 ack=5
+20:01:32 SPL CMD d=1 c=01 b=165 s=00 ack=5
+20:01:32 SPL CMD d=1 c=01 b=166 s=00 ack=5
+20:01:33 SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=219
+20:01:33 SPL CMD d=1 c=01 b=2 s=00 ack=6
+20:01:33 SPL CMD d=1 c=01 b=2 s=00 ack=4
+20:01:33 SPL CMD d=1 c=01 b=1475 s=00 ack=4 ms=539
+20:01:33 SPL CMD d=1 c=01 b=1474 s=00 ack=6
+20:01:33 SPL CMD d=1 c=01 b=1476 s=00 ack=5
+20:01:33 SPL CMD d=1 c=01 b=1477 s=00 ack=4
+20:01:33 SPL CMD d=1 c=01 b=1478 s=00 ack=4
+20:01:33 SPL CMD d=1 c=01 b=1479 s=00 ack=4
+20:01:33 SPL CMD d=1 c=01 b=1480 s=00 ack=5 ms=106
+20:01:34 SPL CMD d=1 c=01 b=1481 s=00 ack=5
+20:01:34 SPL CMD d=1 c=01 b=1482 s=00 ack=5
+20:01:34 SPL CMD d=1 c=01 b=1483 s=00 ack=5
+20:01:34 SPL CMD d=1 c=01 b=1484 s=00 ack=4
+20:01:34 SPL CMD d=1 c=01 b=1485 s=00 ack=5
+20:01:34 SPL CMD d=1 c=01 b=1486 s=00 ack=4
+20:01:34 SPL CMD d=1 c=01 b=1487 s=00 ack=5
+20:01:34 SPL CMD d=1 c=01 b=1488 s=00 ack=4 ms=137
+20:01:34 SPL CMD d=1 c=01 b=1489 s=00 ack=5
+20:01:34 SPL CMD d=1 c=01 b=1490 s=00 ack=4
+20:01:34 SPL CMD d=1 c=01 b=1491 s=00 ack=5
+20:01:34 SPL CMD d=1 c=01 b=1492 s=00 ack=4
+20:01:34 SPL CMD d=1 c=01 b=1493 s=00 ack=4
+20:01:34 SPL CMD d=1 c=01 b=1494 s=00 ack=5
+20:01:34 SPL CMD d=1 c=01 b=1495 s=00 ack=4
+20:01:34 SPL CMD d=1 c=01 b=1496 s=00 ack=4 ms=103
+20:01:34 SPL CMD d=1 c=01 b=1497 s=00 ack=6
+20:01:34 SPL CMD d=1 c=01 b=1498 s=00 ack=5
+20:01:34 SPL CMD d=1 c=01 b=1499 s=00 ack=5
+20:01:34 SPL CMD d=1 c=01 b=1500 s=00 ack=4
+20:01:34 SPL CMD d=1 c=01 b=1501 s=00 ack=5
+20:01:34 SPL CMD d=1 c=01 b=1502 s=00 ack=4
+20:01:34 SPL CMD d=1 c=01 b=1503 s=00 ack=4
+20:01:34 SPL CMD d=1 c=01 b=1504 s=00 ack=4 ms=137
+20:01:34 SPL CMD d=1 c=01 b=1505 s=00 ack=5
+20:01:34 SPL CMD d=1 c=01 b=1506 s=00 ack=4
+20:01:51 SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=844
+20:01:52 SPL CMD d=1 c=01 b=2 s=00 ack=4
+20:01:56 SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=344
+20:01:56 SPL CMD d=1 c=01 b=2 s=00 ack=6
+20:01:56 SPL CMD d=1 c=01 b=2 s=00 ack=4
+20:01:56 SPL CMD d=1 c=01 b=65 s=00 ack=4 ms=198
+20:01:56 SPL CMD d=1 c=01 b=64 s=00 ack=5
+20:01:56 SPL CMD d=1 c=01 b=66 s=00 ack=5
+20:01:56 SPL CMD d=1 c=01 b=67 s=00 ack=5
+20:01:57 SPL CMD d=1 c=00 b=419072 s=00 ack=4
+20:01:57 SPL CMD d=1 c=00 b=419075 s=00 ack=4
+20:01:58 SPL CMD d=1 c=00 b=419077 s=00 ack=4
+20:01:59 SPL CMD d=1 c=00 b=419073 s=21 ack=5
+20:01:59 SPL CMD d=1 c=01 b=0 s=00 ack=4 ms=381
+20:02:03 SPL CMD d=1 c=01 b=1 s=00 ack=6 ms=346
+20:02:07 SPL CMD d=1 c=01 b=2 s=00 ack=5 ms=344
+20:02:11 SPL CMD d=1 c=01 b=1600 s=2d ack=5
+20:02:53 SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=344
+20:02:53 SPL CMD d=1 c=01 b=2 s=00 ack=4
+20:02:53 SPL CMD d=1 c=01 b=2 s=00 ack=5
+20:02:53 SPL CMD d=1 c=01 b=65 s=00 ack=4 ms=198
+20:02:53 SPL CMD d=1 c=01 b=64 s=00 ack=5
+20:02:53 SPL CMD d=1 c=01 b=66 s=00 ack=4
+20:02:53 SPL CMD d=1 c=01 b=67 s=00 ack=4
+20:03:07 > server off
+20:03:07 server off
+20:03:07 OK
+20:03:08 > oe on
+20:03:08 oe on
+20:03:08 OK
+20:03:09 > enbl on
+20:03:09 enbl on
+20:03:09 OK
+20:03:09 > eject
+20:03:09 eject
+20:03:10 OK
+20:03:13 > server on
+20:03:14 server on
+20:03:14 OK
+20:03:15 > sp
+20:03:15 sp
+20:03:15 SP on id=1 last=1 pass=1 img=819200 ovl=0/384
+20:03:15 SP disk=floppy server=on wedged=0 exec_ms last=0 max=844 mech st=00 soft=00 tries=0
+20:03:15 SP pkts=428 acks=428 cksum=0 bad=0 ign=0 tmo=0 resets=2 rereads=0 replies=428
+20:03:15 SP ack_us last=4 max=7 data_max=- late=0 late_entry=0
+20:03:15 SP cmds status=6 readblk=420 writeblk=0 format=0 control=0 init=2 other=0
+20:03:15 SP pins PH0=0 PH1=1 PH2=0 PH3=1 WRREQ=1 HSTEN=1 WR=1 LASTONE=1
+20:03:15 OK
+20:03:22 SPL CMD d=1 c=01 b=2 s=2f ack=5
+20:03:27 SPL CMD d=1 c=01 b=2 s=2f ack=4
+20:03:47 > sp
+20:03:48 sp
+20:03:48 SP on id=1 last=1 pass=1 img=819200 ovl=0/384
+20:03:48 SP disk=floppy server=on wedged=0 exec_ms last=0 max=844 mech st=af soft=00 tries=0
+20:03:48 SP pkts=430 acks=430 cksum=0 bad=0 ign=0 tmo=0 resets=2 rereads=0 replies=430
+20:03:48 SP ack_us last=4 max=7 data_max=- late=0 late_entry=0
+20:03:48 SP cmds status=6 readblk=422 writeblk=0 format=0 control=0 init=2 other=0
+20:03:48 SP pins PH0=0 PH1=1 PH2=0 PH3=1 WRREQ=1 HSTEN=1 WR=1 LASTONE=1
+20:03:48 OK
+20:04:11 SPL CMD d=1 c=00 b=1536 s=00 ack=5
+20:04:12 SPL CMD d=1 c=00 b=1539 s=00 ack=5
+20:04:13 SPL CMD d=1 c=00 b=1541 s=00 ack=4
+20:04:13 SPL CMD d=1 c=00 b=1537 s=21 ack=4
+20:04:14 SPL CMD d=1 c=01 b=0 s=2f ack=5
+20:04:14 SPL CMD d=1 c=01 b=1 s=2f ack=4
+20:04:14 SPL CMD d=1 c=01 b=2 s=2f ack=4
+20:04:15 SPL CMD d=1 c=01 b=1600 s=2f ack=4
+20:05:36 SPL CMD d=1 c=00 b=1536 s=00 ack=5
+20:05:36 SPL CMD d=1 c=00 b=1539 s=00 ack=4
+20:05:37 SPL CMD d=1 c=00 b=1541 s=00 ack=5
+20:05:38 SPL CMD d=1 c=00 b=1537 s=21 ack=5
+20:05:39 SPL CMD d=1 c=01 b=0 s=00 ack=5 ms=377
+20:05:43 SPL CMD d=1 c=01 b=1 s=00 ack=5 ms=340
+20:05:47 SPL CMD d=1 c=01 b=2 s=00 ack=5 ms=337
+20:05:50 SPL CMD d=1 c=01 b=1600 s=2d ack=6
+20:06:27 SPL REREAD
+20:06:27 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+20:06:27 SPL REREAD
+20:06:27 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+20:06:28 SPL REREAD
+20:06:28 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+20:06:28 SPL REREAD
+20:06:28 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
+20:06:28 SPL REREAD
+20:06:28 SPL TIMEOUT d=1 c=01 b=1600 s=2d stage=6
