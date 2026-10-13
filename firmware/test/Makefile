@@ -5,7 +5,7 @@ OUT    := build
 HDRS   := $(wildcard ../src/*.h *.h)
 
 TESTS  := test_crc32 test_mech test_console test_gcr test_flux_dec test_trackbuf_ipc test_mech_server test_wtrack \
-          test_sp_wire test_ramdisk test_sp_dev test_sp_bus test_fstore
+          test_sp_wire test_ramdisk test_sp_dev test_sp_bus test_fstore test_sp_floppy
 
 all: $(addprefix $(OUT)/,$(TESTS))
 	@for t in $(TESTS); do ./$(OUT)/$$t || exit 1; done
@@ -51,6 +51,9 @@ MECH_SRCS := ../src/mech_server.c ../src/mech.c ../src/mech_addr.c ../src/flux_d
 
 $(OUT)/test_fstore: test_fstore.c ../src/fstore.c $(MECH_SRCS) $(HDRS) | $(OUT)
 	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^)
+
+$(OUT)/test_sp_floppy: test_sp_floppy.c test_sp_bus.c ../src/sp_bus.c ../src/sp_dev.c ../src/sp_wire.c ../src/ramdisk.c ../src/fstore.c $(MECH_SRCS) $(HDRS) | $(OUT)
+	$(CC) $(CFLAGS) -o $@ test_sp_floppy.c ../src/sp_bus.c ../src/sp_dev.c ../src/sp_wire.c ../src/ramdisk.c ../src/fstore.c $(MECH_SRCS) -lm
 
 $(OUT):
 	mkdir -p $(OUT)

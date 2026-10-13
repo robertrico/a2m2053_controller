@@ -328,6 +328,7 @@ static sp_store_t store;
 static sp_dev_t dev;
 static sp_bus_t bus;
 static bool lastone_high = true;
+static const sp_store_t *sim_store;     // NULL: the RAM disk (test_sp_floppy.c sets the floppy)
 static bool lastone_cb(void *c) { (void)c; return lastone_high; }
 
 static void sim_reset(void) {
@@ -347,7 +348,7 @@ static void sim_reset(void) {
     max_ack_after_underrun = 0;
     ramdisk_init(&rd, base, sizeof base, slots, 8);
     store = ramdisk_store(&rd);
-    sp_dev_init(&dev, &store, lastone_cb, NULL);
+    sp_dev_init(&dev, sim_store ? sim_store : &store, lastone_cb, NULL);
     sp_bus_init(&bus, &hal, &dev);
     sp_bus_enable(&bus, true);
 }
@@ -379,6 +380,7 @@ static void run_script(double limit_us) {
     while (t < stop) sp_bus_poll(&bus);
 }
 
+#ifndef SIM_NO_MAIN
 int main(void) {
     for (size_t i = 0; i < sizeof base; i++) base[i] = (uint8_t)(i * 13 + (i >> 9));
 
@@ -555,3 +557,4 @@ int main(void) {
     CHECK(!off->ok && !enbus && dev.id == 0);
     TEST_END();
 }
+#endif
