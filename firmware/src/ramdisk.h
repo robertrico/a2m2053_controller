@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "sp_store.h"
 
 #define RD_BLOCKS     1600
 #define RD_BLOCK_LEN  512
@@ -24,3 +25,5 @@ void ramdisk_init(ramdisk_t *rd, const uint8_t *base, size_t base_len,
 rd_err_t ramdisk_read(const ramdisk_t *rd, uint32_t block, uint8_t *out);
 rd_err_t ramdisk_write(ramdisk_t *rd, uint32_t block, const uint8_t *in);
 void ramdisk_format(ramdisk_t *rd);
+// The RAM disk as a SmartPort store (always online, writable).
+sp_store_t ramdisk_store(ramdisk_t *rd);

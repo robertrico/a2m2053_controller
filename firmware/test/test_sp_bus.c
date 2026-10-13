@@ -9,6 +9,7 @@
 #include <string.h>
 #include "test.h"
 #include "sp_bus.h"
+#include "ramdisk.h"
 
 #define T_CELL   3.9111                 // 28 FCLK at 7.159 MHz
 #define T_CALL   0.2                    // simulated cost of one HAL call, us
@@ -323,6 +324,7 @@ static const sp_hal_t hal = {
 static uint8_t base[4 * RD_BLOCK_LEN];
 static uint8_t slots[8][RD_BLOCK_LEN];
 static ramdisk_t rd;
+static sp_store_t store;
 static sp_dev_t dev;
 static sp_bus_t bus;
 static bool lastone_high = true;
@@ -344,7 +346,8 @@ static void sim_reset(void) {
     tx_t0 = tx_end = -1;
     max_ack_after_underrun = 0;
     ramdisk_init(&rd, base, sizeof base, slots, 8);
-    sp_dev_init(&dev, &rd, lastone_cb, NULL);
+    store = ramdisk_store(&rd);
+    sp_dev_init(&dev, &store, lastone_cb, NULL);
     sp_bus_init(&bus, &hal, &dev);
     sp_bus_enable(&bus, true);
 }

@@ -32,6 +32,7 @@ static bool srv_wedged;
 #define RD_SLOTS 384
 static uint8_t rd_slots[RD_SLOTS][RD_BLOCK_LEN];
 static ramdisk_t rd;
+static sp_store_t rd_store;
 static sp_dev_t spdev;
 static sp_bus_t spbus;
 static bool splog = true;
@@ -521,7 +522,8 @@ int main(void) {
     multicore_launch_core1(core1_main);
     sp_hw_init();
     ramdisk_init(&rd, sp_image, (size_t)(sp_image_end - sp_image), rd_slots, RD_SLOTS);
-    sp_dev_init(&spdev, &rd, sp_hw_lastone, NULL);
+    rd_store = ramdisk_store(&rd);
+    sp_dev_init(&spdev, &rd_store, sp_hw_lastone, NULL);
     sp_bus_init(&spbus, sp_hw_hal(), &spdev);
     sp_bus_enable(&spbus, true);        // serve the Liron card from power-on
     for (;;) {

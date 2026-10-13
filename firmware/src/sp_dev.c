@@ -12,9 +12,9 @@ static const uint8_t dib_tail[21] = {
     0x01, 0x00, 0x00, 0x10,
 };
 
-void sp_dev_init(sp_dev_t *d, ramdisk_t *rd, bool (*lastone_high)(void *), void *ctx) {
+void sp_dev_init(sp_dev_t *d, const sp_store_t *store, bool (*lastone_high)(void *), void *ctx) {
     memset(d, 0, sizeof *d);
-    d->rd = rd;
+    d->store = store;
     d->lastone_high = lastone_high;
     d->ctx = ctx;
 }
@@ -34,27 +34,29 @@ bool sp_dev_needs_data(uint8_t cmd) {
     return cmd == SP_WRITEBLOCK || cmd == SP_CONTROL || cmd == SP_WRITE;
 }
 
-// Leda3: general status. Online, read/write, format allowed; 1600 blocks.
-static void gen_status(sp_reply_t *r) {
-    r->data[0] = 0xF8;
-    r->data[1] = RD_BLOCKS & 0xFF;
-    r->data[2] = RD_BLOCKS >> 8;
+// Leda3: general status. $F8 online, read/write, format allowed; $E8 no disk (offline);
+// $FC write-protected. 1600 blocks. The status code itself stays $00.
+static void gen_status(const sp_dev_t *d, sp_reply_t *r) {
+    sp_media_t m = d->store->media(d->store->ctx);
+    r->data[0] = m == SP_MEDIA_NODISK ? 0xE8 : m == SP_MEDIA_WRPROT ? 0xFC : 0xF8;
+    r->data[1] = SP_BLOCKS & 0xFF;
+    r->data[2] = SP_BLOCKS >> 8;
     r->data[3] = 0x00;
     r->len = 4;
 }
 
-static void do_status(uint8_t code, sp_reply_t *r) {
+static void do_status(const sp_dev_t *d, uint8_t code, sp_reply_t *r) {
     switch (code) {
     case 0x00:
-        gen_status(r);
+        gen_status(d, r);
         break;
     case 0x03:
-        gen_status(r);
+        gen_status(d, r);
         memcpy(r->data + 4, dib_tail, sizeof dib_tail);
         r->len = 4 + sizeof dib_tail;
         break;
-    case 0x05:                           // Led96: 8 bytes of drive status; nothing to report
-        memset(r->data, 0, 8);
+    case 0x05:                           // Led96: 8 bytes of drive status
+        d->store->unistat(d->store->ctx, r->data);
         r->len = 8;
         break;
     default:
@@ -74,25 +76,24 @@ void sp_dev_execute(sp_dev_t *d, uint8_t dest, const uint8_t *cmd, size_t len,
     if (c[1] != pcount_tab[c[0]]) { r->stat = SP_E_BADPCNT; return; }
     switch (c[0]) {
     case SP_STATUS:
-        do_status(c[4], r);
+        do_status(d, c[4], r);
         break;
     case SP_READBLOCK:
-        if (ramdisk_read(d->rd, block, r->data) != RD_OK) { r->stat = SP_E_BADBLOCK; break; }
-        r->len = RD_BLOCK_LEN;
+        if (block >= SP_BLOCKS) { r->stat = SP_E_BADBLOCK; break; }   // ROM Le73e, before any media check
+        r->stat = d->store->read(d->store->ctx, block, r->data);
+        if (r->stat == SP_E_OK || r->stat == SP_E_SOFT_IO) r->len = SP_BLOCK_LEN;   // ROM sends data with $E7
         break;
     case SP_WRITEBLOCK:
-        if (dlen != RD_BLOCK_LEN) { r->stat = SP_E_IOERROR; break; }
-        switch (ramdisk_write(d->rd, block, data)) {
-        case RD_OK: break;
-        case RD_BADBLOCK: r->stat = SP_E_BADBLOCK; break;
-        case RD_FULL: r->stat = SP_E_IOERROR; break;
-        }
+        if (dlen != SP_BLOCK_LEN) { r->stat = SP_E_IOERROR; break; }
+        if (block >= SP_BLOCKS) { r->stat = SP_E_BADBLOCK; break; }
+        r->stat = d->store->write(d->store->ctx, block, data);
         break;
     case SP_FORMAT:
-        ramdisk_format(d->rd);
+        r->stat = d->store->format(d->store->ctx);
         break;
     case SP_CONTROL:
-        if (c[4] != 0x00 && c[4] != 0x04) r->stat = SP_E_BADCTL;   // reset, eject (no-op in M6)
+        if (c[4] == 0x04) d->store->eject(d->store->ctx);     // ROM control_eject reports nothing
+        else if (c[4] != 0x00) r->stat = SP_E_BADCTL;          // $00 reset: nothing to do
         break;
     case SP_INIT:
         d->inits++;

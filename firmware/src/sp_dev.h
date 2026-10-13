@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "ramdisk.h"
+#include "sp_store.h"
 #include "sp_wire.h"
 
 #define SP_CMD_LEN 9                     // cmd, pcount, 7 parameter bytes
@@ -14,30 +14,26 @@ enum {
     SP_CONTROL = 0x04, SP_INIT = 0x05, SP_WRITE = 0x09, SP_NCMDS = 0x0A,
 };
 
-// Error codes (liron.asm err_*); the reply STAT byte is $80 | code.
-enum {
-    SP_E_OK = 0x00, SP_E_BADCMD = 0x01, SP_E_BADPCNT = 0x04, SP_E_BADCTL = 0x21,
-    SP_E_IOERROR = 0x27, SP_E_BADBLOCK = 0x2D, SP_E_LAST = 0x40,
-};
+#define SP_BLOCKS 1600                   // 800K double-sided (ROM block_count_tab)
 
 typedef struct {
     uint8_t stat;                        // code without bit 7
     size_t len;
-    uint8_t data[RD_BLOCK_LEN];
+    uint8_t data[SP_BLOCK_LEN];
 } sp_reply_t;
 
 typedef struct {
     uint8_t id;                          // 0 = no ID yet
     bool last;                           // INIT found LASTONE/ high
     bool passthrough;                    // would enable PH3 to the rear port (ROM $44); no pins in M6
-    ramdisk_t *rd;
+    const sp_store_t *store;             // swapped at run time (sp disk ram|floppy)
     bool (*lastone_high)(void *ctx);
     void *ctx;
     uint32_t cmds[SP_NCMDS + 1];         // per command; [SP_NCMDS] = out of range
     uint32_t inits;
 } sp_dev_t;
 
-void sp_dev_init(sp_dev_t *d, ramdisk_t *rd, bool (*lastone_high)(void *), void *ctx);
+void sp_dev_init(sp_dev_t *d, const sp_store_t *store, bool (*lastone_high)(void *), void *ctx);
 void sp_dev_bus_reset(sp_dev_t *d);
 // Is this command packet for us? Without an ID only INIT, to any destination (the card walks
 // the chain); with one, every command to our ID. cmd = first data byte (command code).
