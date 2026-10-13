@@ -1,12 +1,16 @@
 """Draw the A2M2053 board outline on Edge.Cuts in the open PCB editor.
 
 Component-side view (photo was solder side, so mirrored left-right).
-Replaces every existing Edge.Cuts shape. Needs the KiCad API server on
+Replaces every existing Edge.Cuts shape, and moves the mounting-hole
+footprints H1/H2 (frame ground, from the schematic) onto their centers.
+Moving footprints through the API crashed KiCad 10.0.4 twice right after an
+Update PCB from Schematic in the same session; save and restart KiCad first.
+Needs the KiCad API server on
 (Preferences > Plugins) and kicad-python (`pip install kicad-python`).
 """
 import math
 from kipy import KiCad
-from kipy.board_types import BoardSegment, BoardArc, BoardBezier, BoardCircle, BoardLayer
+from kipy.board_types import BoardSegment, BoardArc, BoardBezier, BoardLayer
 from kipy.geometry import Vector2
 
 X0, Y0 = 100.0, 50.0      # top-left of the full 100 mm body, at the 94 mm section top
@@ -27,10 +31,10 @@ L, Rt, B = X0, X0 + W, Y0 + H
 YL, YR = Y0 + STEP_L, Y0 + STEP_R  # step lines
 A = INSET - RS            # cove width
 
-holes = [  # centers
-    (Rt - 1.5 - HOLE_D / 2, Y0 + 17.0),  # right side: edge 1.5 mm in, center 17 mm below the 94 mm top (test print)
-    (L + INSET + 40.0, Y0 + 3.0 + HOLE_D / 2),  # right of the tab: center 40 mm from the 94 mm section's left edge, edge 3 mm below its top
-]
+holes = {  # footprint centers
+    "H1": (Rt - 1.5 - HOLE_D / 2, Y0 + 17.0),  # right side: edge 1.5 mm in, center 17 mm below the 94 mm top (test print)
+    "H2": (L + INSET + 40.0, Y0 + 3.0 + HOLE_D / 2),  # right of the tab: center 40 mm from the 94 mm section's left edge, edge 3 mm below its top
+}
 
 start = (L + INSET, Y0)
 path = [  # ("L", end) | ("A", mid, end) | ("B", c1, c2, end), clockwise from start
@@ -70,12 +74,6 @@ for kind, *p in path:
     items.append(it)
     cur = p[-1]
 
-for h in holes:
-    c = BoardCircle()
-    c.center = v(h)
-    c.radius_point = v((h[0] + HOLE_D / 2, h[1]))
-    items.append(c)
-
 for it in items:
     it.layer = BoardLayer.BL_Edge_Cuts
     it.attributes.stroke.width = int(LW * 1e6)
@@ -86,5 +84,14 @@ commit = board.begin_commit()
 if old:
     board.remove_items(old)
 board.create_items(items)
+moved = []
+for fp in board.get_footprints():
+    ref = fp.reference_field.text.value
+    if ref in holes:
+        fp.position = v(holes[ref])
+        moved.append(fp)
+if moved:
+    board.update_items(moved)
 board.push_commit(commit, "Board outline")
-print(f"removed {len(old)}, drew {len(items)} Edge.Cuts items on {board.name}")
+print(f"removed {len(old)}, drew {len(items)} Edge.Cuts items, placed "
+      f"{sorted(f.reference_field.text.value for f in moved)} on {board.name}")

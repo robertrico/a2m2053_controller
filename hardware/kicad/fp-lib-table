@@ -1,0 +1,4 @@
+(fp_lib_table
+	(version 7)
+	(lib (name "a2m2053")(type "KiCad")(uri "${KIPRJMOD}/a2m2053.pretty")(options "")(descr "Project footprints"))
+)

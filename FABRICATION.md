@@ -31,8 +31,14 @@ round.
   component-side view.
 - The two bottom corners (the edge away from the tab) 1 mm radius. All
   other corners square.
-- Mounting holes: M3, 3.2 mm diameter (the IF-83's measure about 3.35 mm
-  with calipers), drawn as plain holes on Edge.Cuts.
+- Mounting holes: M3, 3.2 mm drill (the IF-83's measure about 3.35 mm
+  with calipers). Plated, on net FG (frame ground, hatched copper on the
+  IF-83), as schematic symbols H1/H2. H2 uses the stock
+  MountingHole_3.2mm_M3_Pad_Via (6.4 mm pad). H1 sits too close to the edge
+  for that, so it uses a project footprint with a 5.2 mm pad
+  (`hardware/kicad/a2m2053.pretty`), which keeps 0.5 mm copper-to-edge.
+  Open: how FG ties to GND (direct, RC, or not at all). Probe FG on a
+  dead-board IF-83 to see what Sony did.
   Hole 1: right side (component-side view), hole edge 1.5 mm from the
   board edge, center 17 mm below the 94 mm top edge. Both holes checked
   against the IF-83 with a 3D-printed outline.
