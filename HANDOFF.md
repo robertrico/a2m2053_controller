@@ -7,7 +7,8 @@ saves and loads files, ACK 5.3 us after /WRREQ rises (card window about
 800K floppy through the board (sentinel disk written by the UniDisk, checksums
 out to track 72), Copy II Plus writes through it, and SPCOMPARE matches the
 working UniDisk byte for byte with a disk, write-protected and with no disk.
-Next: J2 breakout rework, then M8 (daisy chain).
+Next: J2 breakout rework, then M8 (daisy chain). Bench photo of the whole
+rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
 
 ## Where things stand
 
@@ -64,9 +65,10 @@ Next: J2 breakout rework, then M8 (daisy chain).
 
 ## Bench state at shutdown
 
-- Pico 2 flashed with `f54d07d` (M7). The mechanism server and U2/U4 are on
-  from boot; the floppy is the SmartPort disk (`sp disk ram` for the M6 RAM
-  disk).
+- Pico 2 flashed with `f54d07d` (M7). Main is `87c2b66`+ (eject button on by
+  default); flash it before wiring the button. The mechanism server and U2/U4
+  are on from boot; the floppy is the SmartPort disk (`sp disk ram` for the M6
+  RAM disk).
 - Supply limits for mechanism work: about 0.5 A on +5, 1.0 A on +12. Lower
   limits brown the board out at motor start (M7).
 - Power order: Pico, bench +5, +12, IIe. Shutdown: IIe, +12, +5, Pico USB.
@@ -90,8 +92,10 @@ Next: J2 breakout rework, then M8 (daisy chain).
   Correct by hand (shift by -2 x delay) until fixed.
 - Console tail window: open on the laptop screen as a normal window, not full
   screen (iTerm default profile is full screen).
-- bytehamr: "M6: ProDOS boots from my board" and the M7 log written
-  2026-10-12 (local commits in byte-hamr-labs, not published).
+- bytehamr: "M6: ProDOS boots from my board" and "M7: a real floppy through
+  the Liron card" published 2026-10-12, with the project page sections
+  (Current state, Architecture, Gateware and firmware, Open problems) brought
+  up to date.
 - Test disks: `tools/apple/mkimage.sh` (M6 image, flash) and
   `tools/apple/mktest.sh` (M7 sentinel disk). Images in `docs/private/ref/`;
   `M7TEST.po` also in ADTPro's disks folder.
