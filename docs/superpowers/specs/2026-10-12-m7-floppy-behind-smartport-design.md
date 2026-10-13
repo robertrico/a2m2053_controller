@@ -68,9 +68,7 @@ block range. A failed FORMAT returns `$27` but does not eject the disk (the
 ROM ejects it, `Le30c`). **[choice]**
 
 Eject button (GP22): a plain switch straight to the Pico, GND when pressed,
-internal pull-up, so an unwired button reads released (Rico, 2026-10-12;
-replaces the earlier "off until `ejbtn on`" choice made while the wiring was
-open). Core 1 latches a press held 20 ms across idle samples (a request in
+internal pull-up, so an unwired button reads released. On at boot. Core 1 latches a press held 20 ms across idle samples (a request in
 between restarts it) and ejects on release. `ejbtn off` disables it.
 
 LED (GP26, through U4): on while the motor runs. **[choice]** The ROM drives
