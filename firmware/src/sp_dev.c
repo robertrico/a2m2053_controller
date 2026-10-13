@@ -79,21 +79,19 @@ void sp_dev_execute(sp_dev_t *d, uint8_t dest, const uint8_t *cmd, size_t len,
         do_status(d, c[4], r);
         break;
     case SP_READBLOCK:
-        if (block >= SP_BLOCKS) { r->stat = SP_E_BADBLOCK; break; }   // ROM Le73e, before any media check
-        r->stat = d->store->read(d->store->ctx, block, r->data);
+        r->stat = d->store->read(d->store->ctx, block, r->data);   // store checks media, then range (ROM)
         if (r->stat == SP_E_OK || r->stat == SP_E_SOFT_IO) r->len = SP_BLOCK_LEN;   // ROM sends data with $E7
         break;
     case SP_WRITEBLOCK:
         if (dlen != SP_BLOCK_LEN) { r->stat = SP_E_IOERROR; break; }
-        if (block >= SP_BLOCKS) { r->stat = SP_E_BADBLOCK; break; }
         r->stat = d->store->write(d->store->ctx, block, data);
         break;
     case SP_FORMAT:
         r->stat = d->store->format(d->store->ctx);
         break;
     case SP_CONTROL:
-        if (c[4] == 0x04) d->store->eject(d->store->ctx);     // ROM control_eject reports nothing
-        else if (c[4] != 0x00) r->stat = SP_E_BADCTL;          // $00 reset: nothing to do
+        if (c[4] == 0x04) r->stat = d->store->eject(d->store->ctx);   // ROM Se51b: $27 if it failed
+        else if (c[4] != 0x00) r->stat = SP_E_BADCTL;                 // $00 reset: nothing to do
         break;
     case SP_INIT:
         d->inits++;

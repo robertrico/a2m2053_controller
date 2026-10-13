@@ -51,22 +51,26 @@ core 0                                             core 1 (M5 mechanism server)
 | READBLOCK n | `REQ_READ` | `$00` with data; `$2D` n >= 1600; `$2F` no disk; `$27` read failed |
 | WRITEBLOCK n | `REQ_WRITE` (12 tag bytes zero, as `cmd_write_block`) | `$00`; `$2B` write-protected; `$2D`; `$2F`; `$27` |
 | FORMAT | 160 x `REQ_FORMAT_TS`, track 0 side 0 first | `$00`; `$2B`; `$2F`; `$27` on the first track side that fails |
-| CONTROL `$04` eject | `REQ_EJECT` (motor off, eject, clears the track buffer) | `$00` (ROM `control_eject` reports nothing either) |
+| CONTROL `$04` eject | `REQ_EJECT` (motor off, eject, clears the track buffer) | `$00`; `$27` if the disk did not come out (ROM `Se51b`) |
 | STATUS `$00`/`$03` | `REQ_MEDIA` | general byte `$F8`; `$E8` no disk; `$FC` write-protected (ROM `Leda3`). Status code stays `$00`. |
 | STATUS `$05` | none | 8 bytes: byte 1 = soft flags of the last command, byte 2 = tries, rest 0 **[choice]** (ROM `Led96` fields `$56-$5D`) |
 
 Soft errors: the ROM sends `$E7` (status `$67`, counted a success by the
-card) when the last read needed a recalibrate or found the head on the wrong
-cylinder (`Z57` bits). We send `$67` when the M5 reply carries `SOFT_RECAL`
-or `SOFT_FOREIGN`; other soft errors (bad data on one revolution, overrun)
-report `$00`. The card treats `$40-$7F` as success (`liron-if.asm` Lcd9f).
+card) when `Z57` is non-zero after a read: data errors (`$08`/`$10`), an
+address bit slip (`$20`), a wrong cylinder (`$04`). We send `$67` when the M5
+reply carries `SOFT_BADDATA`, `SOFT_BADADDR` or `SOFT_FOREIGN`. A recal alone
+(`Le4f7` leaves `Z57`) and an overrun (ours) report `$00`. Writes never send
+`$67`. The card treats `$40-$7F` as success (`liron-if.asm` Lcd9f).
 
-Media check order matches `Se5f0`: no disk wins over write-protect.
+Check order matches `Le8b2`: no disk, then (writes) write-protect, then the
+block range. A failed FORMAT returns `$27` but does not eject the disk (the
+ROM ejects it, `Le30c`). **[choice]**
 
-Eject button (GP22, internal pull-up, switch to GND): core 1 latches a press
-(20 ms debounce) and ejects at the next idle moment, as the ROM does from
-its `BLATCH` latch in its idle loop. A floating or missing button reads
-released. **[choice]** No eject while a request is running.
+Eject button (GP22, switch to GND): **off until `ejbtn on`** **[choice]**.
+How CN105-108 reaches GP22 is not settled (`pin_budget.md` has it direct in
+one table and on U5 in another); through U5 with an open input it would
+float and eject disks. When on, core 1 latches a press held 20 ms across idle
+samples (a request in between restarts it) and ejects on release.
 
 LED (GP26, through U4): on while the motor runs. **[choice]** The ROM drives
 its LED from the gate array; ours follows the motor.
@@ -91,9 +95,14 @@ the write and a verify revolution, about 0.5 s (M5 measured).
 The bench measures the hold-off directly: CH2 ACK low time on the scope, and
 `splog` prints the core-0 wait per command (new field `ms=`).
 
-While core 0 waits on core 1 it keeps watching the bus for a reset (PH0+PH2):
-it still waits for the reply (core 1 cannot be interrupted mid-write), then
-handles the reset. **[choice]**
+While core 0 waits on core 1 it watches the bus for a reset (PH0+PH2). On a
+reset it stops waiting at once, releases the bus and clears the ID, as a real
+drive does (its reset is hardware, RSTCAP). Without that, the card's single
+INIT try after a Ctrl-Reset would meet our ACK still low and the board would
+drop off the bus. Core 1 finishes what it was doing; its late reply is
+dropped by the request's sequence number. Any wait that times out no longer
+locks the floppy out either: replies are matched by sequence number, not by
+block.
 
 ## 5. IPC additions
 
@@ -132,12 +141,16 @@ handles the reset. **[choice]**
 `tools/apple/SPCOMPARE.bas`, Applesoft, tokenized onto the M6 RAM disk image
 with AppleCommander (`--basic`). It POKEs a 10-byte caller at `$300`
 (`JSR` to the slot 5 SmartPort entry, `$C500 + PEEK($C5FF) + 3`, inline
-command and parameter list at `$310`, result in A to `$3F0`) and prints, per
+command and parameter list at `$310`, result in A to `$30F`) and prints, per
 call, the error code and the reply bytes:
 
 1. STATUS unit 1 code `$00` (4 bytes), `$03` (25 bytes), `$05` (8 bytes).
 2. READBLOCK unit 1 blocks 0, 1, 2: first 8 bytes and an additive checksum.
-3. READBLOCK block 1600 (expect `$2D`), STATUS code `$01` (expect `$21`).
+3. READBLOCK block 1600 (expect `$2D`, or `$2F` with no disk), STATUS code
+   `$01` (expect `$21`).
+
+It has no WRITEBLOCK or CONTROL call: a write test on the oracle drive would
+change the disk. `$2B` and eject are compared by hand (sec. 9).
 
 Run it on our board and on the working UniDisk with the same disk, then with
 no disk and with the tab set. The screens must match except where the spec

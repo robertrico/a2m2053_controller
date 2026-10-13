@@ -2,14 +2,16 @@
 #include <string.h>
 #include "mech_server.h"
 
-#define FS_RW_WAIT_MS   (SRV_REQ_TIMEOUT_MS + 3000)   // as the M5 console path
-#define FS_FAST_WAIT_MS 2000                          // media query; eject is up to 4.7 s
-#define FS_EJECT_WAIT_MS 8000
+// A request can queue behind a button eject (up to 4.7 s: 0.2 s + 3 x 150 x 10 ms, mech.h).
+#define FS_EJECT_MAX_MS  5000
+#define FS_RW_WAIT_MS    (SRV_REQ_TIMEOUT_MS + 3000 + FS_EJECT_MAX_MS)
+#define FS_FAST_WAIT_MS  (2000 + FS_EJECT_MAX_MS)    // media query itself: microseconds
+#define FS_EJECT_WAIT_MS (2 * FS_EJECT_MAX_MS)
 
 uint8_t fstore_code(uint8_t st, uint8_t soft, bool is_read) {
     switch (st) {
     case ST_OK:     return SP_E_OK;
-    case ST_SOFT:   return is_read && (soft & (SOFT_RECAL | SOFT_FOREIGN)) ? SP_E_SOFT_IO : SP_E_OK;
+    case ST_SOFT:   return is_read && (soft & (SOFT_FOREIGN | SOFT_BADDATA | SOFT_BADADDR)) ? SP_E_SOFT_IO : SP_E_OK;
     case ST_NODISK: return SP_E_OFFLINE;
     case ST_BADBLK: return SP_E_BADBLOCK;
     case ST_WRPROT: return SP_E_NOWRITE;

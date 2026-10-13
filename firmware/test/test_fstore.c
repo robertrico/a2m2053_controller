@@ -34,8 +34,10 @@ int main(void) {
 
     // status mapping
     CHECK(fstore_code(ST_OK, 0, true) == SP_E_OK);
-    CHECK(fstore_code(ST_SOFT, SOFT_BADDATA, true) == SP_E_OK);
-    CHECK(fstore_code(ST_SOFT, SOFT_RECAL, true) == SP_E_SOFT_IO);
+    CHECK(fstore_code(ST_SOFT, SOFT_BADDATA, true) == SP_E_SOFT_IO);       // ROM Z57 $08/$10
+    CHECK(fstore_code(ST_SOFT, SOFT_BADADDR, true) == SP_E_SOFT_IO);       // ROM Z57 $20
+    CHECK(fstore_code(ST_SOFT, SOFT_RECAL, true) == SP_E_OK);              // Le4f7 leaves Z57
+    CHECK(fstore_code(ST_SOFT, SOFT_OVERRUN, true) == SP_E_OK);
     CHECK(fstore_code(ST_SOFT, SOFT_FOREIGN | SOFT_BADDATA, true) == SP_E_SOFT_IO);
     CHECK(fstore_code(ST_SOFT, SOFT_RECAL, false) == SP_E_OK);
     CHECK(fstore_code(ST_IOERR, 0, true) == SP_E_IOERROR);
@@ -74,10 +76,17 @@ int main(void) {
     CHECK(code == SP_E_SOFT_IO && data_is(300, b));
     st.unistat(st.ctx, u);
     CHECK(u[1] & SOFT_FOREIGN);
-    // bad data on early revolutions only: soft, but $00 to the host
+    // bad data on early revolutions only: $67 with the data, as the ROM's $E7
     setup();
     D.bad_sector = 3; D.bad_revs = 2;
-    CHECK(st.read(st.ctx, 3, b) == SP_E_OK && data_is(3, b));
+    CHECK(st.read(st.ctx, 3, b) == SP_E_SOFT_IO && data_is(3, b));
+    // order (ROM Le8b2): no disk before a bad block; write-protect before a bad block
+    setup();
+    D.disk_in = false;
+    CHECK(st.read(st.ctx, 1600, b) == SP_E_OFFLINE);
+    setup();
+    D.wprot = true;
+    CHECK(st.write(st.ctx, 1600, b) == SP_E_NOWRITE);
     // a sector that never reads: $27 after the retries and a recal
     setup();
     D.bad_sector = 3; D.bad_revs = 1000;

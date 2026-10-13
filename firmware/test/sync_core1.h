@@ -8,7 +8,7 @@ static mech_server_t *sync_srv;
 static bool sync_off;                    // true: the server is off, every transact fails
 static int sync_calls;
 
-static bool sync_transact(void *ctx, const req_t *rq, reply_t *rp, uint32_t timeout_ms) {
+static bool sync_transact(void *ctx, req_t *rq, reply_t *rp, uint32_t timeout_ms) {
     (void)ctx; (void)timeout_ms;
     sync_calls++;
     if (sync_off) return false;
@@ -20,5 +20,6 @@ static bool sync_transact(void *ctx, const req_t *rq, reply_t *rp, uint32_t time
     case REQ_EJECT:     mech_server_eject(sync_srv, rp); break;
     }
     rp->block = rq->block;
+    rp->seq = rq->seq;
     return true;
 }

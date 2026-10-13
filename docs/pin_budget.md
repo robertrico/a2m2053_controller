@@ -47,7 +47,7 @@ No SD card: the media is the floppy.
 | GP19 | WRTDATA (GCR) | out | U2 |
 | GP20 | mechanism RD | in | U1 |
 | GP21 | U2 /OE (mechanism outputs) | out | none (10k pull-up to 3.3V) |
-| GP22 | eject button | in | none (switch to GND, internal pull-up) |
+| GP22 | eject button | in | none (switch to GND, internal pull-up). **Open:** the U5 table below puts it on U5; settle it when CN105-108 is wired. Firmware ignores it until `ejbtn on` (M7). |
 | GP26 | LED | out | transistor, or a U3 spare channel |
 | GP27 | spare | - | |
 | GP28 | spare | - | |

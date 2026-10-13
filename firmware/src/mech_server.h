@@ -29,6 +29,8 @@
 #define SRV_FORMAT_TS_WAIT_MS     (SRV_FORMAT_TS_TIMEOUT_MS + SRV_REQ_TIMEOUT_MS + 6000)
 #define SRV_VERIFY_REVS       2       // verify reads after a write or format (ROM verify: one pass)
 #define SRV_BUTTON_DEBOUNCE_MS 20     // eject button held this long latches an eject (ROM: BLATCH)
+#define SRV_MOTOR_OFF_REPEAT_MS 1000  // idle: say motor off again (a mechanism powered after us may have
+                                      // latched it on; the first one went out before its +5 was up)
 // Cap on one TX stream: nominal (16.34 us per byte) + 10 % + 1 ms.
 #define SRV_TX_CAP_US(len)    ((uint64_t)(len) * 16340u / 1000u * 11u / 10u + 1000u)
 
@@ -81,6 +83,7 @@ typedef struct {
     void *button_ctx;
     uint64_t button_t;                   // when the current press started; 0 = released
     bool eject_latched;
+    uint64_t motor_off_us;               // last idle motor-off command
     uint32_t ejects;
     uint16_t batch[SRV_BATCH];
 } mech_server_t;

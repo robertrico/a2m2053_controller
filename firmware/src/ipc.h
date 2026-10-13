@@ -19,12 +19,14 @@
 
 typedef enum { REQ_READ, REQ_WRITE, REQ_FORMAT_TS, REQ_MEDIA, REQ_EJECT } req_op_t;
 typedef struct {
+    uint32_t seq;                   // set by core 0; the reply echoes it (stale replies are dropped)
     req_op_t op;
     uint16_t block;                 // REQ_READ / REQ_WRITE; REQ_FORMAT_TS: a tag the reply echoes
     uint8_t cyl, side;              // REQ_FORMAT_TS
     uint8_t data[GCR_SECTOR_LEN];   // REQ_WRITE: 12 tag + 512 data
 } req_t;
 typedef struct {
+    uint32_t seq;
     uint16_t block;
     uint8_t status;
     uint8_t soft;

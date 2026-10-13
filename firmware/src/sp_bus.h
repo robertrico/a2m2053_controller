@@ -73,6 +73,7 @@ typedef struct {
     const sp_hal_t *hal;
     sp_dev_t *dev;
     bool enabled, in_reset;
+    volatile bool reset_latch;               // a reset seen while core 0 was busy elsewhere
     uint64_t reread_t;
     uint64_t t_low_last;                     // last time receive() saw /WRREQ low
     bool tx_valid;
@@ -95,3 +96,6 @@ void sp_bus_enable(sp_bus_t *b, bool on);
 // transaction (bounded by the timeouts above).
 void sp_bus_poll(sp_bus_t *b);
 bool sp_bus_log_pop(sp_bus_t *b, sp_log_t *e);
+// A bus reset (PH0+PH2) was seen while sp_bus was not polling (core 0 waiting on core 1, a
+// console command). Applied at the next sp_bus_poll, or instead of the pending reply.
+void sp_bus_note_reset(sp_bus_t *b);

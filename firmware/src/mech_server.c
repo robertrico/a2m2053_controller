@@ -156,8 +156,8 @@ void mech_server_write(mech_server_t *s, uint16_t block, const uint8_t data[GCR_
         r->status = ST_NODISK;
         return;
     }
-    if (!gcr_block_to_tss(block, &track, &side, &sector)) { r->status = ST_BADBLK; return; }
     if (!mech_status(s->bus, &s->ms, MREG_WRPROT)) { r->status = ST_WRPROT; return; }   // WRPROT low = protected
+    if (!gcr_block_to_tss(block, &track, &side, &sector)) { r->status = ST_BADBLK; return; }   // ROM: after Se5f0
     wtrack_data_field(s->wbuf, sector, data);          // encode before the search, as the ROM
     uint64_t t_req = now_us(s);
     s->soft = 0;
@@ -301,6 +301,10 @@ void mech_server_idle(mech_server_t *s) {
         return;
     }
     if (s->motor_on && now - s->last_us > (uint64_t)SRV_IDLE_OFF_MS * 1000u) motor_off(s);
+    else if (!s->motor_on && now - s->motor_off_us > (uint64_t)SRV_MOTOR_OFF_REPEAT_MS * 1000u) {
+        mech_command(s->bus, MCMD_MOTOR_OFF);
+        s->motor_off_us = now;
+    }
 }
 
 void mech_server_start(mech_server_t *s) {

@@ -14,12 +14,18 @@ static fstore_t F;
 static sp_store_t FS;
 static double longest_wait_us;
 
-static bool timed_transact(void *ctx, const req_t *rq, reply_t *rp, uint32_t to) {
+static bool timed_transact(void *ctx, req_t *rq, reply_t *rp, uint32_t to) {
     uint64_t t0 = D.now_us;
     bool ok = sync_transact(ctx, rq, rp, to);
     double dt = (double)(D.now_us - t0);
     if (dt > longest_wait_us) longest_wait_us = dt;
-    advance(dt);
+    // Core 0 waits while core 1 works, polling for a bus reset as request_ex() does: on a reset it
+    // stops waiting (abort_on_reset); core 1's late reply would be dropped by its sequence number.
+    card_reset_seen = false;
+    for (double done = 0; done < dt; done += 100) {
+        advance(dt - done < 100 ? dt - done : 100);
+        if (card_reset_seen) { sp_bus_note_reset(&bus); return false; }
+    }
     return ok;
 }
 
@@ -128,5 +134,19 @@ int main(void) {
     op_t *ej = read_reply();
     run_script(5e6);
     CHECK(ej->ok && ej->h.stat == 0 && !D.disk_in && D.ejects == 1);
+    // 6. The card resets during a long seek (Ctrl-Reset): the 90 ms reset is over before core 1
+    // answers. No stale reply may go out; the next INIT must get ID and $40 again.
+    floppy_reset();
+    op(OP_RESET);
+    send_cmd(1, SP_INIT, 2, 0, 0, 1);
+    read_reply();
+    op_t *cut = send_cmd(1, SP_READBLOCK, 3, 0x3F, 0x06, 3000);   // track 79: 179 ms
+    op(OP_RESET);
+    op_t *i2 = send_cmd(1, SP_INIT, 2, 0, 0, 1);
+    op_t *i2_r = read_reply();
+    run_script(5e6);
+    CHECK(cut->ok && i2->ok && i2->attempts == 1);
+    CHECK(i2_r->ok && i2_r->h.stat == SP_E_LAST && dev.id == 1);
+    CHECK(proto_err == 0 && bus.st.replies == 2);    // INIT, INIT: the READ reply never went out
     TEST_END();
 }

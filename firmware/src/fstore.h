@@ -8,7 +8,7 @@
 
 // Send one request to core 1 and wait up to timeout_ms for its reply. False = no reply
 // (server off or wedged).
-typedef bool (*fs_transact_t)(void *ctx, const req_t *rq, reply_t *rp, uint32_t timeout_ms);
+typedef bool (*fs_transact_t)(void *ctx, req_t *rq, reply_t *rp, uint32_t timeout_ms);
 
 typedef struct {
     fs_transact_t transact;
@@ -20,5 +20,6 @@ typedef struct {
 
 void fstore_init(fstore_t *f, fs_transact_t transact, void *ctx);
 sp_store_t fstore_store(fstore_t *f);
-// ST_* reply status -> SmartPort code. Reads report $67 for a recal or wrong-cylinder seek.
+// ST_* reply status -> SmartPort code. Reads report $67 (ROM $E7) after data or address errors or a
+// wrong-cylinder seek: the ROM's Z57 bits. A recal alone or an overrun (ours) stays $00.
 uint8_t fstore_code(uint8_t st, uint8_t soft, bool is_read);

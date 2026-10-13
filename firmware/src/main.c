@@ -55,9 +55,14 @@ static bool hw_tx_busy(void *c)  { (void)c; return flux_tx_busy(); }
 static void hw_tx_abort(void *c) { (void)c; flux_tx_abort(); }
 static const flux_tx_t hw_tx = { hw_tx_load, hw_tx_fire, hw_tx_busy, hw_tx_abort, NULL };
 
+// Eject button (GP22): off until `ejbtn on`; how CN105-108 reaches GP22 is not settled
+// (pin_budget.md: direct, or through U5), and a floating input must not eject disks.
+static atomic_bool ejbtn;
+static bool eject_button(void *ctx) { return atomic_load(&ejbtn) && hw_eject_pressed(ctx); }
+
 static void core1_main(void) {
     mech_server_init(&srv, hw_mech_bus(), &hw_src, &hw_tx);
-    mech_server_set_button(&srv, hw_eject_pressed, NULL);
+    mech_server_set_button(&srv, eject_button, NULL);
     bool led = false;
     for (;;) {
         if (!atomic_load(&srv_run)) {
@@ -69,6 +74,10 @@ static void core1_main(void) {
         static req_t rq;
         if (ipc_req_pop(&ipc, &rq)) {
             static reply_t rp;
+            if (rq.op == REQ_READ || rq.op == REQ_WRITE || rq.op == REQ_FORMAT_TS) {
+                hw_led(true);                           // "in use" from the start, not after
+                led = true;
+            }
             switch (rq.op) {
             case REQ_READ:      mech_server_read(&srv, rq.block, &rp); break;
             case REQ_WRITE:     mech_server_write(&srv, rq.block, rq.data, &rp); break;
@@ -76,7 +85,9 @@ static void core1_main(void) {
             case REQ_MEDIA:     mech_server_media(&srv, &rp); break;
             case REQ_EJECT:     mech_server_eject(&srv, &rp); break;
             }
-            rp.block = rq.block;                        // core 0 matches replies by this tag
+            rp.block = rq.block;
+            rp.seq = rq.seq;                            // core 0 matches replies by this
+            srv.button_t = 0;                           // a press must span idle samples only
             while (!ipc_reply_push(&ipc, &rp)) tight_loop_contents();
         } else {
             mech_server_idle(&srv);
@@ -90,6 +101,7 @@ static bool server_set(bool on) {
         if (atomic_load(&srv_run)) return true;         // already on: nothing reset
         if (atomic_load(&srv_running)) { puts("ERR server still stopping"); return false; }
         ipc_init(&ipc);                 // core 1 is stopped (srv_running false)
+        srv_wedged = false;             // fresh queues: nothing stale left
         srv.ms.track_known = false;     // core 1 re-homes; core 0's record is stale
         hw_mech_outputs_enable(true);
         hw_mech_enbl(true);
@@ -120,25 +132,39 @@ static bool server_set(bool on) {
     return true;
 }
 
-static bool request(const req_t *rq, reply_t *r, uint32_t timeout_ms) {
+// One request to core 1. The reply must carry this request's sequence number: a reply that
+// arrives after its request timed out (or was abandoned) is dropped here. A SmartPort bus reset
+// seen while waiting is latched for sp_bus (the card's reset is 80 ms; a seek or a FORMAT is
+// longer). With abort_on_reset (SmartPort calls) the wait ends at once, so the bus is released
+// in time for the card's single INIT try, as a real drive does (its reset is hardware).
+static uint32_t req_seq;
+static bool request_ex(req_t *rq, reply_t *r, uint32_t timeout_ms, bool abort_on_reset) {
+    rq->seq = ++req_seq;
     if (!ipc_req_push(&ipc, rq)) return false;
     absolute_time_t until = make_timeout_time_ms(timeout_ms);
     for (;;) {
         if (ipc_reply_pop(&ipc, r)) {
-            if (r->block == rq->block) return true;
-            continue;                   // stale reply from an earlier timed-out request
+            if (r->seq == rq->seq) return true;
+            continue;                   // late reply to an earlier timed-out request
+        }
+        if (((sp_hw_pins() >> PIN_PH0) & 0xFu) == SP_PH_RESET) {
+            sp_bus_note_reset(&spbus);
+            if (abort_on_reset) return false;
         }
         if (time_reached(until)) { srv_wedged = true; return false; }
         tight_loop_contents();
     }
 }
 
-// Floppy store -> core 1. No server (off, stopping or wedged): no reply, the store reports
-// offline / $27.
-static bool fs_transact(void *ctx, const req_t *rq, reply_t *rp, uint32_t timeout_ms) {
+static bool request(req_t *rq, reply_t *r, uint32_t timeout_ms) { return request_ex(rq, r, timeout_ms, false); }
+
+// Floppy store -> core 1. No server: no reply, the store reports offline / $27. A timeout
+// does not lock the store out (sequence numbers drop the late reply); the console M5 paths
+// still refuse while srv_wedged.
+static bool fs_transact(void *ctx, req_t *rq, reply_t *rp, uint32_t timeout_ms) {
     (void)ctx;
-    if (!atomic_load(&srv_run) || !atomic_load(&srv_running) || srv_wedged) return false;
-    return request(rq, rp, timeout_ms);
+    if (!atomic_load(&srv_run) || !atomic_load(&srv_running)) return false;
+    return request_ex(rq, rp, timeout_ms, true);
 }
 
 static void sp_set_disk(bool floppy) {
@@ -478,6 +504,10 @@ static void execute(const con_cmd_t *c) {
     case CON_IMGCOPY:
         if (!atomic_load(&srv_run)) { puts("ERR server off"); return; }
         do_imgcopy();
+        return;
+    case CON_EJBTN:
+        atomic_store(&ejbtn, c->arg[0] != 0);
+        puts("OK");
         return;
     case CON_SPLOG:
         splog = c->arg[0];

@@ -72,6 +72,7 @@ static bool ack_pin = true, enbus;
 static int proto_err;                   // device did something the card was not expecting
 static double ack_fall_t = -1;          // last time the ACK line went low
 static double max_ack_after_underrun;   // worst underrun -> ACK low seen by the card
+static bool card_reset_seen;            // the card started a bus reset (test_sp_floppy latch)
 
 // WR edges (absolute times), appended per packet
 #define MAX_EDGES 200000
@@ -185,7 +186,7 @@ static void sim_update(double now) {
             op_finish(true);
             break;
         case OP_RESET:                  // reset_smartport_bus: PH0+PH2 80 ms, all off 10 ms
-            if (sub == 0) { phases = SP_IN_PH0 | SP_IN_PH2; sub = 1; ev += 80000; break; }
+            if (sub == 0) { phases = SP_IN_PH0 | SP_IN_PH2; card_reset_seen = true; sub = 1; ev += 80000; break; }
             if (sub == 1) { phases = 0; sub = 2; ev += 10000; break; }
             phases = SP_IN_PH1 | SP_IN_PH3;
             op_finish(true);

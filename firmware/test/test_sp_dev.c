@@ -17,10 +17,11 @@ static bool lastone_cb(void *ctx) { (void)ctx; return lastone; }
 static sp_media_t f_media_v = SP_MEDIA_OK;
 static uint8_t f_read_v, f_write_v, f_format_v;
 static int f_reads, f_ejects;
-static uint8_t f_read(void *c, uint32_t b, uint8_t *o) { (void)c; (void)b; f_reads++; memset(o, 0x5A, 512); return f_read_v; }
+static uint8_t f_read(void *c, uint32_t b, uint8_t *o) { (void)c; f_reads++; if (b >= 1600) return SP_E_BADBLOCK; memset(o, 0x5A, 512); return f_read_v; }
 static uint8_t f_write(void *c, uint32_t b, const uint8_t *i) { (void)c; (void)b; (void)i; return f_write_v; }
 static uint8_t f_format(void *c) { (void)c; return f_format_v; }
-static uint8_t f_eject(void *c) { (void)c; f_ejects++; return 0; }
+static uint8_t f_eject_v;
+static uint8_t f_eject(void *c) { (void)c; f_ejects++; return f_eject_v; }
 static sp_media_t f_media(void *c) { (void)c; return f_media_v; }
 static void f_unistat(void *c, uint8_t o[8]) { (void)c; memset(o, 0, 8); o[1] = 0x11; o[2] = 3; }
 
@@ -172,11 +173,11 @@ int main(void) {
         f_read_v = SP_E_OFFLINE;
         sp_dev_execute(&d2, 1, rb, sizeof rb, NULL, 0, &r);
         CHECK(r.stat == SP_E_OFFLINE && r.len == 0);
-        rb[4] = 0x40; rb[5] = 0x06;                                           // 1600: before the store
-        f_read_v = SP_E_OK;
+        rb[4] = 0x40; rb[5] = 0x06;                                           // 1600: the store decides
+        f_read_v = SP_E_OK;                                                   // (media first, as ROM Le8b2)
         int calls = f_reads;
         sp_dev_execute(&d2, 1, rb, sizeof rb, NULL, 0, &r);
-        CHECK(r.stat == SP_E_BADBLOCK && f_reads == calls);
+        CHECK(r.stat == SP_E_BADBLOCK && f_reads == calls + 1 && r.len == 0);
         uint8_t wb[SP_CMD_LEN] = { SP_WRITEBLOCK, 3, 0, 0, 5 };
         uint8_t blk[512] = {0};
         f_write_v = SP_E_NOWRITE;
@@ -189,6 +190,9 @@ int main(void) {
         uint8_t ej[SP_CMD_LEN] = { SP_CONTROL, 3, 0, 0, 0x04 };
         sp_dev_execute(&d2, 1, ej, sizeof ej, blk, 2, &r);
         CHECK(r.stat == 0 && f_ejects == 1);
+        f_eject_v = SP_E_IOERROR;                                             // ROM Se51b failure
+        sp_dev_execute(&d2, 1, ej, sizeof ej, blk, 2, &r);
+        CHECK(r.stat == SP_E_IOERROR && f_ejects == 2);
     }
 
     // short command packet is padded with zeros

@@ -39,17 +39,24 @@ static void release(sp_bus_t *b) {
     H->set_ack(H->ctx, true);
 }
 
-// Called on seeing the reset state (PH0+PH2); sp_bus_poll ignores it until it ends.
-static void bus_reset(sp_bus_t *b) {
-    b->in_reset = true;
-    release(b);
+static void reset_state(sp_bus_t *b) {
+    b->reset_latch = false;
     sp_dev_bus_reset(b->dev);
     b->tx_valid = false;
     b->cmd_len = 0;
     b->st.resets++;
     log_push(b, SP_LOG_RESET, 0, INT32_MIN);
+}
+
+// Called on seeing the reset state (PH0+PH2); sp_bus_poll ignores it until it ends.
+static void bus_reset(sp_bus_t *b) {
+    b->in_reset = true;
+    release(b);
+    reset_state(b);
     H->rx_arm(H->ctx);
 }
+
+void sp_bus_note_reset(sp_bus_t *b) { b->reset_latch = true; }
 
 void sp_bus_init(sp_bus_t *b, const sp_hal_t *hal, sp_dev_t *dev) {
     memset(b, 0, sizeof *b);
@@ -260,12 +267,19 @@ static void transaction(sp_bus_t *b) {
     sp_dev_execute(b->dev, dest, b->cmd, b->cmd_len, b->data, dlen, &b->reply);
     b->st.exec_ms_last = (uint32_t)((NOW() - t_exec) / 1000u);
     if (b->st.exec_ms_last > b->st.exec_ms_max) b->st.exec_ms_max = b->st.exec_ms_last;
+    if (b->reset_latch) {                       // the card reset while we worked: no stale reply
+        release(b);
+        reset_state(b);
+        H->rx_arm(H->ctx);
+        return;
+    }
     b->hdr.dest = dest;
     send_reply(b, true);
     log_push(b, SP_LOG_CMD, 0, ack_us);
 }
 
 void sp_bus_poll(sp_bus_t *b) {
+    if (b->reset_latch) reset_state(b);         // seen while busy elsewhere: drop ID and old reply
     uint32_t in = INPUTS();
     if (is_reset(in)) {
         if (!b->in_reset) bus_reset(b);
