@@ -28,6 +28,7 @@
 // past it by about SRV_REQ_TIMEOUT_MS (seek, tx cap, verify fill) plus slack.
 #define SRV_FORMAT_TS_WAIT_MS     (SRV_FORMAT_TS_TIMEOUT_MS + SRV_REQ_TIMEOUT_MS + 6000)
 #define SRV_VERIFY_REVS       2       // verify reads after a write or format (ROM verify: one pass)
+#define SRV_BUTTON_DEBOUNCE_MS 20     // eject button held this long latches an eject (ROM: BLATCH)
 // Cap on one TX stream: nominal (16.34 us per byte) + 10 % + 1 ms.
 #define SRV_TX_CAP_US(len)    ((uint64_t)(len) * 16340u / 1000u * 11u / 10u + 1000u)
 
@@ -76,6 +77,11 @@ typedef struct {
     uint8_t wbuf[WT_DATA_FIELD_LEN];
     uint8_t timg[WT_TRACK_MAX];
     srv_stats_t stats;
+    bool (*button)(void *ctx);           // eject button pressed? NULL = none (M7)
+    void *button_ctx;
+    uint64_t button_t;                   // when the current press started; 0 = released
+    bool eject_latched;
+    uint32_t ejects;
     uint16_t batch[SRV_BATCH];
 } mech_server_t;
 
@@ -83,6 +89,12 @@ void mech_server_init(mech_server_t *s, const mech_bus_t *bus, const flux_src_t 
 void mech_server_read(mech_server_t *s, uint16_t block, reply_t *r);
 void mech_server_write(mech_server_t *s, uint16_t block, const uint8_t data[GCR_SECTOR_LEN], reply_t *r);
 void mech_server_format_ts(mech_server_t *s, int cyl, int side, reply_t *r);
+// REQ_MEDIA: ST_OK, ST_NODISK or ST_WRPROT (no disk wins, as ROM Se5f0).
+void mech_server_media(mech_server_t *s, reply_t *r);
+// REQ_EJECT: motor off, eject, buffer dropped. ST_OK (also with no disk) or ST_IOERR.
+void mech_server_eject(mech_server_t *s, reply_t *r);
+void mech_server_set_button(mech_server_t *s, bool (*pressed)(void *ctx), void *ctx);
+// Between requests: motor off after SRV_IDLE_OFF_MS, eject button (debounced, latched).
 void mech_server_idle(mech_server_t *s);
 void mech_server_start(mech_server_t *s);   // stopped -> running: motor off, buffer dropped
 void mech_server_stop(mech_server_t *s);

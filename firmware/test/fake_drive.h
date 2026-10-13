@@ -28,6 +28,7 @@ typedef struct {
     uint8_t addr;
     int side;                     // last head selected via RDDATA0/1
     int step_strobes, starts;     // counters for the tests
+    int ejects;
     uint32_t step_cost_us;        // extra time each STEP strobe takes (slow mechanism)
     bool ready_stuck;             // READY reads not-ready once a step happened since motor-on
     int steps_since_motor;
@@ -85,6 +86,7 @@ static void fd_set_lstrb(void *c, bool high) {
         break;
     case MCMD_MOTOR_ON:  d->motor = true; d->steps_since_motor = 0; break;
     case MCMD_MOTOR_OFF: d->motor = false; break;
+    case MCMD_EJECT:     if (!d->motor) { d->disk_in = false; d->ejects++; } break;
     default: break;
     }
 }

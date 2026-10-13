@@ -260,8 +260,47 @@ void mech_server_read(mech_server_t *s, uint16_t block, reply_t *r) {
     }
 }
 
+void mech_server_media(mech_server_t *s, reply_t *r) {
+    memset(r, 0, sizeof *r);
+    if (mech_status(s->bus, &s->ms, MREG_CSTIN)) {     // CSTIN high = no disk
+        trackbuf_invalidate(&s->tb);
+        r->status = ST_NODISK;
+    } else if (!mech_status(s->bus, &s->ms, MREG_WRPROT)) {
+        r->status = ST_WRPROT;                         // WRPROT low = protected
+    } else {
+        r->status = ST_OK;
+    }
+}
+
+void mech_server_eject(mech_server_t *s, reply_t *r) {
+    memset(r, 0, sizeof *r);
+    motor_off(s);                                      // mech_eject also waits for the spin-down
+    r->status = mech_eject(s->bus, &s->ms) == MECH_OK ? ST_OK : ST_IOERR;
+    trackbuf_invalidate(&s->tb);
+    s->ejects++;
+    s->last_us = now_us(s);
+}
+
+void mech_server_set_button(mech_server_t *s, bool (*pressed)(void *ctx), void *ctx) {
+    s->button = pressed;
+    s->button_ctx = ctx;
+}
+
 void mech_server_idle(mech_server_t *s) {
-    if (s->motor_on && now_us(s) - s->last_us > (uint64_t)SRV_IDLE_OFF_MS * 1000u) motor_off(s);
+    uint64_t now = now_us(s);
+    if (s->button) {
+        if (!s->button(s->button_ctx)) s->button_t = 0;
+        else if (!s->button_t) s->button_t = now ? now : 1;
+        else if (now - s->button_t >= (uint64_t)SRV_BUTTON_DEBOUNCE_MS * 1000u) s->eject_latched = true;
+    }
+    if (s->eject_latched && (!s->button || !s->button(s->button_ctx))) {   // eject on release
+        s->eject_latched = false;
+        s->button_t = 0;
+        reply_t r;
+        mech_server_eject(s, &r);
+        return;
+    }
+    if (s->motor_on && now - s->last_us > (uint64_t)SRV_IDLE_OFF_MS * 1000u) motor_off(s);
 }
 
 void mech_server_start(mech_server_t *s) {

@@ -425,7 +425,61 @@ static void test_write_on_board_formatted_track(void) {
     for (int i = 0; i < GCR_SECTOR_LEN; i++) CHECK(r.data[i] == 0);
 }
 
+static void test_media(void) {
+    setup();
+    reply_t r;
+    mech_server_media(&SRV, &r);
+    CHECK(r.status == ST_OK);
+    D.wprot = true;
+    mech_server_media(&SRV, &r);
+    CHECK(r.status == ST_WRPROT);
+    D.disk_in = false;                               // no disk wins over the tab
+    mech_server_media(&SRV, &r);
+    CHECK(r.status == ST_NODISK && D.step_strobes == 0 && !D.motor);
+}
+
+static void test_eject(void) {
+    setup();
+    reply_t r;
+    mech_server_read(&SRV, 30, &r);                  // motor on, buffer filled
+    CHECK(r.status == ST_OK && D.motor);
+    mech_server_eject(&SRV, &r);
+    CHECK(r.status == ST_OK && !D.disk_in && !D.motor && D.ejects == 1);
+    mech_server_read(&SRV, 30, &r);                  // buffer dropped: no stale data
+    CHECK(r.status == ST_NODISK);
+    mech_server_eject(&SRV, &r);                     // nothing in: still OK, no eject strobe
+    CHECK(r.status == ST_OK && D.ejects == 1);
+}
+
+static bool btn;
+static bool btn_cb(void *c) { (void)c; return btn; }
+
+static void test_eject_button(void) {
+    setup();
+    mech_server_set_button(&SRV, btn_cb, NULL);
+    btn = true;                                      // a 5 ms bounce: ignored
+    mech_server_idle(&SRV);
+    D.now_us += 5000;
+    mech_server_idle(&SRV);
+    btn = false;
+    mech_server_idle(&SRV);
+    CHECK(D.disk_in && D.ejects == 0);
+    btn = true;                                      // held 30 ms, then released: eject
+    mech_server_idle(&SRV);
+    D.now_us += 30000;
+    mech_server_idle(&SRV);
+    CHECK(D.disk_in);                                // not while held
+    btn = false;
+    mech_server_idle(&SRV);
+    CHECK(!D.disk_in && D.ejects == 1);
+    mech_server_idle(&SRV);
+    CHECK(D.ejects == 1);                            // latch cleared
+}
+
 int main(void) {
+    test_media();
+    test_eject();
+    test_eject_button();
     test_miss_then_hit();
     test_no_disk();
     test_bad_block();

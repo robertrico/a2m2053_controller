@@ -17,7 +17,7 @@
 #define SOFT_BADADDR  0x08
 #define SOFT_OVERRUN  0x10
 
-typedef enum { REQ_READ, REQ_WRITE, REQ_FORMAT_TS } req_op_t;
+typedef enum { REQ_READ, REQ_WRITE, REQ_FORMAT_TS, REQ_MEDIA, REQ_EJECT } req_op_t;
 typedef struct {
     req_op_t op;
     uint16_t block;                 // REQ_READ / REQ_WRITE; REQ_FORMAT_TS: a tag the reply echoes
