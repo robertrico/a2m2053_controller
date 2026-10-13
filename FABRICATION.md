@@ -9,14 +9,23 @@ the perfboard prototype so they aren't rediscovered at layout time.
 KiCad project: `hardware/kicad/a2m2053.kicad_pro`. The outline on Edge.Cuts
 is drawn by `tools/kicad_outline.py` (KiCad IPC API, run against the open
 PCB editor). It matches the original IF-83 board (photo of the solder side,
-mirrored for the component-side view):
+mirrored for the component-side view).
+
+**The outline is a hard constraint.** A 3D-printed copy was fitted against
+the IF-83 on 2026-10-13 and both mounting holes line up. The PCB must fit
+within this geometry; parts and copper go inside it, never the other way
+round.
+
 
 - Body 100 mm wide, 105 mm from the bottom edge to the top of the 94 mm
   section.
-- 94 mm section (calipers) at the top, centered (3 mm step on each side), 10 mm deep
-  (read off the photo, not measured). Each step is a wide, shallow cove
-  as on the IF-83: a quarter-ellipse 2.5 mm wide and 1.8 mm tall, then a
-  0.5 mm radius onto the 100 mm edge.
+- 94 mm section (calipers) at the top, centered (3 mm step on each side).
+  The steps are not level: 8 mm deep on the left, 13 mm on the right
+  (component-side view, fitted with a 3D-printed outline). Each step is a
+  wide, shallow cove as on the IF-83: a quarter-ellipse 2.5 mm wide and
+  1.8 mm tall, then a 0.5 mm radius onto the 100 mm edge. The steps are
+  cosmetic: no chassis hardware sits there. The mounting holes are what
+  must line up.
 - Tab 15.5 mm wide (calipers), 5 mm tall, above the 94 mm top edge. Its
   left edge is 22 mm from the left edge of the 94 mm section, in the
   component-side view.
@@ -24,8 +33,9 @@ mirrored for the component-side view):
   other corners square.
 - Mounting holes: M3, 3.2 mm diameter (the IF-83's measure about 3.35 mm
   with calipers), drawn as plain holes on Edge.Cuts.
-  Hole 1: right side (component-side view), hole edge 2 mm from the board
-  edge, center 10 mm below the step.
+  Hole 1: right side (component-side view), hole edge 1.5 mm from the
+  board edge, center 17 mm below the 94 mm top edge. Both holes checked
+  against the IF-83 with a 3D-printed outline.
   Hole 2: right of the tab, center 40 mm from the left edge of the
   94 mm section, hole edge 3 mm below the 94 mm top edge.
 - DB-19 screw holes and any other mounting holes: not drawn yet.
