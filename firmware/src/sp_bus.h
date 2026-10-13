@@ -72,6 +72,7 @@ typedef struct {
     sp_dev_t *dev;
     bool enabled, in_reset;
     uint64_t reread_t;
+    uint64_t t_low_last;                     // last time receive() saw /WRREQ low
     bool tx_valid;
     size_t tx_len;
     sp_hdr_t hdr;

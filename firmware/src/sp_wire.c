@@ -1,4 +1,5 @@
 #include "sp_wire.h"
+#include "sp_ram.h"
 #include <string.h>
 
 // Drive ROM reply preamble (liron.asm spb_send_packet): FF written first, then spb_sync_pattern.
@@ -6,11 +7,11 @@ static const uint8_t preamble[SP_PREAMBLE_LEN] = {
     0xFF, 0x3F, 0xCF, 0xF3, 0xFC, 0xFF, 0x3F, 0xCF, 0xF3, 0xFC, 0xFF, SP_PBEGIN,
 };
 
-static size_t expected_len(uint8_t odd, uint8_t grp) {
+static size_t SP_RAM(expected_len)(uint8_t odd, uint8_t grp) {
     return SP_HDR_LEN + (odd ? 1u + odd : 0u) + (size_t)grp * 8u + 3u;
 }
 
-static bool counts_ok(uint8_t odd, uint8_t grp) {
+static bool SP_RAM(counts_ok)(uint8_t odd, uint8_t grp) {
     return odd <= 6 && (size_t)odd + (size_t)grp * 7u <= SP_DATA_MAX;
 }
 
@@ -21,7 +22,7 @@ void sp_rx_init(sp_rx_t *rx) {
     rx->st = SP_RX_MORE;
 }
 
-static void rx_byte(sp_rx_t *rx, uint8_t b) {
+static void SP_RAM(rx_byte)(sp_rx_t *rx, uint8_t b) {
     if (!rx->framed) {
         if (b == SP_PBEGIN) rx->framed = true;
         return;
@@ -35,7 +36,7 @@ static void rx_byte(sp_rx_t *rx, uint8_t b) {
     if (rx->expect && rx->n == rx->expect) rx->st = SP_RX_DONE;
 }
 
-sp_rx_status_t sp_rx_chunk(sp_rx_t *rx, uint8_t chunk) {
+sp_rx_status_t SP_RAM(sp_rx_chunk)(sp_rx_t *rx, uint8_t chunk) {
     for (int i = 7; i >= 0 && rx->st == SP_RX_MORE; i--) {
         int b = sp_framer_bit(&rx->fr, (chunk >> i) & 1u);
         if (b >= 0) rx_byte(rx, (uint8_t)b);
@@ -43,7 +44,7 @@ sp_rx_status_t sp_rx_chunk(sp_rx_t *rx, uint8_t chunk) {
     return rx->st;
 }
 
-sp_err_t sp_decode(const uint8_t *wire, size_t n, sp_hdr_t *h, uint8_t *data) {
+sp_err_t SP_RAM(sp_decode)(const uint8_t *wire, size_t n, sp_hdr_t *h, uint8_t *data) {
     if (n < SP_HDR_LEN + 3) return SP_ERR_SHORT;
     uint8_t odd = wire[5] & 0x7F, grp = wire[6] & 0x7F;
     if (!counts_ok(odd, grp)) return SP_ERR_COUNT;

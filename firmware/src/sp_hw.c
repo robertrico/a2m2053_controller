@@ -1,4 +1,5 @@
 #include "sp_hw.h"
+#include "sp_ram.h"
 #include "pins.h"
 #include "hardware/clocks.h"
 #include "hardware/dma.h"
@@ -27,9 +28,9 @@ static uint rx_off, tx_off;
 static int rx_dma, tx_dma;
 static pio_sm_config rx_cfg, tx_cfg;
 
-static uint32_t h_inputs(void *c) { (void)c; return (sio_hw->gpio_in >> PIN_PH0) & 0x1Fu; }
-static void h_set_ack(void *c, bool high) { (void)c; gpio_put(PIN_ACK, high); }
-static void h_set_enbus(void *c, bool on) { (void)c; gpio_put(PIN_HOST_RD_OE, !on); }
+static uint32_t SP_RAM(h_inputs)(void *c) { (void)c; return (sio_hw->gpio_in >> PIN_PH0) & 0x1Fu; }
+static void SP_RAM(h_set_ack)(void *c, bool high) { (void)c; gpio_put(PIN_ACK, high); }
+static void SP_RAM(h_set_enbus)(void *c, bool on) { (void)c; gpio_put(PIN_HOST_RD_OE, !on); }
 
 static void h_rx_arm(void *c) {
     (void)c;
@@ -46,7 +47,7 @@ static void h_rx_arm(void *c) {
     pio_sm_set_enabled(SP_PIO, RX_SM, true);
 }
 
-static size_t h_rx_count(void *c) { (void)c; return RX_BUF_LEN - DMA_COUNT(rx_dma); }
+static size_t SP_RAM(h_rx_count)(void *c) { (void)c; return RX_BUF_LEN - DMA_COUNT(rx_dma); }
 
 static void h_tx_start(void *c, const uint8_t *buf, size_t len) {
     (void)c;
@@ -71,10 +72,10 @@ static bool h_tx_busy(void *c) {
     return on && pio_sm_get_pc(SP_PIO, TX_SM) != tx_off + fm_tx_offset_park;
 }
 
-static uint64_t h_now(void *c) { (void)c; return time_us_64(); }
+static uint64_t SP_RAM(h_now)(void *c) { (void)c; return time_us_64(); }
 static void h_delay(void *c, uint32_t us) { (void)c; busy_wait_us_32(us); }
-static uint32_t h_irq_off(void *c) { (void)c; return save_and_disable_interrupts(); }
-static void h_irq_restore(void *c, uint32_t s) { (void)c; restore_interrupts(s); }
+static uint32_t SP_RAM(h_irq_off)(void *c) { (void)c; return save_and_disable_interrupts(); }
+static void SP_RAM(h_irq_restore)(void *c, uint32_t s) { (void)c; restore_interrupts(s); }
 
 static const sp_hal_t hal = {
     h_inputs, h_set_ack, h_set_enbus, h_rx_arm, h_rx_count, rx_buf, RX_BUF_LEN,

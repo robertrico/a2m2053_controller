@@ -1,4 +1,5 @@
 #include "sp_dev.h"
+#include "sp_ram.h"
 #include <string.h>
 
 // liron.asm expected_param_count_tab, low 7 bits, commands $00-$09.
@@ -24,7 +25,7 @@ void sp_dev_bus_reset(sp_dev_t *d) {
     d->passthrough = false;
 }
 
-bool sp_dev_accepts(const sp_dev_t *d, const sp_hdr_t *h, uint8_t cmd) {
+bool SP_RAM(sp_dev_accepts)(const sp_dev_t *d, const sp_hdr_t *h, uint8_t cmd) {
     if (h->type != SP_TYPE_CMD || h->len == 0) return false;
     return d->id == 0 ? cmd == SP_INIT : h->dest == d->id;
 }

@@ -1,4 +1,5 @@
 #include "sp_bus.h"
+#include "sp_ram.h"
 #include <string.h>
 
 typedef enum { W_OK, W_TIMEOUT, W_RESET } wait_t;
@@ -8,10 +9,10 @@ typedef enum { RX_GOOD, RX_IGNORE, RX_ABORT, RX_RESET } rxres_t;
 #define NOW()    (H->now_us(H->ctx))
 #define INPUTS() (H->inputs(H->ctx))
 
-static bool is_reset(uint32_t in) { return (in & SP_IN_PHASES) == SP_PH_RESET; }
-static bool bus_enabled(uint32_t in) { return (in & (SP_IN_PH1 | SP_IN_PH3)) == (SP_IN_PH1 | SP_IN_PH3); }
+static bool SP_RAM(is_reset)(uint32_t in) { return (in & SP_IN_PHASES) == SP_PH_RESET; }
+static bool SP_RAM(bus_enabled)(uint32_t in) { return (in & (SP_IN_PH1 | SP_IN_PH3)) == (SP_IN_PH1 | SP_IN_PH3); }
 
-static void log_push(sp_bus_t *b, sp_log_kind_t kind, uint8_t stage, int32_t ack_us) {
+static void SP_RAM(log_push)(sp_bus_t *b, sp_log_kind_t kind, uint8_t stage, int32_t ack_us) {
     uint32_t wr = b->log_wr;
     if (wr - b->log_rd >= SP_LOG_LEN) return;                  // full: drop, the console is behind
     sp_log_t *e = &b->log[wr & (SP_LOG_LEN - 1)];
@@ -78,7 +79,7 @@ static wait_t wait_req(sp_bus_t *b, bool high, uint32_t timeout_us) {
 // Collect one packet from the fm_rx buffer. t_up gets the time /WRREQ was seen going high
 // (the host's write underrun), 0 if not seen; *wr_seen says /WRREQ was seen low at all (false:
 // we started after the underrun and cannot tell how late we are).
-static rxres_t receive(sp_bus_t *b, uint8_t want_type, uint64_t *t_up, bool *wr_seen) {
+static rxres_t SP_RAM(receive)(sp_bus_t *b, uint8_t want_type, uint64_t *t_up, bool *wr_seen) {
     sp_rx_init(&b->rx);
     size_t idx = 0;
     uint64_t t0 = NOW();
@@ -89,7 +90,7 @@ static rxres_t receive(sp_bus_t *b, uint8_t want_type, uint64_t *t_up, bool *wr_
     for (;;) {
         uint32_t in = INPUTS();
         if (is_reset(in)) return RX_RESET;
-        if (!(in & SP_IN_WRREQ)) wr_low = true;
+        if (!(in & SP_IN_WRREQ)) { wr_low = true; b->t_low_last = NOW(); }
         else if (wr_low && !*t_up) *t_up = NOW();
         size_t n = H->rx_count(H->ctx);
         while (idx < n && st == SP_RX_MORE) st = sp_rx_chunk(&b->rx, H->rx_buf[idx++]);
@@ -121,7 +122,7 @@ static rxres_t receive(sp_bus_t *b, uint8_t want_type, uint64_t *t_up, bool *wr_
 }
 
 // ROM order: ACK low, then ENBUS on.
-static void ack_low(sp_bus_t *b) {
+static void SP_RAM(ack_low)(sp_bus_t *b) {
     H->set_ack(H->ctx, false);
     H->set_enbus(H->ctx, true);
     b->st.acks++;
@@ -131,8 +132,11 @@ static void ack_low(sp_bus_t *b) {
 // underrun, less than SP_T_ACK_LATE after it. A late ACK would land in the card's retry.
 // Returns false (nothing driven) when late. *ack_us: /WRREQ rise to ACK, negative when ACK came
 // first; INT32_MIN when we started after the underrun.
-static bool ack_if_in_time(sp_bus_t *b, uint64_t t_up, bool wr_seen, int32_t *ack_us) {
+static bool SP_RAM(ack_if_in_time)(sp_bus_t *b, uint64_t t_up, bool wr_seen, int32_t *ack_us) {
     uint32_t in = INPUTS();
+    // /WRREQ rose while we were busy with the last chunk: it rose after the last low sample.
+    // Using that sample makes ack_us an upper bound (and the late check stricter).
+    if (wr_seen && !t_up && (in & SP_IN_WRREQ)) t_up = b->t_low_last;
     if (!(in & SP_IN_PH0) || (t_up && NOW() - t_up > SP_T_ACK_LATE)) {
         b->st.late++;
         log_push(b, SP_LOG_LATE, 0, t_up ? (int32_t)(NOW() - t_up) : INT32_MIN);
