@@ -21,3 +21,6 @@ CLAUDE.local.md
 
 firmware/build/
 firmware/test/build/
+
+# raw scope waveforms (MBs each): local only
+docs/captures/**/*.csv

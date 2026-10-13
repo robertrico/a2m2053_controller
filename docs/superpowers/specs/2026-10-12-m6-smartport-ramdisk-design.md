@@ -1,6 +1,7 @@
 # M6: SmartPort on the RP2350, serving a RAM disk (design)
 
-Status: draft, 2026-10-12. Written without Rico in the loop (he asked for
+Status: implemented and passed on the bench 2026-10-12 (`docs/build_log/m6.md`).
+Written without Rico in the loop (he asked for
 spec, plan and build in one go). Design choices that are his to overrule
 are marked **[choice]**. Rico's brief: functionality, timing, "does it
 work"; the bench is the final test.

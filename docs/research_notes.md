@@ -377,6 +377,9 @@ Used by the M6 spec (sec. 3, 4).
 - Checksum = XOR of the seven header bytes as sent and the decoded data;
   sent as `c | $AA`, `(c >> 1) | $AA`. GRP7CNT and ODDCNT are 7-bit, so a
   packet carries at most 127 x 7 + 6 = 895 data bytes.
+- **[measured] 2026-10-12 (M6):** our board ACKs 5.3-6.7 us after /WRREQ
+  rises, and the card drops REQ 9-23 us after ACK. The card accepted every
+  ACK in that range (no retries in 193 packets).
 
 ## Drive supply requirement [measured] 2026-10-10 (M3)
 

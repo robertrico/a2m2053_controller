@@ -1,8 +1,9 @@
 # Handoff
 
-Last updated: 2026-10-12 (evening). **M6 active, firmware ready for the
-bench** on branch `m6` (not merged, not flashed). Spec, plan, code and host
-tests done without Rico; the bench is the test. J2 breakout arrives
+Last updated: 2026-10-12 (night). **M6 passed on the bench** and is merged
+to main: ProDOS boots from the board's RAM disk through the Liron card,
+saves and loads files, ACK 5.3 us after /WRREQ rises (card window about
+105 us). Next: M7 (floppy behind the SmartPort engine). J2 breakout arrives
 2026-10-13.
 
 ## Where things stand
@@ -24,8 +25,9 @@ tests done without Rico; the bench is the test. J2 breakout arrives
     because of our 10k pull-down. **WR pull-down on U1 B7 is now 100k**; idle
     3.96 V (host drives about 4.0 V through about 1.9k). Packet start decodes
     `FF 3F CF F3 FC FF C3 81`, cell 3.91 us. Captures in `docs/captures/m6/`.
-- M6 firmware on branch `m6`: SmartPort device serving an 800K ProDOS RAM
-  disk (flash image + 384-block RAM overlay). Spec
+- M6 firmware (merged; last `2e7311a`): SmartPort device serving an 800K ProDOS RAM
+  disk (flash image + 384-block RAM overlay). Results: `docs/build_log/m6.md`
+  "M6 passed on the bench". Spec
   `docs/superpowers/specs/2026-10-12-m6-smartport-ramdisk-design.md`, plan
   `docs/superpowers/plans/2026-10-12-m6-smartport-ramdisk.md`. Bench steps:
   `docs/build_log/m6.md` "Firmware ready for the bench".
@@ -40,10 +42,10 @@ tests done without Rico; the bench is the test. J2 breakout arrives
 
 ## Resume order
 
-1. **M6 bench test** (`docs/build_log/m6.md`, "Bench steps"): flash `m6`,
-   `sp`, IIe on, expect INIT/STATUS/READ in the `SPL` log and the `]` prompt;
-   scope /WRREQ rise to ACK low (model: about 1 us before); BASIC save/load.
-   Design choices marked **[choice]** in the spec are Rico's to overrule.
+1. **M7 brainstorm, then spec**: SmartPort engine (M6) + mechanism server
+   (M5) on the two cores; READBLOCK/WRITEBLOCK/FORMAT go to core 1 while ACK
+   holds the card off (no host timeout on the reply). Measure the worst-case
+   hold-off. Oracle comparison program against the working UniDisk.
 2. When J2 lands: mechanism side on the breakout (J2 = CN104, straight IDC
    ribbon). Ring out the ribbon to the terminals, then isolation checks:
    +12 V (13/15/17/19) vs RD (16), WRTDATA (18) and every signal. Short heavy
@@ -51,22 +53,20 @@ tests done without Rico; the bench is the test. J2 breakout arrives
    at the terminals. Re-run a disk read scan on drive A with the bench at
    5.0 V to confirm the IR drop is gone. Check the U2 channel order against
    GP12-19 (not recorded in the M0 notes).
-3. After M6 passes: merge `m6`, bytehamr log, then M7 (floppy back end behind
-   the same SmartPort engine).
-4. Re-format disk 2 with our board. Not time critical.
+3. Re-format disk 2 with our board. Not time critical.
 
 ## Bench state at shutdown
 
-- Pico 2 flashed with `61d4690` (M5 + READY fix).
-- Bench +5 at 5.00 V. Bench +12 off. Mechanism ribbon unplugged (it loads the
-  bench +5 if left on the old tap).
-- Our DB-19 cable is on the Liron card (slot 5), in place of the working
-  UniDisk.
-- Scope probes on J1: CH1 J1.10 /WRREQ, CH2 J1.18 WR, CH3 J1.2 PH0, ground
-  J1.5.
-- Pico console `/dev/cu.usbmodem114401`, Debug Probe `114202`. GPIO state can
-  be read over SWD without halting (`mdw 0xd0000004`, pad registers at
-  `0x40038004 + 4n`).
+- Pico 2 flashed with `2e7311a` (M6). Power order: Pico, board (bench +5 at
+  5.00 V), IIe; at shutdown everything off, Pico included (a Pico left
+  running across an IIe power cycle twice left the IIe not starting).
+- Bench +12 off. Mechanism ribbon unplugged.
+- Our DB-19 cable is on the Liron card (slot 5). A Disk II in slot 6 boots
+  first on a cold start; `PR#5` boots our board.
+- Scope probes on J1: CH1 J1.10 /WRREQ, CH2 J1.20 ACK, CH3 J1.2 PH0 (REQ),
+  ground J1.5.
+- Pico console `/dev/cu.usbmodem114401`, Debug Probe `114202`. `make flash`
+  does an OpenOCD rescue reset, then programs (the 864 KB image needs it).
 
 ## Notes
 

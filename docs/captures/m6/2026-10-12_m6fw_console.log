@@ -1,0 +1,2026 @@
+# M6 firmware 8649c44 first bench run. Console /dev/cu.usbmodem114401.
+16:53:29 --- console open /dev/cu.usbmodem114401
+16:53:32 > sp
+16:53:32 sp
+16:53:32 SP on id=0 last=0 pass=0 img=819200 ovl=0/384
+16:53:32 SP pkts=0 acks=0 cksum=0 bad=0 ign=0 tmo=0 resets=0 rereads=0 replies=0
+16:53:32 SP ack_us last=- max=- data_max=- late=0 late_entry=0
+16:53:32 SP cmds status=0 readblk=0 writeblk=0 format=0 control=0 init=0 other=0
+16:53:32 SP pins PH0=0 PH1=0 PH2=0 PH3=0 WRREQ=0 HSTEN=0 WR=0 LASTONE=1
+16:53:32 OK
+16:54:11 > sp
+16:54:11 sp
+16:54:11 SP on id=0 last=0 pass=0 img=819200 ovl=0/384
+16:54:11 SP pkts=0 acks=0 cksum=0 bad=0 ign=0 tmo=0 resets=0 rereads=0 replies=0
+16:54:11 SP ack_us last=- max=- data_max=- late=0 late_entry=0
+16:54:11 SP cmds status=0 readblk=0 writeblk=0 format=0 control=0 init=0 other=0
+16:54:11 SP pins PH0=0 PH1=0 PH2=0 PH3=0 WRREQ=1 HSTEN=1 WR=0 LASTONE=1
+16:54:11 OK
+16:55:17 > sp
+16:55:17 sp
+16:55:17 SP on id=1 last=1 pass=1 img=819200 ovl=0/384
+16:55:17 SP pkts=150 acks=150 cksum=0 bad=0 ign=0 tmo=0 resets=3 rereads=0 replies=150
+16:55:17 SP ack_us last=-1 max=18 data_max=- late=0 late_entry=0
+16:55:17 SP cmds status=3 readblk=144 writeblk=0 format=0 control=0 init=3 other=0
+16:55:17 SP pins PH0=0 PH1=1 PH2=0 PH3=1 WRREQ=1 HSTEN=1 WR=1 LASTONE=1
+16:55:17 OK
+16:58:22 > sp
+16:58:22 sp
+16:58:22 SP on id=1 last=1 pass=1 img=819200 ovl=3/384
+16:58:22 SP pkts=193 acks=193 cksum=0 bad=0 ign=0 tmo=0 resets=3 rereads=0 replies=188
+16:58:22 SP ack_us last=-1 max=18 data_max=0 late=0 late_entry=0
+16:58:22 SP cmds status=5 readblk=175 writeblk=5 format=0 control=0 init=3 other=0
+16:58:22 SP pins PH0=0 PH1=1 PH2=0 PH3=1 WRREQ=1 HSTEN=1 WR=1 LASTONE=1
+16:58:22 OK
+17:02:15 --- console open /dev/cu.usbmodem114401
+17:02:17 > sp
+17:02:17 sp
+17:02:17 SP on id=0 last=0 pass=0 img=819200 ovl=0/384
+17:02:17 SP pkts=0 acks=0 cksum=0 bad=0 ign=0 tmo=0 resets=0 rereads=0 replies=0
+17:02:17 SP ack_us last=- max=- data_max=- late=0 late_entry=0
+17:02:17 SP cmds status=0 readblk=0 writeblk=0 format=0 control=0 init=0 other=0
+17:02:17 SP pins PH0=0 PH1=0 PH2=0 PH3=0 WRREQ=1 HSTEN=1 WR=0 LASTONE=1
+17:02:17 OK
+--- (logger lost USB at the IIe power cycle; rig cold booted, Pico first, then IIe, PR#5)
+# SCOPE ACK timing during PR#5 boot from the board:
+#   CH1 J1.10 /WRREQ, CH2 J1.20 ACK, CH3 J1.2 PH0 (REQ); 10x, 2 V/div; GND J1.5
+#   trigger CH1 rising 2.52 V, single; 20 us/div, trigger 2 div left of centre (delay -40 us)
+#   files: 2026-10-12_ack_wrreq-rise_20us.png, 2026-10-12_ack_ch{1,2,3}_*_20us.csv (500 MSa/s)
+# RESULT (computed from CSV, edges at 2.5 V / <1.0 V held 2 us):
+#   /WRREQ rise -> ACK low      6.68 us   (card gives up about 105 us after underrun)
+#   ACK low     -> REQ low     21.92 us   (card saw ACK, dropped REQ)
+#   ACK low     -> ACK high    27.20 us   (reply ready 5 us after REQ low)
+#   ACK levels: high 4.72 V, low -0.02 V
+#   ACK trace shows crosstalk spikes from WR (J1.18, two pins over) before the ACK.
+--- reflash: splog fix + make flash rescue
+17:15:49 --- console open /dev/cu.usbmodem114401
+17:15:51 > sp
+17:15:51 sp
+17:15:51 SP on id=0 last=0 pass=0 img=819200 ovl=0/384
+17:15:51 SP pkts=0 acks=0 cksum=0 bad=0 ign=0 tmo=0 resets=0 rereads=0 replies=0
+17:15:51 SP ack_us last=- max=- data_max=- late=0 late_entry=0
+17:15:51 SP cmds status=0 readblk=0 writeblk=0 format=0 control=0 init=0 other=0
+17:15:51 SP pins PH0=0 PH1=0 PH2=0 PH3=0 WRREQ=0 HSTEN=0 WR=0 LASTONE=1
+17:15:51 OK
+17:18:17 > sp
+17:18:17 sp
+17:18:17 SP on id=0 last=0 pass=0 img=819200 ovl=0/384
+17:18:17 SP pkts=0 acks=0 cksum=0 bad=0 ign=0 tmo=0 resets=0 rereads=0 replies=0
+17:18:17 SP ack_us last=- max=- data_max=- late=0 late_entry=0
+17:18:17 SP cmds status=0 readblk=0 writeblk=0 format=0 control=0 init=0 other=0
+17:18:17 SP pins PH0=1 PH1=1 PH2=1 PH3=1 WRREQ=1 HSTEN=1 WR=1 LASTONE=1
+17:18:17 OK
+--- cold boot of all systems (Rico)
+17:23:34 --- console open /dev/cu.usbmodem114401
+17:23:34 
+17:23:34 SPL CMD d=1 c=01 b=12 s=00 ack=0
+17:23:34 SPL CMD d=1 c=01 b=13 s=00 ack=-1
+17:23:34 SPL CMD d=1 c=01 b=14 s=00 ack=-2
+17:23:34 SPL CMD d=1 c=01 b=15 s=00 ack=-1
+17:23:34 SPL CMD d=1 c=01 b=16 s=00 ack=0
+17:23:34 SPL CMD d=1 c=01 b=17 s=00 ack=-1
+17:23:34 SPL CMD d=1 c=01 b=18 s=00 ack=-1
+17:23:34 SPL CMD d=1 c=01 b=19 s=00 ack=0
+17:23:34 SPL CMD d=1 c=01 b=20 s=00 ack=-1
+17:23:34 SPL CMD d=1 c=01 b=21 s=00 ack=0
+17:23:34 SPL CMD d=1 c=01 b=22 s=00 ack=-1
+17:23:34 SPL CMD d=1 c=01 b=23 s=00 ack=-1
+17:23:34 SPL CMD d=1 c=01 b=24 s=00 ack=-1
+17:23:34 SPL CMD d=1 c=01 b=25 s=00 ack=0
+17:23:34 SPL CMD d=1 c=01 b=26 s=00 ack=-1
+17:23:34 SPL CMD d=1 c=01 b=27 s=00 ack=-1
+17:23:34 SPL CMD d=1 c=01 b=28 s=00 ack=0
+17:23:41 > sp
+17:23:41 sp
+17:23:41 SP on id=1 last=1 pass=1 img=819200 ovl=0/384
+17:23:41 SP pkts=87 acks=87 cksum=0 bad=0 ign=0 tmo=0 resets=2 rereads=0 replies=87
+17:23:41 SP ack_us last=-1 max=6 data_max=- late=0 late_entry=0
+17:23:41 SP cmds status=2 readblk=83 writeblk=0 format=0 control=0 init=2 other=0
+17:23:41 SP pins PH0=0 PH1=1 PH2=0 PH3=1 WRREQ=1 HSTEN=1 WR=1 LASTONE=1
+17:23:41 OK
+17:24:13 SPL RESET
+17:24:13 SPL CMD d=1 c=05 b=262144 s=40 ack=-3
+17:24:13 SPL CMD d=1 c=01 b=0 s=00 ack=-2
+17:24:13 SPL CMD d=1 c=01 b=2 s=00 ack=-2
+17:24:13 SPL CMD d=1 c=01 b=3 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=4 s=00 ack=-2
+17:24:13 SPL CMD d=1 c=01 b=5 s=00 ack=13
+17:24:13 SPL CMD d=1 c=01 b=8 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=7 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=9 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=10 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=11 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=12 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=13 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=14 s=00 ack=-4
+17:24:13 SPL CMD d=1 c=01 b=15 s=00 ack=-2
+17:24:13 SPL CMD d=1 c=01 b=16 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=17 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=18 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=19 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=20 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=21 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=22 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=23 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=24 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=25 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=26 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=27 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=28 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=29 s=00 ack=-1
+17:24:13 SPL CMD d=1 c=01 b=30 s=00 ack=-3
+17:24:14 SPL CMD d=1 c=01 b=31 s=00 ack=-3
+17:24:14 SPL CMD d=1 c=01 b=32 s=00 ack=17
+17:24:14 SPL CMD d=1 c=01 b=33 s=00 ack=-2
+17:24:14 SPL CMD d=1 c=01 b=34 s=00 ack=-2
+17:24:14 SPL CMD d=1 c=01 b=35 s=00 ack=-2
+17:24:14 SPL CMD d=1 c=01 b=36 s=00 ack=-1
+17:24:14 SPL CMD d=1 c=01 b=37 s=00 ack=-1
+17:24:14 SPL CMD d=1 c=01 b=38 s=00 ack=-2
+17:24:14 SPL CMD d=1 c=01 b=39 s=00 ack=-1
+17:24:14 SPL CMD d=1 c=01 b=40 s=00 ack=-2
+17:24:14 SPL CMD d=1 c=01 b=41 s=00 ack=-1
+17:24:14 SPL CMD d=1 c=00 b=0 s=00 ack=-2
+17:24:14 SPL CMD d=1 c=01 b=2 s=00 ack=-1
+17:24:14 SPL CMD d=1 c=01 b=2 s=00 ack=-1
+17:24:14 SPL CMD d=1 c=01 b=2 s=00 ack=-1
+17:24:14 SPL CMD d=1 c=01 b=3 s=00 ack=-1
+17:24:14 SPL CMD d=1 c=01 b=4 s=00 ack=-1
+17:24:14 SPL CMD d=1 c=01 b=5 s=00 ack=-2
+17:24:14 SPL CMD d=1 c=01 b=2 s=00 ack=-1
+17:24:14 SPL CMD d=1 c=01 b=2 s=00 ack=-1
+17:24:14 SPL CMD d=1 c=01 b=43 s=00 ack=-1
+17:24:14 SPL CMD d=1 c=01 b=42 s=00 ack=-1
+17:24:14 SPL CMD d=1 c=01 b=44 s=00 ack=-1
+17:24:14 SPL CMD d=1 c=01 b=45 s=00 ack=-1
+17:24:14 SPL CMD d=1 c=01 b=46 s=00 ack=-4
+17:24:14 SPL CMD d=1 c=01 b=47 s=00 ack=-1
+17:24:14 SPL CMD d=1 c=01 b=48 s=00 ack=-1
+17:24:14 SPL CMD d=1 c=01 b=49 s=00 ack=-1
+17:24:14 SPL CMD d=1 c=01 b=50 s=00 ack=-1
+17:24:14 SPL CMD d=1 c=01 b=51 s=00 ack=-2
+17:24:14 SPL CMD d=1 c=01 b=52 s=00 ack=-1
+17:24:15 SPL CMD d=1 c=01 b=53 s=00 ack=-1
+17:24:15 SPL CMD d=1 c=01 b=54 s=00 ack=-1
+17:24:15 SPL CMD d=1 c=01 b=55 s=00 ack=-1
+17:24:15 SPL CMD d=1 c=01 b=56 s=00 ack=-1
+17:24:15 SPL CMD d=1 c=01 b=57 s=00 ack=-2
+17:24:15 SPL CMD d=1 c=01 b=58 s=00 ack=-2
+17:24:15 SPL CMD d=1 c=01 b=59 s=00 ack=-2
+17:24:15 SPL CMD d=1 c=01 b=60 s=00 ack=-1
+17:24:15 SPL CMD d=1 c=01 b=61 s=00 ack=14
+17:24:15 SPL CMD d=1 c=01 b=62 s=00 ack=-4
+17:24:15 SPL CMD d=1 c=01 b=2 s=00 ack=-2
+17:24:15 SPL CMD d=1 c=01 b=2 s=00 ack=-2
+17:24:15 SPL CMD d=1 c=01 b=2 s=00 ack=-1
+17:27:25 SPL RESET
+--- firmware 2e7311a (hot path in RAM); full reboot, BASIC from Liron
+17:33:26 --- console open /dev/cu.usbmodem114401
+17:33:26 
+17:33:26 SPL CMD d=1 c=01 b=17 s=00 ack=4
+17:33:26 SPL CMD d=1 c=01 b=18 s=00 ack=5
+17:33:26 SPL CMD d=1 c=01 b=19 s=00 ack=5
+17:33:26 SPL CMD d=1 c=01 b=20 s=00 ack=4
+17:33:26 SPL CMD d=1 c=01 b=21 s=00 ack=4
+17:33:26 SPL CMD d=1 c=01 b=22 s=00 ack=4
+17:33:26 SPL CMD d=1 c=01 b=23 s=00 ack=4
+17:33:26 SPL CMD d=1 c=01 b=24 s=00 ack=4
+17:33:26 SPL CMD d=1 c=01 b=25 s=00 ack=5
+17:33:26 SPL CMD d=1 c=01 b=26 s=00 ack=5
+17:33:26 SPL CMD d=1 c=01 b=27 s=00 ack=4
+17:33:26 SPL CMD d=1 c=01 b=28 s=00 ack=4
+17:33:29 > sp
+17:33:29 sp
+17:33:29 SP on id=1 last=1 pass=1 img=819200 ovl=0/384
+17:33:29 SP pkts=87 acks=87 cksum=0 bad=0 ign=0 tmo=0 resets=2 rereads=0 replies=87
+17:33:29 SP ack_us last=4 max=6 data_max=- late=0 late_entry=0
+17:33:29 SP cmds status=2 readblk=83 writeblk=0 format=0 control=0 init=2 other=0
+17:33:29 SP pins PH0=0 PH1=1 PH2=0 PH3=1 WRREQ=1 HSTEN=1 WR=1 LASTONE=1
+17:33:29 OK
+17:33:46 SPL RESET
+17:33:46 SPL CMD d=1 c=05 b=262144 s=40 ack=6
+17:33:46 SPL CMD d=1 c=01 b=0 s=00 ack=4
+17:33:46 SPL CMD d=1 c=01 b=2 s=00 ack=5
+17:33:46 SPL CMD d=1 c=01 b=3 s=00 ack=4
+17:33:46 SPL CMD d=1 c=01 b=4 s=00 ack=4
+17:33:46 SPL CMD d=1 c=01 b=5 s=00 ack=5
+17:33:47 SPL CMD d=1 c=01 b=8 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=7 s=00 ack=5
+17:33:47 SPL CMD d=1 c=01 b=9 s=00 ack=5
+17:33:47 SPL CMD d=1 c=01 b=10 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=11 s=00 ack=5
+17:33:47 SPL CMD d=1 c=01 b=12 s=00 ack=5
+17:33:47 SPL CMD d=1 c=01 b=13 s=00 ack=5
+17:33:47 SPL CMD d=1 c=01 b=14 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=15 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=16 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=17 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=18 s=00 ack=6
+17:33:47 SPL CMD d=1 c=01 b=19 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=20 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=21 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=22 s=00 ack=5
+17:33:47 SPL CMD d=1 c=01 b=23 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=24 s=00 ack=5
+17:33:47 SPL CMD d=1 c=01 b=25 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=26 s=00 ack=5
+17:33:47 SPL CMD d=1 c=01 b=27 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=28 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=29 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=30 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=31 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=32 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=33 s=00 ack=5
+17:33:47 SPL CMD d=1 c=01 b=34 s=00 ack=5
+17:33:47 SPL CMD d=1 c=01 b=35 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=36 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=37 s=00 ack=5
+17:33:47 SPL CMD d=1 c=01 b=38 s=00 ack=5
+17:33:47 SPL CMD d=1 c=01 b=39 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=40 s=00 ack=4
+17:33:47 SPL CMD d=1 c=01 b=41 s=00 ack=4
+17:33:47 SPL CMD d=1 c=00 b=0 s=00 ack=5
+17:33:48 SPL CMD d=1 c=01 b=2 s=00 ack=5
+17:33:48 SPL CMD d=1 c=01 b=2 s=00 ack=4
+17:33:48 SPL CMD d=1 c=01 b=2 s=00 ack=4
+17:33:48 SPL CMD d=1 c=01 b=3 s=00 ack=4
+17:33:48 SPL CMD d=1 c=01 b=4 s=00 ack=4
+17:33:48 SPL CMD d=1 c=01 b=5 s=00 ack=5
+17:33:48 SPL CMD d=1 c=01 b=2 s=00 ack=4
+17:33:48 SPL CMD d=1 c=01 b=2 s=00 ack=4
+17:33:48 SPL CMD d=1 c=01 b=43 s=00 ack=5
+17:33:48 SPL CMD d=1 c=01 b=42 s=00 ack=5
+17:33:48 SPL CMD d=1 c=01 b=44 s=00 ack=4
+17:33:48 SPL CMD d=1 c=01 b=45 s=00 ack=5
+17:33:48 SPL CMD d=1 c=01 b=46 s=00 ack=4
+17:33:48 SPL CMD d=1 c=01 b=47 s=00 ack=5
+17:33:48 SPL CMD d=1 c=01 b=48 s=00 ack=5
+17:33:48 SPL CMD d=1 c=01 b=49 s=00 ack=4
+17:33:48 SPL CMD d=1 c=01 b=50 s=00 ack=6
+17:33:48 SPL CMD d=1 c=01 b=51 s=00 ack=6
+17:33:48 SPL CMD d=1 c=01 b=52 s=00 ack=5
+17:33:48 SPL CMD d=1 c=01 b=53 s=00 ack=4
+17:33:48 SPL CMD d=1 c=01 b=54 s=00 ack=5
+17:33:48 SPL CMD d=1 c=01 b=55 s=00 ack=4
+17:33:48 SPL CMD d=1 c=01 b=56 s=00 ack=4
+17:33:48 SPL CMD d=1 c=01 b=57 s=00 ack=5
+17:33:48 SPL CMD d=1 c=01 b=58 s=00 ack=5
+17:33:48 SPL CMD d=1 c=01 b=59 s=00 ack=4
+17:33:48 SPL CMD d=1 c=01 b=60 s=00 ack=4
+17:33:48 SPL CMD d=1 c=01 b=61 s=00 ack=5
+17:33:48 SPL CMD d=1 c=01 b=62 s=00 ack=4
+17:33:48 SPL CMD d=1 c=01 b=2 s=00 ack=4
+17:33:49 SPL CMD d=1 c=01 b=2 s=00 ack=4
+17:33:49 SPL CMD d=1 c=01 b=2 s=00 ack=5
+# SCOPE INIT after PR#5 bus reset, firmware 2e7311a (hot path in RAM). Same setup as above.
+#   files: 2026-10-12_ack3_pr5-init-ramfunc_20us.png, 2026-10-12_ack3_ch{1,2,3}_*_20us.csv
+#   /WRREQ rise -> ACK low 5.29 us (was 30.93 us with code in flash, ack2_*); engine ack_us=6 (upper bound)
+#   ACK low -> REQ low 23.32 us; ACK low -> ACK high 60.75 us
+17:35:39 SPL REREAD
+17:35:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:39 SPL REREAD
+17:35:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:39 SPL REREAD
+17:35:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:39 SPL REREAD
+17:35:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:39 SPL REREAD
+17:35:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:39 SPL REREAD
+17:35:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:39 SPL REREAD
+17:35:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:39 SPL REREAD
+17:35:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:39 SPL REREAD
+17:35:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:39 SPL REREAD
+17:35:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:39 SPL REREAD
+17:35:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:40 SPL REREAD
+17:35:40 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:40 SPL REREAD
+17:35:40 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:40 SPL REREAD
+17:35:40 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:40 SPL REREAD
+17:35:40 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:40 SPL REREAD
+17:35:40 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:40 SPL REREAD
+17:35:40 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:40 SPL REREAD
+17:35:40 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:40 SPL REREAD
+17:35:40 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:40 SPL REREAD
+17:35:40 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:40 SPL REREAD
+17:35:40 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:40 SPL REREAD
+17:35:40 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:40 SPL REREAD
+17:35:40 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:40 SPL REREAD
+17:35:40 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:40 SPL REREAD
+17:35:40 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:41 SPL REREAD
+17:35:41 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:41 SPL REREAD
+17:35:41 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:41 SPL REREAD
+17:35:41 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:41 SPL REREAD
+17:35:41 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:41 SPL REREAD
+17:35:41 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:41 SPL REREAD
+17:35:41 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:41 SPL REREAD
+17:35:41 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:41 SPL REREAD
+17:35:41 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:41 SPL REREAD
+17:35:41 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:41 SPL REREAD
+17:35:41 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:41 SPL REREAD
+17:35:41 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:41 SPL REREAD
+17:35:41 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:41 SPL REREAD
+17:35:41 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:41 SPL REREAD
+17:35:41 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:41 SPL REREAD
+17:35:42 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:42 SPL REREAD
+17:35:42 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:42 SPL REREAD
+17:35:42 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:42 SPL REREAD
+17:35:42 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:42 SPL REREAD
+17:35:42 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:42 SPL REREAD
+17:35:42 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:42 SPL REREAD
+17:35:42 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:42 SPL REREAD
+17:35:42 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:42 SPL REREAD
+17:35:42 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:42 SPL REREAD
+17:35:42 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:42 SPL REREAD
+17:35:42 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:42 SPL REREAD
+17:35:42 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:42 SPL REREAD
+17:35:42 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:42 SPL REREAD
+17:35:42 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:42 SPL REREAD
+17:35:42 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:43 SPL REREAD
+17:35:43 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:43 SPL REREAD
+17:35:43 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:43 SPL REREAD
+17:35:43 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:43 SPL REREAD
+17:35:43 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:43 SPL REREAD
+17:35:43 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:43 SPL REREAD
+17:35:43 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:43 SPL REREAD
+17:35:43 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:43 SPL REREAD
+17:35:43 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:43 SPL REREAD
+17:35:43 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:43 SPL REREAD
+17:35:43 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:43 SPL REREAD
+17:35:43 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:43 SPL REREAD
+17:35:43 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:43 SPL REREAD
+17:35:43 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:43 SPL REREAD
+17:35:43 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:44 SPL REREAD
+17:35:44 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:44 SPL REREAD
+17:35:44 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:44 SPL REREAD
+17:35:44 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:44 SPL REREAD
+17:35:44 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:44 SPL REREAD
+17:35:44 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:44 SPL REREAD
+17:35:44 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:44 SPL REREAD
+17:35:44 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:44 SPL REREAD
+17:35:44 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:44 SPL REREAD
+17:35:44 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:44 SPL REREAD
+17:35:44 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:44 SPL REREAD
+17:35:44 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:44 SPL REREAD
+17:35:44 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:44 SPL REREAD
+17:35:44 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:44 SPL REREAD
+17:35:44 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:45 SPL REREAD
+17:35:45 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:45 SPL REREAD
+17:35:45 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:45 SPL REREAD
+17:35:45 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:45 SPL REREAD
+17:35:45 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:45 SPL REREAD
+17:35:45 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:45 SPL REREAD
+17:35:45 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:45 SPL REREAD
+17:35:45 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:45 SPL REREAD
+17:35:45 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:45 SPL REREAD
+17:35:45 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:45 SPL REREAD
+17:35:45 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:45 SPL REREAD
+17:35:45 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:45 SPL REREAD
+17:35:45 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:45 SPL REREAD
+17:35:45 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:45 SPL REREAD
+17:35:45 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:45 SPL REREAD
+17:35:45 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:46 SPL REREAD
+17:35:46 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:46 SPL REREAD
+17:35:46 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:46 SPL REREAD
+17:35:46 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:46 SPL REREAD
+17:35:46 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:46 SPL REREAD
+17:35:46 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:46 SPL REREAD
+17:35:46 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:46 SPL REREAD
+17:35:46 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:46 SPL REREAD
+17:35:46 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:46 SPL REREAD
+17:35:46 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:46 SPL REREAD
+17:35:46 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:46 SPL REREAD
+17:35:46 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:46 SPL REREAD
+17:35:46 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:46 SPL REREAD
+17:35:46 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:46 SPL REREAD
+17:35:46 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:46 SPL REREAD
+17:35:46 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:47 SPL REREAD
+17:35:47 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:47 SPL REREAD
+17:35:47 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:47 SPL REREAD
+17:35:47 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:47 SPL REREAD
+17:35:47 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:47 SPL REREAD
+17:35:47 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:47 SPL REREAD
+17:35:47 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:47 SPL REREAD
+17:35:47 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:47 SPL REREAD
+17:35:47 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:47 SPL REREAD
+17:35:47 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:47 SPL REREAD
+17:35:47 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:47 SPL REREAD
+17:35:47 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:47 SPL REREAD
+17:35:47 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:47 SPL REREAD
+17:35:47 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:47 SPL REREAD
+17:35:47 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:48 SPL REREAD
+17:35:48 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:48 SPL REREAD
+17:35:48 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:48 SPL REREAD
+17:35:48 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:48 SPL REREAD
+17:35:48 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:48 SPL REREAD
+17:35:48 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:48 SPL REREAD
+17:35:48 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:48 SPL REREAD
+17:35:48 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:48 SPL REREAD
+17:35:48 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:48 SPL REREAD
+17:35:48 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:48 SPL REREAD
+17:35:48 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:48 SPL REREAD
+17:35:48 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:48 SPL REREAD
+17:35:48 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:48 SPL REREAD
+17:35:48 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:48 SPL REREAD
+17:35:48 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:48 SPL REREAD
+17:35:48 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:49 SPL REREAD
+17:35:49 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:49 SPL REREAD
+17:35:49 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:49 SPL REREAD
+17:35:49 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:49 SPL REREAD
+17:35:49 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:49 SPL REREAD
+17:35:49 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:49 SPL REREAD
+17:35:49 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:49 SPL REREAD
+17:35:49 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:49 SPL REREAD
+17:35:49 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:49 SPL REREAD
+17:35:49 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:49 SPL REREAD
+17:35:49 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:49 SPL REREAD
+17:35:49 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:49 SPL REREAD
+17:35:49 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:49 SPL REREAD
+17:35:49 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:49 SPL REREAD
+17:35:49 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:50 SPL REREAD
+17:35:50 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:50 SPL REREAD
+17:35:50 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:50 SPL REREAD
+17:35:50 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:50 SPL REREAD
+17:35:50 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:50 SPL REREAD
+17:35:50 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:50 SPL REREAD
+17:35:50 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:50 SPL REREAD
+17:35:50 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:50 SPL REREAD
+17:35:50 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:50 SPL REREAD
+17:35:50 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:50 SPL REREAD
+17:35:50 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:50 SPL REREAD
+17:35:50 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:50 SPL REREAD
+17:35:50 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:50 SPL REREAD
+17:35:50 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:50 SPL REREAD
+17:35:50 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:51 SPL REREAD
+17:35:51 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:51 SPL REREAD
+17:35:51 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:51 SPL REREAD
+17:35:51 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:51 SPL REREAD
+17:35:51 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:51 SPL REREAD
+17:35:51 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:51 SPL REREAD
+17:35:51 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:51 SPL REREAD
+17:35:51 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:51 SPL REREAD
+17:35:51 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:51 SPL REREAD
+17:35:51 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:51 SPL REREAD
+17:35:51 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:51 SPL REREAD
+17:35:51 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:51 SPL REREAD
+17:35:51 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:51 SPL REREAD
+17:35:51 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:51 SPL REREAD
+17:35:51 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:51 SPL REREAD
+17:35:51 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:52 SPL REREAD
+17:35:52 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:52 SPL REREAD
+17:35:52 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:52 SPL REREAD
+17:35:52 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:52 SPL REREAD
+17:35:52 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:52 SPL REREAD
+17:35:52 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:52 SPL REREAD
+17:35:52 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:52 SPL REREAD
+17:35:52 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:52 SPL REREAD
+17:35:52 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:52 SPL REREAD
+17:35:52 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:52 SPL REREAD
+17:35:52 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:52 SPL REREAD
+17:35:52 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:52 SPL REREAD
+17:35:52 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:52 SPL REREAD
+17:35:52 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:52 SPL REREAD
+17:35:52 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:53 SPL REREAD
+17:35:53 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:53 SPL REREAD
+17:35:53 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:53 SPL REREAD
+17:35:53 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:53 SPL REREAD
+17:35:53 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:53 SPL REREAD
+17:35:53 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:53 SPL REREAD
+17:35:53 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:53 SPL REREAD
+17:35:53 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:53 SPL REREAD
+17:35:53 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:53 SPL REREAD
+17:35:53 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:53 SPL REREAD
+17:35:53 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:53 SPL REREAD
+17:35:53 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:53 SPL REREAD
+17:35:53 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:53 SPL REREAD
+17:35:53 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:53 SPL REREAD
+17:35:53 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:53 SPL REREAD
+17:35:53 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:54 SPL REREAD
+17:35:54 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:54 SPL REREAD
+17:35:54 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:54 SPL REREAD
+17:35:54 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:54 SPL REREAD
+17:35:54 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:54 SPL REREAD
+17:35:54 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:54 SPL REREAD
+17:35:54 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:54 SPL REREAD
+17:35:54 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:54 SPL REREAD
+17:35:54 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:54 SPL REREAD
+17:35:54 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:54 SPL REREAD
+17:35:54 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:54 SPL REREAD
+17:35:54 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:54 SPL REREAD
+17:35:54 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:54 SPL REREAD
+17:35:54 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:54 SPL REREAD
+17:35:54 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:55 SPL REREAD
+17:35:55 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:55 SPL REREAD
+17:35:55 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:55 SPL REREAD
+17:35:55 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:55 SPL REREAD
+17:35:55 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:55 SPL REREAD
+17:35:55 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:55 SPL REREAD
+17:35:55 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:55 SPL REREAD
+17:35:55 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:55 SPL REREAD
+17:35:55 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:55 SPL REREAD
+17:35:55 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:55 SPL REREAD
+17:35:55 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:55 SPL REREAD
+17:35:55 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:55 SPL REREAD
+17:35:55 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:55 SPL REREAD
+17:35:55 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:55 SPL REREAD
+17:35:55 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:55 SPL REREAD
+17:35:55 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:56 SPL REREAD
+17:35:56 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:56 SPL REREAD
+17:35:56 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:56 SPL REREAD
+17:35:56 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:56 SPL REREAD
+17:35:56 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:56 SPL REREAD
+17:35:56 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:56 SPL REREAD
+17:35:56 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:56 SPL REREAD
+17:35:56 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:56 SPL REREAD
+17:35:56 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:56 SPL REREAD
+17:35:56 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:56 SPL REREAD
+17:35:56 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:56 SPL REREAD
+17:35:56 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:56 SPL REREAD
+17:35:56 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:56 SPL REREAD
+17:35:56 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:56 SPL REREAD
+17:35:56 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:57 SPL REREAD
+17:35:57 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:57 SPL REREAD
+17:35:57 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:57 SPL REREAD
+17:35:57 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:57 SPL REREAD
+17:35:57 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:57 SPL REREAD
+17:35:57 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:57 SPL REREAD
+17:35:57 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:57 SPL REREAD
+17:35:57 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:57 SPL REREAD
+17:35:57 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:57 SPL REREAD
+17:35:57 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:57 SPL REREAD
+17:35:57 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:57 SPL REREAD
+17:35:57 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:57 SPL REREAD
+17:35:57 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:57 SPL REREAD
+17:35:57 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:57 SPL REREAD
+17:35:57 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:58 SPL REREAD
+17:35:58 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:58 SPL REREAD
+17:35:58 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:58 SPL REREAD
+17:35:58 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:58 SPL REREAD
+17:35:58 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:58 SPL REREAD
+17:35:58 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:58 SPL REREAD
+17:35:58 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:58 SPL REREAD
+17:35:58 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:58 SPL REREAD
+17:35:58 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:58 SPL REREAD
+17:35:58 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:58 SPL REREAD
+17:35:58 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:58 SPL REREAD
+17:35:58 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:58 SPL REREAD
+17:35:58 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:58 SPL REREAD
+17:35:58 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:58 SPL REREAD
+17:35:58 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:58 SPL REREAD
+17:35:58 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:59 SPL REREAD
+17:35:59 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:59 SPL REREAD
+17:35:59 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:59 SPL REREAD
+17:35:59 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:59 SPL REREAD
+17:35:59 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:59 SPL REREAD
+17:35:59 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:59 SPL REREAD
+17:35:59 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:59 SPL REREAD
+17:35:59 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:59 SPL REREAD
+17:35:59 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:59 SPL REREAD
+17:35:59 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:59 SPL REREAD
+17:35:59 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:59 SPL REREAD
+17:35:59 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:59 SPL REREAD
+17:35:59 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:59 SPL REREAD
+17:35:59 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:35:59 SPL REREAD
+17:35:59 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:00 SPL REREAD
+17:36:00 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:00 SPL REREAD
+17:36:00 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:00 SPL REREAD
+17:36:00 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:00 SPL REREAD
+17:36:00 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:00 SPL REREAD
+17:36:00 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:00 SPL REREAD
+17:36:00 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:00 SPL REREAD
+17:36:00 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:00 SPL REREAD
+17:36:00 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:00 SPL REREAD
+17:36:00 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:00 SPL REREAD
+17:36:00 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:00 SPL REREAD
+17:36:00 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:00 SPL REREAD
+17:36:00 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:00 SPL REREAD
+17:36:00 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:00 SPL REREAD
+17:36:00 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:01 SPL REREAD
+17:36:01 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:01 SPL REREAD
+17:36:01 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:01 SPL REREAD
+17:36:01 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:01 SPL REREAD
+17:36:01 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:01 SPL REREAD
+17:36:01 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:01 SPL REREAD
+17:36:01 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:01 SPL REREAD
+17:36:01 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:01 SPL REREAD
+17:36:01 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:01 SPL REREAD
+17:36:01 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:01 SPL REREAD
+17:36:01 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:01 SPL REREAD
+17:36:01 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:01 SPL REREAD
+17:36:01 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:01 SPL REREAD
+17:36:01 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:01 SPL REREAD
+17:36:01 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:02 SPL REREAD
+17:36:02 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:02 SPL REREAD
+17:36:02 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:02 SPL REREAD
+17:36:02 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:02 SPL REREAD
+17:36:02 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:02 SPL REREAD
+17:36:02 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:02 SPL REREAD
+17:36:02 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:02 SPL REREAD
+17:36:02 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:02 SPL REREAD
+17:36:02 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:02 SPL REREAD
+17:36:02 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:02 SPL REREAD
+17:36:02 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:02 SPL REREAD
+17:36:02 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:02 SPL REREAD
+17:36:02 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:02 SPL REREAD
+17:36:02 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:02 SPL REREAD
+17:36:02 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:02 SPL REREAD
+17:36:02 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:03 SPL REREAD
+17:36:03 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:03 SPL REREAD
+17:36:03 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:03 SPL REREAD
+17:36:03 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:03 SPL REREAD
+17:36:03 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:03 SPL REREAD
+17:36:03 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:03 SPL REREAD
+17:36:03 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:03 SPL REREAD
+17:36:03 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:03 SPL REREAD
+17:36:03 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:03 SPL REREAD
+17:36:03 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:03 SPL REREAD
+17:36:03 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:03 SPL REREAD
+17:36:03 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:03 SPL REREAD
+17:36:03 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:03 SPL REREAD
+17:36:03 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:03 SPL REREAD
+17:36:03 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:03 SPL REREAD
+17:36:03 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:04 SPL REREAD
+17:36:04 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:04 SPL REREAD
+17:36:04 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:04 SPL REREAD
+17:36:04 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:04 SPL REREAD
+17:36:04 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:04 SPL REREAD
+17:36:04 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:04 SPL REREAD
+17:36:04 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:04 SPL REREAD
+17:36:04 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:04 SPL REREAD
+17:36:04 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:04 SPL REREAD
+17:36:04 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:04 SPL REREAD
+17:36:04 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:04 SPL REREAD
+17:36:04 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:04 SPL REREAD
+17:36:04 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:04 SPL REREAD
+17:36:04 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:04 SPL REREAD
+17:36:04 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:05 SPL REREAD
+17:36:05 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:05 SPL REREAD
+17:36:05 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:05 SPL REREAD
+17:36:05 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:05 SPL REREAD
+17:36:05 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:05 SPL REREAD
+17:36:05 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:05 SPL REREAD
+17:36:05 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:05 SPL REREAD
+17:36:05 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:05 SPL REREAD
+17:36:05 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:05 SPL REREAD
+17:36:05 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:05 SPL REREAD
+17:36:05 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:05 SPL REREAD
+17:36:05 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:05 SPL REREAD
+17:36:05 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:05 SPL REREAD
+17:36:05 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:05 SPL REREAD
+17:36:05 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:05 SPL REREAD
+17:36:05 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:06 SPL REREAD
+17:36:06 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:06 SPL REREAD
+17:36:06 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:06 SPL REREAD
+17:36:06 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:06 SPL REREAD
+17:36:06 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:06 SPL REREAD
+17:36:06 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:06 SPL REREAD
+17:36:06 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:06 SPL REREAD
+17:36:06 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:06 SPL REREAD
+17:36:06 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:06 SPL REREAD
+17:36:06 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:06 SPL REREAD
+17:36:06 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:06 SPL REREAD
+17:36:06 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:06 SPL REREAD
+17:36:06 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:06 SPL REREAD
+17:36:06 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:06 SPL REREAD
+17:36:06 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:07 SPL REREAD
+17:36:07 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:07 SPL REREAD
+17:36:07 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:07 SPL REREAD
+17:36:07 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:07 SPL REREAD
+17:36:07 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:07 SPL REREAD
+17:36:07 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:07 SPL REREAD
+17:36:07 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:07 SPL REREAD
+17:36:07 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:07 SPL REREAD
+17:36:07 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:07 SPL REREAD
+17:36:07 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:07 SPL REREAD
+17:36:07 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:07 SPL REREAD
+17:36:07 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:07 SPL REREAD
+17:36:07 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:07 SPL REREAD
+17:36:07 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:07 SPL REREAD
+17:36:07 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:07 SPL REREAD
+17:36:07 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:08 SPL REREAD
+17:36:08 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:08 SPL REREAD
+17:36:08 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:08 SPL REREAD
+17:36:08 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:08 SPL REREAD
+17:36:08 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:08 SPL REREAD
+17:36:08 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:08 SPL REREAD
+17:36:08 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:08 SPL REREAD
+17:36:08 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:08 SPL REREAD
+17:36:08 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:08 SPL REREAD
+17:36:08 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:08 SPL REREAD
+17:36:08 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:08 SPL REREAD
+17:36:08 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:08 SPL REREAD
+17:36:08 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:08 SPL REREAD
+17:36:08 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:08 SPL REREAD
+17:36:08 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:09 SPL REREAD
+17:36:09 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:09 SPL REREAD
+17:36:09 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:09 SPL REREAD
+17:36:09 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:09 SPL REREAD
+17:36:09 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:09 SPL REREAD
+17:36:09 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:09 SPL REREAD
+17:36:09 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:09 SPL REREAD
+17:36:09 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:09 SPL REREAD
+17:36:09 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:09 SPL REREAD
+17:36:09 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:09 SPL REREAD
+17:36:09 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:09 SPL REREAD
+17:36:09 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:09 SPL REREAD
+17:36:09 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:09 SPL REREAD
+17:36:09 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:09 SPL REREAD
+17:36:09 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:10 SPL REREAD
+17:36:10 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:10 SPL REREAD
+17:36:10 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:10 SPL REREAD
+17:36:10 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:10 SPL REREAD
+17:36:10 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:10 SPL REREAD
+17:36:10 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:10 SPL REREAD
+17:36:10 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:10 SPL REREAD
+17:36:10 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:10 SPL REREAD
+17:36:10 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:10 SPL REREAD
+17:36:10 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:10 SPL REREAD
+17:36:10 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:10 SPL REREAD
+17:36:10 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:10 SPL REREAD
+17:36:10 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:10 SPL REREAD
+17:36:10 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:10 SPL REREAD
+17:36:10 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:11 SPL REREAD
+17:36:11 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:11 SPL REREAD
+17:36:11 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:11 SPL REREAD
+17:36:11 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:11 SPL REREAD
+17:36:11 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:11 SPL REREAD
+17:36:11 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:11 SPL REREAD
+17:36:11 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:11 SPL REREAD
+17:36:11 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:11 SPL REREAD
+17:36:11 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:11 SPL REREAD
+17:36:11 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:11 SPL REREAD
+17:36:11 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:11 SPL REREAD
+17:36:11 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:11 SPL REREAD
+17:36:11 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:11 SPL REREAD
+17:36:11 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:11 SPL REREAD
+17:36:11 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:11 SPL REREAD
+17:36:11 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:12 SPL REREAD
+17:36:12 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:12 SPL REREAD
+17:36:12 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:12 SPL REREAD
+17:36:12 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:12 SPL REREAD
+17:36:12 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:12 SPL REREAD
+17:36:12 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:12 SPL REREAD
+17:36:12 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:12 SPL REREAD
+17:36:12 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:12 SPL REREAD
+17:36:12 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:12 SPL REREAD
+17:36:12 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:12 SPL REREAD
+17:36:12 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:12 SPL REREAD
+17:36:12 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:12 SPL REREAD
+17:36:12 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:12 SPL REREAD
+17:36:12 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:12 SPL REREAD
+17:36:12 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:13 SPL REREAD
+17:36:13 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:13 SPL REREAD
+17:36:13 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:13 SPL REREAD
+17:36:13 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:13 SPL REREAD
+17:36:13 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:13 SPL REREAD
+17:36:13 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:13 SPL REREAD
+17:36:13 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:13 SPL REREAD
+17:36:13 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:13 SPL REREAD
+17:36:13 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:13 SPL REREAD
+17:36:13 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:13 SPL REREAD
+17:36:13 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:13 SPL REREAD
+17:36:13 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:13 SPL REREAD
+17:36:13 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:13 SPL REREAD
+17:36:13 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:13 SPL REREAD
+17:36:13 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:13 SPL REREAD
+17:36:13 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:14 SPL REREAD
+17:36:14 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:14 SPL REREAD
+17:36:14 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:14 SPL REREAD
+17:36:14 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:14 SPL REREAD
+17:36:14 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:14 SPL REREAD
+17:36:14 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:14 SPL REREAD
+17:36:14 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:14 SPL REREAD
+17:36:14 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:14 SPL REREAD
+17:36:14 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:14 SPL REREAD
+17:36:14 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:14 SPL REREAD
+17:36:14 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:14 SPL REREAD
+17:36:14 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:14 SPL REREAD
+17:36:14 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:14 SPL REREAD
+17:36:14 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:14 SPL REREAD
+17:36:14 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:14 SPL REREAD
+17:36:14 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:15 SPL REREAD
+17:36:15 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:15 SPL REREAD
+17:36:15 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:15 SPL REREAD
+17:36:15 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:15 SPL REREAD
+17:36:15 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:15 SPL REREAD
+17:36:15 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:15 SPL REREAD
+17:36:15 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:15 SPL REREAD
+17:36:15 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:15 SPL REREAD
+17:36:15 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:15 SPL REREAD
+17:36:15 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:15 SPL REREAD
+17:36:15 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:15 SPL REREAD
+17:36:15 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:15 SPL REREAD
+17:36:15 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:15 SPL REREAD
+17:36:15 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:15 SPL REREAD
+17:36:15 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:16 SPL REREAD
+17:36:16 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:16 SPL REREAD
+17:36:16 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:16 SPL REREAD
+17:36:16 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:16 SPL REREAD
+17:36:16 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:16 SPL REREAD
+17:36:16 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:16 SPL REREAD
+17:36:16 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:16 SPL REREAD
+17:36:16 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:16 SPL REREAD
+17:36:16 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:16 SPL REREAD
+17:36:16 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:16 SPL REREAD
+17:36:16 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:16 SPL REREAD
+17:36:16 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:16 SPL REREAD
+17:36:16 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:16 SPL REREAD
+17:36:16 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:16 SPL REREAD
+17:36:16 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:16 SPL REREAD
+17:36:16 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:17 SPL REREAD
+17:36:17 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:17 SPL REREAD
+17:36:17 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:17 SPL REREAD
+17:36:17 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:17 SPL REREAD
+17:36:17 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:17 SPL REREAD
+17:36:17 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:17 SPL REREAD
+17:36:17 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:17 SPL REREAD
+17:36:17 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:17 SPL REREAD
+17:36:17 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:17 SPL REREAD
+17:36:17 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:17 SPL REREAD
+17:36:17 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:17 SPL REREAD
+17:36:17 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:17 SPL REREAD
+17:36:17 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:17 SPL REREAD
+17:36:17 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:18 SPL REREAD
+17:36:18 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:18 SPL REREAD
+17:36:18 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:18 SPL REREAD
+17:36:18 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:18 SPL REREAD
+17:36:18 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:18 SPL REREAD
+17:36:18 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:18 SPL REREAD
+17:36:18 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:18 SPL REREAD
+17:36:18 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:18 SPL REREAD
+17:36:18 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:18 SPL REREAD
+17:36:18 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:18 SPL REREAD
+17:36:18 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:18 SPL REREAD
+17:36:18 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:18 SPL REREAD
+17:36:18 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:18 SPL REREAD
+17:36:18 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:18 SPL REREAD
+17:36:18 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:18 SPL REREAD
+17:36:18 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:19 SPL REREAD
+17:36:19 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:19 SPL REREAD
+17:36:19 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:19 SPL REREAD
+17:36:19 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:19 SPL REREAD
+17:36:19 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:19 SPL REREAD
+17:36:19 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:19 SPL REREAD
+17:36:19 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:19 SPL REREAD
+17:36:19 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:19 SPL REREAD
+17:36:19 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:19 SPL REREAD
+17:36:19 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:19 SPL REREAD
+17:36:19 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:19 SPL REREAD
+17:36:19 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:19 SPL REREAD
+17:36:19 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:19 SPL REREAD
+17:36:19 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:19 SPL REREAD
+17:36:19 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:20 SPL REREAD
+17:36:20 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:20 SPL REREAD
+17:36:20 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:20 SPL REREAD
+17:36:20 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:20 SPL REREAD
+17:36:20 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:20 SPL REREAD
+17:36:20 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:20 SPL REREAD
+17:36:20 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:20 SPL REREAD
+17:36:20 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:20 SPL REREAD
+17:36:20 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:20 SPL REREAD
+17:36:20 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:20 SPL REREAD
+17:36:20 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:20 SPL REREAD
+17:36:20 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:20 SPL REREAD
+17:36:20 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:20 SPL REREAD
+17:36:20 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:20 SPL REREAD
+17:36:20 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:20 SPL REREAD
+17:36:20 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:21 SPL REREAD
+17:36:21 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:21 SPL REREAD
+17:36:21 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:21 SPL REREAD
+17:36:21 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:21 SPL REREAD
+17:36:21 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:21 SPL REREAD
+17:36:21 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:21 SPL REREAD
+17:36:21 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:21 SPL REREAD
+17:36:21 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:21 SPL REREAD
+17:36:21 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:21 SPL REREAD
+17:36:21 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:21 SPL REREAD
+17:36:21 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:21 SPL REREAD
+17:36:21 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:21 SPL REREAD
+17:36:21 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:21 SPL REREAD
+17:36:21 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:21 SPL REREAD
+17:36:21 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:22 SPL REREAD
+17:36:22 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:22 SPL REREAD
+17:36:22 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:22 SPL REREAD
+17:36:22 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:22 SPL REREAD
+17:36:22 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:22 SPL REREAD
+17:36:22 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:22 SPL REREAD
+17:36:22 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:22 SPL REREAD
+17:36:22 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:22 SPL REREAD
+17:36:22 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:22 SPL REREAD
+17:36:22 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:22 SPL REREAD
+17:36:22 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:22 SPL REREAD
+17:36:22 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:22 SPL REREAD
+17:36:22 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:22 SPL REREAD
+17:36:22 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:22 SPL REREAD
+17:36:22 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:23 SPL REREAD
+17:36:23 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:23 SPL REREAD
+17:36:23 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:23 SPL REREAD
+17:36:23 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:23 SPL REREAD
+17:36:23 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:23 SPL REREAD
+17:36:23 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:23 SPL REREAD
+17:36:23 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:23 SPL REREAD
+17:36:23 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:23 SPL REREAD
+17:36:23 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:23 SPL REREAD
+17:36:23 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:23 SPL REREAD
+17:36:23 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:23 SPL REREAD
+17:36:23 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:23 SPL REREAD
+17:36:23 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:23 SPL REREAD
+17:36:23 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:23 SPL REREAD
+17:36:23 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:23 SPL REREAD
+17:36:23 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:24 SPL REREAD
+17:36:24 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:24 SPL REREAD
+17:36:24 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:24 SPL REREAD
+17:36:24 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:24 SPL REREAD
+17:36:24 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:24 SPL REREAD
+17:36:24 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:24 SPL REREAD
+17:36:24 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:24 SPL REREAD
+17:36:24 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:24 SPL REREAD
+17:36:24 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:24 SPL REREAD
+17:36:24 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:24 SPL REREAD
+17:36:24 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:24 SPL REREAD
+17:36:24 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:24 SPL REREAD
+17:36:24 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:24 SPL REREAD
+17:36:24 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:24 SPL REREAD
+17:36:24 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:25 SPL REREAD
+17:36:25 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:25 SPL REREAD
+17:36:25 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:25 SPL REREAD
+17:36:25 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:25 SPL REREAD
+17:36:25 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:25 SPL REREAD
+17:36:25 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:25 SPL REREAD
+17:36:25 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:25 SPL REREAD
+17:36:25 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:25 SPL REREAD
+17:36:25 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:25 SPL REREAD
+17:36:25 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:25 SPL REREAD
+17:36:25 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:25 SPL REREAD
+17:36:25 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:25 SPL REREAD
+17:36:25 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:25 SPL REREAD
+17:36:25 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:25 SPL REREAD
+17:36:25 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:25 SPL REREAD
+17:36:25 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:26 SPL REREAD
+17:36:26 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:26 SPL REREAD
+17:36:26 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:26 SPL REREAD
+17:36:26 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:26 SPL REREAD
+17:36:26 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:26 SPL REREAD
+17:36:26 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:26 SPL REREAD
+17:36:26 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:26 SPL REREAD
+17:36:26 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:26 SPL REREAD
+17:36:26 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:26 SPL REREAD
+17:36:26 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:26 SPL REREAD
+17:36:26 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:26 SPL REREAD
+17:36:26 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:26 SPL REREAD
+17:36:26 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:26 SPL REREAD
+17:36:26 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:26 SPL REREAD
+17:36:26 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:26 SPL REREAD
+17:36:26 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:27 SPL REREAD
+17:36:27 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:27 SPL REREAD
+17:36:27 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:27 SPL REREAD
+17:36:27 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:27 SPL REREAD
+17:36:27 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:27 SPL REREAD
+17:36:27 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:27 SPL REREAD
+17:36:27 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:27 SPL REREAD
+17:36:27 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:27 SPL REREAD
+17:36:27 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:27 SPL REREAD
+17:36:27 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:27 SPL REREAD
+17:36:27 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:27 SPL REREAD
+17:36:27 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:27 SPL REREAD
+17:36:27 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:27 SPL REREAD
+17:36:27 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:27 SPL REREAD
+17:36:27 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:28 SPL REREAD
+17:36:28 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:28 SPL REREAD
+17:36:28 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:28 SPL REREAD
+17:36:28 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:28 SPL REREAD
+17:36:28 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:28 SPL REREAD
+17:36:28 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:28 SPL REREAD
+17:36:28 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:28 SPL REREAD
+17:36:28 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:28 SPL REREAD
+17:36:28 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:28 SPL REREAD
+17:36:28 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:28 SPL REREAD
+17:36:28 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:28 SPL REREAD
+17:36:28 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:28 SPL REREAD
+17:36:28 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:28 SPL REREAD
+17:36:28 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:28 SPL REREAD
+17:36:28 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:29 SPL REREAD
+17:36:29 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:29 SPL REREAD
+17:36:29 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:29 SPL REREAD
+17:36:29 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:29 SPL REREAD
+17:36:29 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:29 SPL REREAD
+17:36:29 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:29 SPL REREAD
+17:36:29 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:29 SPL REREAD
+17:36:29 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:29 SPL REREAD
+17:36:29 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:29 SPL REREAD
+17:36:29 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:29 SPL REREAD
+17:36:29 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:29 SPL REREAD
+17:36:29 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:29 SPL REREAD
+17:36:29 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:29 SPL REREAD
+17:36:29 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:29 SPL REREAD
+17:36:29 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:30 SPL REREAD
+17:36:30 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:30 SPL REREAD
+17:36:30 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:30 SPL REREAD
+17:36:30 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:30 SPL REREAD
+17:36:30 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:30 SPL REREAD
+17:36:30 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:30 SPL REREAD
+17:36:30 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:30 SPL REREAD
+17:36:30 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:30 SPL REREAD
+17:36:30 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:30 SPL REREAD
+17:36:30 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:30 SPL REREAD
+17:36:30 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:30 SPL REREAD
+17:36:30 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:30 SPL REREAD
+17:36:30 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:30 SPL REREAD
+17:36:30 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:30 SPL REREAD
+17:36:30 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:30 SPL REREAD
+17:36:30 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:31 SPL REREAD
+17:36:31 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:31 SPL REREAD
+17:36:31 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:31 SPL REREAD
+17:36:31 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:31 SPL REREAD
+17:36:31 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:31 SPL REREAD
+17:36:31 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:31 SPL REREAD
+17:36:31 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:31 SPL REREAD
+17:36:31 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:31 SPL REREAD
+17:36:31 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:31 SPL REREAD
+17:36:31 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:31 SPL REREAD
+17:36:31 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:31 SPL REREAD
+17:36:31 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:31 SPL REREAD
+17:36:31 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:31 SPL REREAD
+17:36:31 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:31 SPL REREAD
+17:36:31 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:32 SPL REREAD
+17:36:32 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:32 SPL REREAD
+17:36:32 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:32 SPL REREAD
+17:36:32 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:32 SPL REREAD
+17:36:32 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:32 SPL REREAD
+17:36:32 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:32 SPL REREAD
+17:36:32 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:32 SPL REREAD
+17:36:32 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:32 SPL REREAD
+17:36:32 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:32 SPL REREAD
+17:36:32 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:32 SPL REREAD
+17:36:32 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:32 SPL REREAD
+17:36:32 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:32 SPL REREAD
+17:36:32 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:32 SPL REREAD
+17:36:32 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:32 SPL REREAD
+17:36:32 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:32 SPL REREAD
+17:36:32 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:33 SPL REREAD
+17:36:33 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:33 SPL REREAD
+17:36:33 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:33 SPL REREAD
+17:36:33 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:33 SPL REREAD
+17:36:33 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:33 SPL REREAD
+17:36:33 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:33 SPL REREAD
+17:36:33 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:33 SPL REREAD
+17:36:33 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:33 SPL REREAD
+17:36:33 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:33 SPL REREAD
+17:36:33 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:33 SPL REREAD
+17:36:33 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:33 SPL REREAD
+17:36:33 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:33 SPL REREAD
+17:36:33 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:33 SPL REREAD
+17:36:33 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:33 SPL REREAD
+17:36:33 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:34 SPL REREAD
+17:36:34 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:34 SPL REREAD
+17:36:34 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:34 SPL REREAD
+17:36:34 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:34 SPL REREAD
+17:36:34 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:34 SPL REREAD
+17:36:34 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:34 SPL REREAD
+17:36:34 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:34 SPL REREAD
+17:36:34 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:34 SPL REREAD
+17:36:34 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:34 SPL REREAD
+17:36:34 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:34 SPL REREAD
+17:36:34 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:34 SPL REREAD
+17:36:34 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:34 SPL REREAD
+17:36:34 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:34 SPL REREAD
+17:36:34 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:34 SPL REREAD
+17:36:34 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:35 SPL REREAD
+17:36:35 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:35 SPL REREAD
+17:36:35 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:35 SPL REREAD
+17:36:35 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:35 SPL REREAD
+17:36:35 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:35 SPL REREAD
+17:36:35 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:35 SPL REREAD
+17:36:35 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:35 SPL REREAD
+17:36:35 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:35 SPL REREAD
+17:36:35 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:35 SPL REREAD
+17:36:35 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:35 SPL REREAD
+17:36:35 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:35 SPL REREAD
+17:36:35 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:35 SPL REREAD
+17:36:35 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:35 SPL REREAD
+17:36:35 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:35 SPL REREAD
+17:36:35 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:35 SPL REREAD
+17:36:35 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:36 SPL REREAD
+17:36:36 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:36 SPL REREAD
+17:36:36 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:36 SPL REREAD
+17:36:36 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:36 SPL REREAD
+17:36:36 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:36 SPL REREAD
+17:36:36 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:36 SPL REREAD
+17:36:36 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:36 SPL REREAD
+17:36:36 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:36 SPL REREAD
+17:36:36 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:36 SPL REREAD
+17:36:36 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:36 SPL REREAD
+17:36:36 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:36 SPL REREAD
+17:36:36 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:36 SPL REREAD
+17:36:36 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:36 SPL REREAD
+17:36:36 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:36 SPL REREAD
+17:36:36 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:36 SPL REREAD
+17:36:36 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:37 SPL REREAD
+17:36:37 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:37 SPL REREAD
+17:36:37 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:37 SPL REREAD
+17:36:37 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:37 SPL REREAD
+17:36:37 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:37 SPL REREAD
+17:36:37 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:37 SPL REREAD
+17:36:37 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:37 SPL REREAD
+17:36:37 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:37 SPL REREAD
+17:36:37 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:37 SPL REREAD
+17:36:37 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:37 SPL REREAD
+17:36:37 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:37 SPL REREAD
+17:36:37 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:37 SPL REREAD
+17:36:37 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:37 SPL REREAD
+17:36:37 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:37 SPL REREAD
+17:36:37 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:38 SPL REREAD
+17:36:38 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:38 SPL REREAD
+17:36:38 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:38 SPL REREAD
+17:36:38 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:38 SPL REREAD
+17:36:38 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:38 SPL REREAD
+17:36:38 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:38 SPL REREAD
+17:36:38 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:38 SPL REREAD
+17:36:38 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:38 SPL REREAD
+17:36:38 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:38 SPL REREAD
+17:36:38 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:38 SPL REREAD
+17:36:38 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:38 SPL REREAD
+17:36:38 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:38 SPL REREAD
+17:36:38 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:38 SPL REREAD
+17:36:38 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:38 SPL REREAD
+17:36:38 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:39 SPL REREAD
+17:36:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:39 SPL REREAD
+17:36:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:39 SPL REREAD
+17:36:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:39 SPL REREAD
+17:36:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:39 SPL REREAD
+17:36:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:39 SPL REREAD
+17:36:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:39 SPL REREAD
+17:36:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:39 SPL REREAD
+17:36:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:39 SPL REREAD
+17:36:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:39 SPL REREAD
+17:36:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:39 SPL REREAD
+17:36:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:39 SPL REREAD
+17:36:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
+17:36:39 SPL REREAD
+17:36:39 SPL TIMEOUT d=1 c=01 b=2 s=00 stage=6
