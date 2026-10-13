@@ -67,13 +67,12 @@ rides U3 with RD, released with it by U3 /OE).
 
 ### Risks carried
 
-1. **How long the host waits for ACK.** The Liron card ROM waits for ACK
-   with a timeout. The original drive was no faster than us (it seeks the
-   same mechanism), so we expect to fit. To be computed from `liron-if.asm`
-   (card) and checked against the drive ROM.
-2. **PicoPort `sp_asm.S` timing** was counted for the RP2040 Cortex-M0+.
-   The RP2350 Cortex-M33 runs at different cycle timing. Retime it, or move
-   those waits into PIO.
+1. ~~**How long the host waits for ACK.**~~ Resolved (M6/M7): the card
+   gives about 105 us for the ACK after its write underrun (ours: 4-7 us),
+   and waits for the reply with no timeout, so seeks fit (M7 bench: up to
+   844 ms). `docs/research_notes.md` "SmartPort handshake from the two ROMs".
+2. ~~**PicoPort `sp_asm.S` timing.**~~ Moot: the M6 bus code is new; bit
+   timing is in PIO and the hot path runs from RAM (M6 spec).
 
 ## 2. Mechanism driver (core 1 + PIO1)
 

@@ -136,5 +136,6 @@ optionally U2):
 3. Does the mechanism tri-state RD when /ENBL is high? (ERS 3.4.x RDDATA
    timing; check on a dead-board drive.)
 4. Daisy-chain out (rear D-sub): pass-through of PH/WR/RD/enable to a second
-   drive. Out of scope for the first prototype.
+   drive. Next milestone (M8); pins in `pin_budget.md` (U4 PH3_OUT/ENBL_OUT,
+   U5 LASTONE/).
 5. Front LED + eject button wiring (CN105-108 on IF-83).

@@ -122,11 +122,12 @@ CXD1013. **[guess, strongly supported; confirm mechanism pinout on a real unit]*
    is internal to the mech (800K Sony mechs) or needs PWM from the controller.
 2. ~~CN104 pin-by-pin map.~~ Orientation confirmed by continuity 2026-10-10
    (pin 1 = GND, pin 8 = LSTRB). Resolved.
-3. Host connector pinout on CN102 vs SmartPort DB-19; which pins carry /EN,
-   WRPROT/ACK, RDDATA/WRDATA.
+3. ~~Host connector pinout on CN102 vs SmartPort DB-19.~~ Resolved: sec. 10
+   and "Host bus on the Liron card (M6)" (ACK on CN102/flat 20).
 4. Eject button and LED wiring (CN105-108?).
 5. ~~IWM inside CXD1013?~~ No: discrete AMI 344-0041-B (IC103). Resolved.
-6. Do we have a working unit to sniff, or is the mechanism all we have?
+6. ~~Working unit to sniff?~~ Resolved: one working UniDisk, used through its
+   cable only (never opened); M7 compares against it with SPCOMPARE.
 7. X101 frequency.
 
 ## 6. Sources
