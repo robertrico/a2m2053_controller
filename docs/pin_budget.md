@@ -47,7 +47,7 @@ No SD card: the media is the floppy.
 | GP19 | WRTDATA (GCR) | out | U2 |
 | GP20 | mechanism RD | in | U1 |
 | GP21 | U2 /OE (mechanism outputs) | out | none (10k pull-up to 3.3V) |
-| GP22 | eject button | in | none (switch to GND, internal pull-up). **Open:** the U5 table below puts it on U5; settle it when CN105-108 is wired. Firmware ignores it until `ejbtn on` (M7). |
+| GP22 | eject button | in | none: a plain switch straight to the Pico, GND when pressed, internal pull-up (Rico, 2026-10-12). Firmware on at boot, `ejbtn off` disables it. |
 | GP26 | LED | out | transistor, or a U3 spare channel |
 | GP27 | spare | - | |
 | GP28 | spare | - | |
@@ -118,7 +118,7 @@ software loop: tens of ns, versus SmartPort timing in us.
 | U2 | A->B | GP21 + 10k pull-up (Hi-Z through boot) | CA0, CA1, CA2, LSTRB, SEL, /ENBL, /WRTGATE, WRTDATA | 8/8 |
 | U3 | A->B | GP11 (= ENBUS) | host RD | 1/8 |
 | U4 | A->B | **GP21 (shared with U2)** | PH3_OUT, ENBL_OUT, LED | 3/8 |
-| U5 | B->A | tied low | LASTONE/, eject button | 2/8 |
+| U5 | B->A | tied low | LASTONE/ | 1/8 |
 
 U4 must be gated: RP2350 pins default low-ish at boot, and a low on ENBL_OUT
 would enable the downstream drive. B-side pulls: ENBL_OUT 10k to +5V

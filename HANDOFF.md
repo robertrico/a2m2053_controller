@@ -56,8 +56,9 @@ Next: J2 breakout rework, then M8 (daisy chain).
    UniDisk, then behind it. PH3_OUT / ENBL_OUT (U4) and LASTONE/ (U5): check
    what is actually wired (`pin_budget.md`), and the /ENBL pass-through rule
    (parent spec 3.5, unverified).
-3. Open: the GP22 eject button wiring (direct or via U5); firmware ignores it
-   until `ejbtn on`.
+3. Eject button: a plain switch straight to GP22 (no shifter, internal pull-up),
+   settled 2026-10-12. Firmware on main has it on by default (not flashed yet:
+   the Pico runs `f54d07d`, where it is off until `ejbtn on`). Wire the button.
 4. Re-format disk 2 with our board (`imgcopy` puts the M6 image on it). Not
    time critical.
 

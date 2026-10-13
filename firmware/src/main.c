@@ -55,8 +55,9 @@ static bool hw_tx_busy(void *c)  { (void)c; return flux_tx_busy(); }
 static void hw_tx_abort(void *c) { (void)c; flux_tx_abort(); }
 static const flux_tx_t hw_tx = { hw_tx_load, hw_tx_fire, hw_tx_busy, hw_tx_abort, NULL };
 
-// Eject button (GP22): off until `ejbtn on`; how CN105-108 reaches GP22 is not settled
-// (pin_budget.md: direct, or through U5), and a floating input must not eject disks.
+// Eject button (GP22): a plain switch to GND, wired straight to the Pico (no shifter) with the
+// internal pull-up, so an unwired or released button reads high. On at boot; `ejbtn off`
+// disables it.
 static atomic_bool ejbtn;
 static bool eject_button(void *ctx) { return atomic_load(&ejbtn) && hw_eject_pressed(ctx); }
 
@@ -616,6 +617,7 @@ int main(void) {
     ipc_init(&ipc);
     atomic_init(&srv_run, false);
     atomic_init(&srv_running, false);
+    atomic_init(&ejbtn, true);
     multicore_reset_core1();            // after an SWD flash/reset core 1 may not be in its boot-ROM wait
     multicore_launch_core1(core1_main);
     sp_hw_init();

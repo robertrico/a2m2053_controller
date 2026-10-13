@@ -67,11 +67,11 @@ Check order matches `Le8b2`: no disk, then (writes) write-protect, then the
 block range. A failed FORMAT returns `$27` but does not eject the disk (the
 ROM ejects it, `Le30c`). **[choice]**
 
-Eject button (GP22, switch to GND): **off until `ejbtn on`** **[choice]**.
-How CN105-108 reaches GP22 is not settled (`pin_budget.md` has it direct in
-one table and on U5 in another); through U5 with an open input it would
-float and eject disks. When on, core 1 latches a press held 20 ms across idle
-samples (a request in between restarts it) and ejects on release.
+Eject button (GP22): a plain switch straight to the Pico, GND when pressed,
+internal pull-up, so an unwired button reads released (Rico, 2026-10-12;
+replaces the earlier "off until `ejbtn on`" choice made while the wiring was
+open). Core 1 latches a press held 20 ms across idle samples (a request in
+between restarts it) and ejects on release. `ejbtn off` disables it.
 
 LED (GP26, through U4): on while the motor runs. **[choice]** The ROM drives
 its LED from the gate array; ours follows the motor.
