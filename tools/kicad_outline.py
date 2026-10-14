@@ -5,10 +5,12 @@ Replaces every existing Edge.Cuts shape, and moves the mounting-hole
 footprints H1/H2 (frame ground, from the schematic) onto their centers.
 Moving footprints through the API crashed KiCad 10.0.4 twice right after an
 Update PCB from Schematic in the same session; save and restart KiCad first.
+`--outline-only` redraws Edge.Cuts and leaves every footprint alone.
 Needs the KiCad API server on
 (Preferences > Plugins) and kicad-python (`pip install kicad-python`).
 """
 import math
+import sys
 from kipy import KiCad
 from kipy.board_types import BoardSegment, BoardArc, BoardBezier, BoardLayer
 from kipy.geometry import Vector2
@@ -16,7 +18,7 @@ from kipy.geometry import Vector2
 X0, Y0 = 100.0, 50.0      # top-left of the full 100 mm body, at the 94 mm section top
 W, H = 100.0, 105.0       # body width; height from bottom to top of 94 mm section
 INSET = 3.0               # 94 mm section (calipers), centered
-STEP_L, STEP_R = 8.0, 13.0  # depth of the 94 mm section on each side (test print); the steps differ
+STEP_L, STEP_R = 12.0, 6.0  # depth of the 94 mm section on each side (Rico, checked on the IF-83); the steps differ
 TAB_X, TAB_W = INSET + 22.0, 15.5  # tab left edge 22 mm from the 94 mm section edge, width (calipers)
 TAB_H = 5.0               # tab height above the 94 mm top (Rico)
 COVE_H = 1.8              # step: quarter-ellipse cove, this tall, as wide as the step
@@ -85,7 +87,7 @@ if old:
     board.remove_items(old)
 board.create_items(items)
 moved = []
-for fp in board.get_footprints():
+for fp in ([] if "--outline-only" in sys.argv else board.get_footprints()):
     ref = fp.reference_field.text.value
     if ref in holes:
         fp.position = v(holes[ref])

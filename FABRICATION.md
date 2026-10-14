@@ -20,7 +20,7 @@ round.
 - Body 100 mm wide, 105 mm from the bottom edge to the top of the 94 mm
   section.
 - 94 mm section (calipers) at the top, centered (3 mm step on each side).
-  The steps are not level: 8 mm deep on the left, 13 mm on the right
+  The steps are not level: 12 mm deep on the left, 6 mm on the right
   (component-side view, fitted with a 3D-printed outline). Each step is a
   wide, shallow cove as on the IF-83: a quarter-ellipse 2.5 mm wide and
   1.8 mm tall, then a 0.5 mm radius onto the 100 mm edge. The steps are
@@ -44,7 +44,22 @@ round.
   against the IF-83 with a 3D-printed outline.
   Hole 2: right of the tab, center 40 mm from the left edge of the
   94 mm section, hole edge 3 mm below the 94 mm top edge.
-- DB-19 screw holes and any other mounting holes: not drawn yet.
+- Rear DB-19 (J1, female right angle, daisy-chain port): footprint
+  `a2m2053:DSUB-19_Female_Horizontal_P2.77x2.84mm_MountingHoles38.8mm`.
+  Pin pitch and pad sizes match KiCad's stock D-sub sockets. Board-lock
+  holes are 38.8 mm apart, checked against the part. Both board-lock pads
+  are numbered SH and sit on FG. The face points at the 94 mm top edge (rotation 180). Pin 1 at (159.115, 59.92); the
+  board-lock holes at (152.18, 58.5) and (190.98, 58.5). The right one is
+  10.36 mm from H1 center to center, the left one 9.97 mm from H2. The body's
+  right end sits 3 mm from the right edge of the 94 mm section. Checked on
+  2026-10-14 with a 3D print holding the real connector: the holes take its
+  board locks, the print sits on the IF-83 mounting points, and the D-shell
+  lines up with the case opening.
+  The distance from the pins to the front face is 12.68 mm, a stock D-sub
+  value, not a measurement. It moves only the silkscreen and the edge
+  line, not the holes. The silkscreen overhangs the board edge (DRC
+  warning, expected: the shell sits past the edge as on the IF-83).
+- No other mounting holes.
 
 ## Rule: hand-solderable
 
