@@ -5,7 +5,7 @@ OUT    := build
 HDRS   := $(wildcard ../src/*.h *.h)
 
 TESTS  := test_crc32 test_mech test_console test_gcr test_flux_dec test_trackbuf_ipc test_mech_server test_wtrack \
-          test_sp_wire test_ramdisk test_sp_dev test_sp_bus test_fstore test_sp_floppy
+          test_sp_wire test_ramdisk test_sp_dev test_sp_bus test_fstore test_sp_floppy test_loop
 
 all: $(addprefix $(OUT)/,$(TESTS))
 	@for t in $(TESTS); do ./$(OUT)/$$t || exit 1; done
@@ -15,6 +15,9 @@ $(OUT)/test_crc32: test_crc32.c ../src/crc32.c $(HDRS) | $(OUT)
 	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^)
 
 $(OUT)/test_mech: test_mech.c ../src/mech.c ../src/mech_addr.c $(HDRS) | $(OUT)
+	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^)
+
+$(OUT)/test_loop: test_loop.c ../src/loop.c $(HDRS) | $(OUT)
 	$(CC) $(CFLAGS) -o $@ $(filter %.c,$^)
 
 $(OUT)/test_console: test_console.c ../src/console.c $(HDRS) | $(OUT)

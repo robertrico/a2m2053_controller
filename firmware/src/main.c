@@ -19,6 +19,7 @@
 #include "sp_hw.h"
 #include "fstore.h"
 #include "pins.h"
+#include "loop.h"
 #include "tusb.h"
 
 static mech_state_t ms;
@@ -459,6 +460,86 @@ static void do_tach(const mech_bus_t *b) {
     puts("OK");
 }
 
+// loop: rear-port loopback (M8). Drives each daisy-chain output and the host RD/ACK pair through
+// a fixed pattern, one at a time, and reports which inputs followed. Jumpers on J3 decide what
+// should follow what (docs/build_log/m8.md). Bench names: J1 = host IDC20, J3 = rear IDC20.
+// U3 drives RD/ACK onto J1 meanwhile, so the host cable must be off the Liron card.
+typedef struct { unsigned pin; bool idle; const char *name; } loop_pin_t;
+
+static const loop_pin_t loop_drv[] = {
+    {PIN_PH3_OUT,  0, "GP0 PH3_OUT J3.8"},
+    {PIN_ENBL_OUT, 1, "GP27 ENBL_OUT J3.14"},
+    {PIN_HOST_RD,  1, "GP10 RD J1.16/J3.16"},
+    {PIN_ACK,      1, "GP9 ACK J1.20/J3.20"},
+};
+
+static const loop_pin_t loop_in[] = {
+    {PIN_LASTONE,    0, "GP1 LASTONE J3.12"},
+    {PIN_PH0,        0, "GP2 PH0 J1.2/J3.2"},
+    {PIN_PH1,        0, "GP3 PH1 J1.4/J3.4"},
+    {PIN_PH2,        0, "GP4 PH2 J1.6/J3.6"},
+    {PIN_PH3,        0, "GP5 PH3 J1.8"},
+    {PIN_HOST_WRREQ, 0, "GP6 WRREQ J1.10/J3.10"},
+    {PIN_HOST_HSTEN, 0, "GP7 HSTEN J1.14"},
+    {PIN_HOST_WR,    0, "GP8 WR J1.18/J3.18"},
+    {PIN_MECH_RD,    0, "GP20 mech RD J2.16"},
+};
+
+#define LOOP_N(a) (sizeof a / sizeof a[0])
+#define LOOP_SETTLE_US 50
+
+static void do_loop(void) {
+    if (atomic_load(&srv_run) || atomic_load(&srv_running)) { puts("ERR server on (server off first)"); return; }
+    if (spbus.enabled) { puts("ERR sp on (sp off first)"); return; }
+    bool drv[LOOP_STEPS];
+    static uint32_t in[LOOP_STEPS];
+    loop_pattern(drv);
+
+    for (size_t d = 0; d < LOOP_N(loop_drv); d++) gpio_put(loop_drv[d].pin, loop_drv[d].idle);
+    sp_hw_rd_gpio(true);
+    hw_mech_enbl(false);                // mechanism stays deselected; U2 drives idle levels
+    hw_mech_outputs_enable(true);       // U2 + U4
+    gpio_put(PIN_HOST_RD_OE, 0);        // U3: RD and ACK onto J1/J3
+    busy_wait_us_32(LOOP_SETTLE_US);
+
+    uint32_t idle = sp_hw_pins();
+    printf("LOOP idle");
+    for (size_t i = 0; i < LOOP_N(loop_in); i++)
+        printf(" %s=%lu", loop_in[i].name, (unsigned long)((idle >> loop_in[i].pin) & 1u));
+    printf("\n");
+
+    int mixed = 0;
+    for (size_t d = 0; d < LOOP_N(loop_drv); d++) {
+        for (int k = 0; k < LOOP_STEPS; k++) {
+            gpio_put(loop_drv[d].pin, drv[k]);
+            busy_wait_us_32(LOOP_SETTLE_US);
+            in[k] = sp_hw_pins();
+        }
+        gpio_put(loop_drv[d].pin, loop_drv[d].idle);
+        busy_wait_us_32(LOOP_SETTLE_US);
+        printf("LOOP %s ->", loop_drv[d].name);
+        int hits = 0;
+        for (size_t i = 0; i < LOOP_N(loop_in); i++) {
+            loop_rel_t r = loop_relation(drv, in, loop_in[i].pin);
+            if (r == LOOP_FOLLOW || r == LOOP_INVERT) {
+                printf(" %s(%s)", loop_in[i].name, loop_rel_name(r));
+                hits++;
+            } else if (r == LOOP_MIXED) {
+                mixed++;                // moved, but not with this driver: noise or a second source
+                printf(" %s(mixed)", loop_in[i].name);
+            }
+        }
+        printf(hits ? "\n" : " none\n");
+    }
+
+    gpio_put(PIN_HOST_RD_OE, 1);
+    hw_mech_outputs_enable(false);
+    oe_on = enbl_on = motor_on = false;
+    sp_hw_rd_gpio(false);
+    printf("LOOP mixed=%d\n", mixed);
+    puts("OK");
+}
+
 static void execute(const con_cmd_t *c) {
     bool mech_cmd = c->op == CON_OE || c->op == CON_ENBL || c->op == CON_STATUS || c->op == CON_CMD ||
                     c->op == CON_MOTOR || c->op == CON_RECAL || c->op == CON_SEEK || c->op == CON_HEAD ||
@@ -505,6 +586,9 @@ static void execute(const con_cmd_t *c) {
     case CON_IMGCOPY:
         if (!atomic_load(&srv_run)) { puts("ERR server off"); return; }
         do_imgcopy();
+        return;
+    case CON_LOOP:
+        do_loop();
         return;
     case CON_EJBTN:
         atomic_store(&ejbtn, c->arg[0] != 0);

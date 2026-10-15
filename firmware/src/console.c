@@ -34,6 +34,7 @@ static const con_spec_t specs[] = {
     {"splog",    CON_SPLOG,    1, true,  {0},       {0}},
     {"imgcopy",  CON_IMGCOPY,  0, false, {0},       {0}},
     {"ejbtn",    CON_EJBTN,    1, true,  {0},       {0}},
+    {"loop",     CON_LOOP,     0, false, {0},       {0}},
 };
 
 static bool parse_long(const char *s, long lo, long hi, long *out) {
@@ -94,5 +95,6 @@ const char *console_help(void) {
            "server on|off | readblk <0-1599> | readdisk\n"
            "writeblk <0-1599> (then 512 raw bytes) | format [<0-79> <0|1>] (any key stops)\n"
            "sp [on|off] (SmartPort: status, or serve/leave the bus) | sp disk ram|floppy | splog on|off\n"
-           "imgcopy (write the flash ProDOS image to the floppy; any key stops) | ejbtn on|off";
+           "imgcopy (write the flash ProDOS image to the floppy; any key stops) | ejbtn on|off\n"
+           "loop (rear-port loopback; server off, sp off, host cable off the card)";
 }

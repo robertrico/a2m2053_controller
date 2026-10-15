@@ -52,6 +52,8 @@ int main(void) {
     CHECK(P("imgcopy 3").op == CON_BAD);
     CHECK(P("ejbtn on").op == CON_EJBTN && P("ejbtn on").arg[0] == 1);
     CHECK(P("ejbtn").op == CON_BAD);
+    CHECK(P("loop").op == CON_LOOP && P("loop").argc == 0);
+    CHECK(P("loop 1").op == CON_BAD);
     char longline[200];
     memset(longline, 'a', sizeof longline - 1);
     longline[sizeof longline - 1] = 0;

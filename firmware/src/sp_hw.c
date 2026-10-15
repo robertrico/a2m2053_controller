@@ -86,6 +86,16 @@ const sp_hal_t *sp_hw_hal(void) { return &hal; }
 bool sp_hw_lastone(void *ctx) { (void)ctx; return gpio_get(PIN_LASTONE); }
 uint32_t sp_hw_pins(void) { return sio_hw->gpio_in; }
 
+void sp_hw_rd_gpio(bool gpio) {
+    gpio_put(PIN_HOST_RD, 1);           // latch high before the pad changes hands: no glitch
+    if (gpio) {
+        gpio_set_dir(PIN_HOST_RD, GPIO_OUT);
+        gpio_set_function(PIN_HOST_RD, GPIO_FUNC_SIO);
+    } else {
+        pio_gpio_init(SP_PIO, PIN_HOST_RD);   // fm_tx parks with RD high
+    }
+}
+
 void sp_hw_init(void) {
     float sys = (float)clock_get_hz(clk_sys);
     rx_off = pio_add_program(SP_PIO, &fm_rx_program);
