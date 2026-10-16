@@ -10,7 +10,7 @@ working UniDisk byte for byte with a disk, write-protected and with no disk.
 J2 is on an off-the-shelf breakout, and M7.5 moved the rig onto IIe power
 (2026-10-15). **M8 passed on the bench** and is merged (2026-10-15, `a1e51db`):
 daisy chain with the working UniDisk in both orders, full disk copied to it.
-Next: commit, then M9. Bench photo of the whole rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
+Next: M9 robustness (spec sec. 4.2). Bench photo of the whole rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
 
 ## Where things stand
 
@@ -47,9 +47,9 @@ Next: commit, then M9. Bench photo of the whole rig: `docs/photos/m7/2026-10-12_
 1. **M7.5 host power: done 2026-10-15** (`docs/build_log/m7_5.md`). Bench
    supply retired; board and mechanism on the IIe rails via J1. Sentinel boot
    and SPCOMPARE match M7. +5 read 4.54 V; thin +5 jumpers
-   replaced with 24 AWG in M8 (4.7 V at the UniDisk feed). Not yet run on
-   IIe power: full read scan, SPCOMPARE write-protected / no-disk.
-   Eject works on IIe power (button, M8).
+   replaced with 24 AWG in M8 (4.7 V at the UniDisk feed). Full read scan,
+   SPCOMPARE write-protected / no-disk and eject all run on IIe power in M8
+   and match M7.
 2. **M8 brainstorm and spec: daisy chain.** Our board in front of the working
    UniDisk, then behind it. Rear port J3 mapped in `pin_budget.md` (IDC40
    breakout, ribbon crimped flat, DB-19 soldered in Apple mapping, J1.n ->
@@ -60,7 +60,8 @@ Next: commit, then M9. Bench photo of the whole rig: `docs/photos/m7/2026-10-12_
    PIO2 pass-through of PH3 and /ENBL after our INIT, stale-reply fix. Both
    orders work; ProDOS lists S5,D1 and S5,D2. /ENBL rule confirmed. Full
    disk copied D1 -> D2 (UniDisk) and the sentinel boots from the copy.
-   **M8 passed on the bench.** Next: commit the firmware.
+   **M8 passed on the bench.** Firmware committed (`a1e51db`). Clean-boot
+   check: 0 timeouts, 0 re-reads. Next: M9 robustness.
 3. Eject button: wired 2026-10-15 (GP22 pin 29 to GND pin 28, internal
    pull-up, on by default). Works.
 4. Re-format disk 2 with our board (`imgcopy` puts the M6 image on it). Not

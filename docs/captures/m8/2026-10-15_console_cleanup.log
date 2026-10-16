@@ -1,0 +1,85 @@
+# 2026-10-15 M8 cleanup: clean IIe boot, 24 AWG +5, chain on, USB plugged in after the run
+> sp
+ck=4
+SPL CMD d=1 c=01 b=4 s=00 ack=4
+SPL CMD d=1 c=01 b=5 s=00 ack=4
+SPL IGN d=2 c=01 b=2 s=00
+SPL IGN d=2 c=01 b=2 s=00
+SPL IGN d=2 c=01 b=2 s=00
+SPL IGN d=2 c=01 b=3 s=00
+SPL IGN d=2 c=01 b=4 s=00
+SPL IGN d=2 c=01 b=5 s=00
+SPL CMD d=1 c=00 b=0 s=00 ack=4
+SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=396
+SPL CMD d=1 c=01 b=2 s=00 ack=5
+SPL CMD d=1 c=01 b=2 s=00 ack=5
+SPL CMD d=1 c=01 b=3 s=00 ack=4
+SPL CMD d=1 c=01 b=4 s=00 ack=4
+SPL CMD d=1 c=01 b=5 s=00 ack=4
+SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=350
+SPL CMD d=1 c=01 b=2 s=00 ack=5
+SPL CMD d=1 c=01 b=2 s=00 ack=4
+SPL CMD d=1 c=01 b=43 s=00 ack=5 ms=185
+SPL CMD d=1 c=01 b=42 s=00 ack=5
+SPL CMD d=1 c=01 b=44 s=00 ack=5
+SPL CMD d=1 c=01 b=45 s=00 ack=4
+SPL CMD d=1 c=01 b=46 s=00 ack=5
+SPL CMD d=1 c=01 b=47 s=00 ack=4
+sp
+SP on id=1 last=0 pass=1 img=819200 ovl=0/384
+SP disk=floppy server=on wedged=0 exec_ms last=0 max=402 mech st=ad soft=00 tries=0
+SP pkts=77 acks=57 cksum=0 bad=0 ign=20 tmo=0 resets=1 rereads=0 replies=57
+SP ack_us last=6 max=7 data_max=- late=0 late_entry=0
+SP cmds status=6 readblk=50 writeblk=0 format=0 control=0 init=1 other=0
+SP pins PH0=0 PH1=1 PH2=0 PH3=1 WRREQ=1 HSTEN=1 WR=1 LASTONE=0
+OK
+> splog off
+=1 c=00 b=1537 s=21 ack=4
+SPL CMD d=1 c=01 b=0 s=00 ack=4 ms=363
+SPL CMD d=1 c=01 b=1 s=00 ack=5 ms=361
+SPL CMD d=1 c=01 b=2 s=00 ack=5 ms=364
+SPL CMD d=1 c=01 b=1600 s=2d ack=5
+SPL IGN d=2 c=01 b=2 s=00
+SPL IGN d=2 c=01 b=2 s=00
+SPL CMD d=1 c=01 b=2 s=00 ack=4 ms=383
+SPL CMD d=1 c=01 b=2 s=00 ack=5
+SPL CMD d=1 c=01 b=2 s=00 ack=5
+SPL CMD d=1 c=01 b=65 s=00 ack=4 ms=197
+SPL CMD d=1 c=01 b=64 s=00 ack=5
+SPL CMD d=1 c=01 b=66 s=00 ack=4
+SPL CMD d=1 c=01 b=67 s=00 ack=4
+SPL CMD d=1 c=00 b=1536 s=00 ack=5
+SPL CMD d=1 c=00 b=1539 s=00 ack=4
+SPL CMD d=1 c=00 b=1541 s=00 ack=4
+SPL CMD d=1 c=00 b=1537 s=21 ack=5
+SPL CMD d=1 c=01 b=0 s=2f ack=4
+SPL CMD d=1 c=01 b=1 s=2f ack=4
+SPL CMD d=1 c=01 b=2 s=2f ack=4
+SPL CMD d=1 c=01 b=1600 s=2f ack=4
+splog off
+OK
+> sp off
+sp off
+SP off id=1 last=0 pass=1 img=819200 ovl=0/384
+SP disk=floppy server=on wedged=0 exec_ms last=0 max=402 mech st=af soft=00 tries=0
+SP pkts=124 acks=88 cksum=0 bad=0 ign=36 tmo=0 resets=1 rereads=0 replies=88
+SP ack_us last=4 max=7 data_max=- late=0 late_entry=0
+SP cmds status=18 readblk=69 writeblk=0 format=0 control=0 init=1 other=0
+SP pins PH0=0 PH1=1 PH2=0 PH3=1 WRREQ=1 HSTEN=1 WR=1 LASTONE=0
+OK
+> readdisk
+(binary sector data dropped from this log)
+DISK END 0 0 1302
+Result: track sides report $AF (ST_NODISK), mech st=af before the scan: no disk in D1 after the no-disk SPCOMPARE. Rerun with the disk in.
+> a2m readdisk --compare (rerun, disk in)
+scan vs docs/private/ref/m7_test800k.po and ADTPro M7TEST.po: 6 blocks differ [2, 6, 1507, 1508, 1509, 1510]
+= root directory, volume bitmap, and files DATA5 + README that are on the disk but not in the image. Other 1594 blocks identical.
+> sp on
+sp on
+SP on id=1 last=0 pass=1 img=819200 ovl=0/384
+SP disk=floppy server=on wedged=0 exec_ms last=0 max=402 mech st=af soft=00 tries=0
+SP pkts=124 acks=88 cksum=0 bad=0 ign=36 tmo=0 resets=1 rereads=0 replies=88
+SP ack_us last=4 max=7 data_max=- late=0 late_entry=0
+SP cmds status=18 readblk=69 writeblk=0 format=0 control=0 init=1 other=0
+SP pins PH0=0 PH1=1 PH2=0 PH3=1 WRREQ=1 HSTEN=1 WR=1 LASTONE=0
+OK
