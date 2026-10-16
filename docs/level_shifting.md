@@ -117,6 +117,8 @@ optionally U2):
   the drive may tri-state RD when /ENBL is high).
 - Mech /ENBL, /WRTGATE: 10k pull-ups on the B side, so they stay inactive
   while U2 is Hi-Z.
+- Mech LSTRB: 10k pull-down on the B side, so no stray strobe (eject, step)
+  while U2 is Hi-Z (fitted at M0, `docs/build_log/m0.md`).
 - Host PH0-3: 10k pull-downs on the B side (read 0 with no host).
 - Host /WRREQ, /HSTEN: 10k pull-ups on the B side, so they read inactive with
   no host (IIe off or cable out).
@@ -138,4 +140,5 @@ optionally U2):
 4. Daisy-chain out (rear D-sub): pass-through of PH/WR/RD/enable to a second
    drive. Next milestone (M8); pins in `pin_budget.md` (U4 PH3_OUT/ENBL_OUT,
    U5 LASTONE/).
-5. Front LED + eject button wiring (CN105-108 on IF-83).
+5. ~~Front LED + eject button wiring~~ Resolved 2026-10-14: eject straight to
+   GP22, LED from U4 B3 through R17 (`pin_budget.md` Open 3).

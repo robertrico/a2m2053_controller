@@ -59,6 +59,17 @@ round.
   value, not a measurement. It moves only the silkscreen and the edge
   line, not the holes. The silkscreen overhangs the board edge (DRC
   warning, expected: the shell sits past the edge as on the IF-83).
+- Ribbon headers, 2x10 shrouded, 2.54 mm
+  (`Connector_IDC:IDC-Header_2x10_P2.54mm_Vertical`), long side parallel to
+  the top edge, pin 1 at the bottom left, odd pins on the bottom row
+  (rotation 90). Positions from Rico's measurements on the IF-83; not
+  printed yet (ribbon cables, some play).
+  J2 (CN104, mechanism): shroud's upper-left corner 3.5 mm from the board's
+  left edge (below the step) and 18.5 mm below the 94 mm top edge. Pin 1 at
+  (108.6, 74.22).
+  J3 (CN102, host): centered on J1, shroud top 2.5 mm below the back of
+  J1's housing (12.83 mm from the top edge, calipers). Pin 1 at
+  (160.15, 71.05).
 - No other mounting holes.
 
 ## Rule: hand-solderable
@@ -136,13 +147,44 @@ VCCA so the chip stays tristated through power-up and RP2350 boot.
   from the input connector to CN104 (wide traces or pours), all four CN104
   GND pins tied, 4.7 uF 50 V electrolytic at CN104 on both rails as on the
   IF-83. The read amplifier fails silently when +5V sags at the connector.
+- **Rear-port pass-through rails** (`docs/build_log/m8.md`): +5V, +12V and
+  GND from the host connector to the rear DB-19 as wide traces too. The
+  drive chained behind us takes its whole supply through them; thin bench
+  wire dropped it to 4.3 V and it could not read.
+- **Pico power:** VSYS from the IIe +5V rail through a Schottky (D1,
+  STPS2L40AF, SMA), the part Byte Hamr rev2 uses. It keeps USB VBUS from
+  back-feeding the host rail when USB is plugged in (Rico, 2026-10-14).
 - **Shifter /OE pull-ups** (`docs/level_shifting.md`): 10k to VCCA on U2 and
   U3 /OE (and any shifter that must stay quiet through boot).
 - **Pull-ups / pull-downs**: as listed in `docs/level_shifting.md`
-  "Pull-ups / idle states". Host WR pull-down is 100k, not 10k.
+  "Pull-ups / idle states". Host WR pull-down is 100k, not 10k. **The
+  schematic is missing the LSTRB pull-down:** `/MECH_LSTRB` (U2.B4, J2.8)
+  needs 10k to GND, as on the bench since M0. Every other pull on the list
+  is in the schematic (checked 2026-10-14).
 - **3V3 supervisor** (`docs/build_log/m0.md`): consider one that holds U2
   and U4 off below a valid VCCA. Decide at M9.
 - **CN104 pin 20 (/PWM)** tied to +5V, as on the original board.
 - **Rear daisy-chain port** (`docs/pin_budget.md`): PH3_OUT, ENBL_OUT and
   LASTONE/ (rear pin 16, 2k pull-up).
 - **Cost:** whole board well under $150 (the unsold eBay spare).
+
+## Confirm on the prototype at M9
+
+Guesses in the schematic, picked to be safe if wrong. Check each one on the
+perfboard prototype before the PCB order.
+
+- **In-use LED (J5):** polarity is from the wire colors only (RED +, BLK
+  GND); the meter's diode test showed nothing either way. If it stays dark,
+  flip the plug. R17 = 330 is a starting value; the LED board probably has
+  its own resistor, so lower R17 if the LED is dim.
+- **Eject button (J4):** pin 2 to GP22, pins 1 and 3 to GND (meter, cable
+  only). Confirm a press reads low on GP22 with the cable on the board.
+- **J4/J5 pitch:** 2.54 mm headers are a placeholder until the plugs are
+  measured.
+- **J2/J3 positions:** from calipers, not printed. Print once more if the
+  ribbons don't reach.
+- **J1 pins-to-face distance:** 12.68 mm stock value; it only moves the
+  silkscreen.
+- **Pico on D1:** VSYS from +5V through the Schottky. Check that the Pico
+  boots from the IIe alone, and that USB plugged in with the IIe off leaves
+  the host +5V rail dead.

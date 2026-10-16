@@ -219,9 +219,9 @@ Model of the ROM's gate-array use (PH3EN, ENBUS, LASTONE/):
 - **Bus drive:** we drive RD and ACK (both on U3, gated by U3 /OE) only while
   answering a packet addressed to us. This is the ROM's ENBUS on (`$88`)
   and off (`$08`).
-- **Unverified (bench, with a real drive behind us):** that /ENBL
-  pass-through follows the same rule as PH3. The continuity check shows
-  rear pin 17 comes from the CXD1013 (pins 12 and 13), but not the logic.
+- **/ENBL follows the same rule as PH3** (bench, 2026-10-15): with ENBL_OUT
+  copying host /ENBL after our INIT, the working UniDisk behind us takes its
+  INIT and answers reads (`docs/build_log/m8.md`).
 
 ## 4. Bring-up and test plan
 
@@ -250,6 +250,7 @@ cabled behind our board. Never opened, never probed.
 | M5 | Write + format | Sector write + verify on a scratch disk; a disk formatted by our board reads correctly in the working UniDisk |
 | M6 | SmartPort on the RP2350 (alongside M1-M5) | PicoPort ported, serving a RAM disk; ProDOS boots through the Liron card; `sp_asm` timing retuned |
 | M7 | Integration | ProDOS boots from a real 800K floppy through our board; comparison program matches the working UniDisk; worst-case ACK wait measured against the host timeout |
+| M7.5 | Host power | Bench supply retired: our board and mechanism run on the IIe rails through J1. Staged first power-up (logic only, then mechanism); CN104 pin 11 stays >= 4.75 V through motor start and eject; read scan, floppy boot and SPCOMPARE match M7 |
 | M8 | Daisy chain | Our board in front of the working UniDisk, then behind it. INIT assigns both, ProDOS sees both drives, /ENBL pass-through rule confirmed |
 | M9 | Robustness | Disk swap mid-session, write-protected disk, empty drive, long copy loops |
 

@@ -81,11 +81,9 @@ the high nibble, mask in the low nibble):
 
 So daisy chain costs us: **PH3_OUT (1 output) + ENBL_OUT (1 output) + LASTONE/
 (1 input)**. ENBL_OUT was found by continuity (research_notes sec. 10): rear
-pin 17 comes from the CXD1013, not straight from CN102. The other
-bus lines (PH0-2, WR, /WRREQ, RD, ACK, power) are probably wired straight
-through to the rear connector. **Verify on a dead board:** continuity
-CN102 pin <-> rear D-sub pin for every pin, and note which ones go to the
-CXD1013 instead.
+pin 17 comes from the CXD1013, not straight from CN102. Every other rear
+pin except 14 (PH3) and 16 (LASTONE/) is straight copper to CN102: power,
+HDSEL, ACK, PH0-2, /WRREQ, RD, WR (beeped 2026-10-07 and again 2026-10-13).
 
 The internal second mechanism (DRIVE1/DRIVE2, DuoDisk) never shipped. Not
 needed for parity, so /ENBL2 is dropped.
@@ -105,6 +103,40 @@ needed for parity, so /ENBL2 is dropped.
 
 Pass-through, no GPIO (wires CN102 <-> rear D-sub): GND, -12V, +5V, +12V,
 HDSEL (rear 9 / CN102 17), ACK (rear 10 / CN102 20), PH0-2, /WRREQ, RD, WR.
+
+### J3 (our rear port) **[measured]** 2026-10-15, `docs/build_log/m8.md`
+
+J3 is an IDC40 breakout, positions 1-20 used, fed by a 20-wire ribbon. The
+IDC40 end is crimped flat (ribbon wire n = J3.n). The DB-19 female is
+soldered wire by wire in Apple's internal mapping, same as J1 and CN102:
+wire 2n-1 -> DB n (n = 1-9), wire 2k -> DB 10+k (k = 1-9), **wire 20 ->
+DB 10 (ACK)**, wire 19 cut and insulated at the DB end. Rule: **J1.n -> J3.n
+straight, except 8, 12 and 14.**
+
+| J3 | DB-19 | Signal | Connects to |
+|---|---|---|---|
+| 1, 3, 5, 7 | 1-4 | GND | GND |
+| 9 | 5 | -12V | J1.9 |
+| 11 | 6 | +5V | J1.11 |
+| 13, 15 | 7, 8 | +12V | J1.13, J1.15 |
+| 2, 4, 6 | 11-13 | PH0-2 | J1.2, J1.4, J1.6 |
+| 8 | 14 | PH3_OUT | U4 -> GP0, 10k to GND |
+| 10 | 15 | /WRREQ | J1.10 |
+| 12 | 16 | LASTONE/ | 2k to +5V, U5 -> GP1 |
+| 14 | 17 | ENBL_OUT | U4 -> GP27, 10k to +5V |
+| 16 | 18 | RD | J1.16 |
+| 17 | 9 | HDSEL | J1.17 |
+| 18 | 19 | WR | J1.18 |
+| 19 | - | no wire | - |
+| 20 | 10 | ACK | J1.20 |
+
+Plus **J1.12 -> GND**, so a drive in front of us sees us on its LASTONE/
+(CN102.12 is grounded on the IF-83, measured 2026-10-13). J1.9-15 carry
+the host rails through to J3 for the downstream drive: run the +12V and
+-12V isolation checks against every signal pin before host power.
+
+Cable checks: DB-19 pin 10 -> J3.20, nothing on J3.19, DB pin 1 -> J3.1,
+DB pin 19 -> J3.18.
 
 PH3_OUT and ENBL_OUT copy host PH3 and host /ENBL when we enable
 pass-through. Do it in a PIO state machine (input -> output copy), not in a
@@ -131,10 +163,13 @@ them when it's not answering, which is why U3 needs its own /OE.
 ## Open
 
 1. ~~Rear D-sub pinout~~ Measured, see research_notes sec. 10. Apple handwritten table (research_notes sec. 9): rear
-   port = same Liron DB-19 pinout. Remaining check: beep test that PH0-2,
-   WR, RD, ACK, /WRREQ, /ENBL and power go straight CN102 -> rear D-sub, and
-   that PH3 doesn't (it's gated).
+   port = same Liron DB-19 pinout. PH0-2, WR, RD, ACK, /WRREQ, HDSEL and
+   power go straight CN102 -> rear D-sub; PH3, /ENBL and LASTONE/ go to the
+   CXD1013.
 2. ~~LASTONE/~~ Resolved: rear pin 16, 2k pull-up to +5V on our output port;
-   our input-side cable grounds pin 16. Our board: 2k pull-up on rear pin 16,
-   into U5.
-3. Eject button + LED: electrical (CN105-108).
+   ground on input-side pin 16 (CN102.12). Our board: J1.12 -> GND, 2k
+   pull-up on rear pin 16 (J3.12), into U5.
+3. ~~Eject button + LED~~ Resolved 2026-10-14. Eject cable, 3 pins: the outer
+   two are tied in the cable (black wire) and go to GND; the button shorts the
+   middle pin to them. Middle pin straight to GP22 (J4). LED: two wires, RED
+   and BLK, to a small LED board; U4 B3 through R17 to RED, BLK to GND (J5).

@@ -212,7 +212,7 @@ the card does not check the type). STAT = `$80 | code`. SRC = our ID.
 
 - No ID: INIT to any destination is accepted (the card walks the chain) and
   takes the destination as our ID.
-  LASTONE/ (GP1, internal pull-up while U5 is not fitted) high -> status
+  LASTONE/ (GP1 via U5, fitted 2026-10-15; internal pull-up as a fallback) high -> status
   `$40` ("last device"), so the card stops its INIT loop. Then pass-through
   would turn on (ROM `$44`); in M6 it only sets a flag shown by `sp`.
 - No ID and not INIT: ignore (no ACK). The ROM answers these; we do not,

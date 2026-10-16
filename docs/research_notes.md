@@ -124,7 +124,11 @@ CXD1013. **[guess, strongly supported; confirm mechanism pinout on a real unit]*
    (pin 1 = GND, pin 8 = LSTRB). Resolved.
 3. ~~Host connector pinout on CN102 vs SmartPort DB-19.~~ Resolved: sec. 10
    and "Host bus on the Liron card (M6)" (ACK on CN102/flat 20).
-4. Eject button and LED wiring (CN105-108?).
+4. ~~Eject button and LED wiring~~ Eject cable: 3 pins, the outer two tied
+   together (black wire), the button shorts the middle pin to them. LED cable:
+   RED and BLK to a small LED board; meter diode test shows nothing either
+   way (likely a series resistor on that board). **[measured]** 2026-10-14.
+   Polarity from the wire colors only. **[guess]**
 5. ~~IWM inside CXD1013?~~ No: discrete AMI 344-0041-B (IC103). Resolved.
 6. ~~Working unit to sniff?~~ Resolved: one working UniDisk, used through its
    cable only (never opened); M7 compares against it with SPCOMPARE.
@@ -270,7 +274,9 @@ Pin 16 note, verbatim: **"GND on input port, +5V -2k-> on output port."**
 So LASTONE/ = rear (output) port pin 16, pulled up to +5V through 2k. A
 downstream drive's cable (its input port) grounds pin 16, so we read low =
 drive behind us, high = we're last. Matches the firmware (`LASTONE/` read
-after the last ID is assigned).
+after the last ID is assigned). Input-port ground confirmed on a dead IF-83:
+CN102.12 (DB-19 pin 16 on the host side) beeps to GND. **[measured]**
+2026-10-13
 
 Flat 20-pin mapping (right column): DB-19 pin n -> flat pin 2n-1 for 1-10
 (odd side), pins 11-19 -> flat 2,4,...18 (even side), flat 20 unused.
@@ -302,7 +308,7 @@ Flat 20-pin mapping (right column): DB-19 pin n -> flat pin 2n-1 for 1-10
 - +5V at CN104 pin 11 must stay >= 4.75 V with the motor running, or read data
   vanishes (M3 and again M5). **[measured]**
 
-## 10. Rear D-sub <-> CN102 continuity (Rico, dead board, 2026-10-07) **[measured]**
+## 10. Rear D-sub <-> CN102 continuity (Rico, dead board, 2026-10-07; re-beeped 2026-10-13, same map) **[measured]**
 
 Expected map = Apple "regular" flat mapping (DB-19 n -> flat 2n-1 for 1-10,
 2(n-10) for 11-19). Everything matched that, except:

@@ -1,14 +1,16 @@
 # Handoff
 
-Last updated: 2026-10-12 (night). **M6 passed on the bench** and is merged
+Last updated: 2026-10-15. **M6 passed on the bench** and is merged
 to main: ProDOS boots from the board's RAM disk through the Liron card,
 saves and loads files, ACK 5.3 us after /WRREQ rises (card window about
 105 us). **M7 passed on the bench** and is merged: ProDOS boots from a real
 800K floppy through the board (sentinel disk written by the UniDisk, checksums
 out to track 72), Copy II Plus writes through it, and SPCOMPARE matches the
 working UniDisk byte for byte with a disk, write-protected and with no disk.
-Next: J2 breakout rework, then M8 (daisy chain). Bench photo of the whole
-rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
+J2 is on an off-the-shelf breakout, and M7.5 moved the rig onto IIe power
+(2026-10-15). **M8 passed on the bench** (2026-10-15, uncommitted firmware):
+daisy chain with the working UniDisk in both orders, full disk copied to it.
+Next: commit, then M9. Bench photo of the whole rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
 
 ## Where things stand
 
@@ -40,39 +42,39 @@ rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
 - Spare IWMs: one left, on the other dead IF-83.
 - `blinky/` (RP2350 bring-up test) is stashed: `stash@{0}: blinky: RP2350 bring-up test`. Its git-ignored `blinky/build/` output stays on disk.
 
-## Waiting on
-
-- J2 breakout (mechanism side) arrives 2026-10-13.
-
 ## Resume order
 
-1. **J2 breakout** (arrives 2026-10-13): mechanism side on the breakout
-   (J2 = CN104, straight IDC ribbon). Ring out the ribbon to the terminals,
-   then isolation checks: +12 V (13/15/17/19) vs RD (16), WRTDATA (18) and
-   every signal. Short heavy +5 V run to pin 11 and GND to 1/3/5/7, bulk caps
-   (4.7 uF, as on the IF-83) at the terminals. Re-run a disk read scan on
-   drive A with the bench at 5.0 V (`server off` first). Check the U2 channel
-   order against GP12-19 (not recorded in the M0 notes). M7 ran on the old tap.
+1. **M7.5 host power: done 2026-10-15** (`docs/build_log/m7_5.md`). Bench
+   supply retired; board and mechanism on the IIe rails via J1. Sentinel boot
+   and SPCOMPARE match M7. +5 read 4.54 V; thin +5 jumpers
+   replaced with 24 AWG in M8 (4.7 V at the UniDisk feed). Not yet run on
+   IIe power: full read scan, SPCOMPARE write-protected / no-disk.
+   Eject works on IIe power (button, M8).
 2. **M8 brainstorm and spec: daisy chain.** Our board in front of the working
-   UniDisk, then behind it. PH3_OUT / ENBL_OUT (U4) and LASTONE/ (U5): check
-   what is actually wired (`pin_budget.md`), and the /ENBL pass-through rule
-   (parent spec 3.5, unverified).
-3. Eject button: a plain switch straight to GP22 (no shifter, internal pull-up),
-   settled 2026-10-12. Firmware on main has it on by default (not flashed yet:
-   the Pico runs `f54d07d`, where it is off until `ejbtn on`). Wire the button.
+   UniDisk, then behind it. Rear port J3 mapped in `pin_budget.md` (IDC40
+   breakout, ribbon crimped flat, DB-19 soldered in Apple mapping, J1.n ->
+   J3.n except 8/12/14, plus J1.12 -> GND). Rear port wired and proven
+   2026-10-15 (`docs/build_log/m8.md`): U4 and U5 fitted, cable loopback
+   with the `loop` command (branch `m8-loopback`), end-to-end DB-19 beep.
+   Chain firmware on the bench 2026-10-15 (uncommitted on `m8-loopback`):
+   PIO2 pass-through of PH3 and /ENBL after our INIT, stale-reply fix. Both
+   orders work; ProDOS lists S5,D1 and S5,D2. /ENBL rule confirmed. Full
+   disk copied D1 -> D2 (UniDisk) and the sentinel boots from the copy.
+   **M8 passed on the bench.** Next: commit the firmware.
+3. Eject button: wired 2026-10-15 (GP22 pin 29 to GND pin 28, internal
+   pull-up, on by default). Works.
 4. Re-format disk 2 with our board (`imgcopy` puts the M6 image on it). Not
    time critical.
 
 ## Bench state at shutdown
 
-- Pico 2 flashed with `f54d07d` (M7). Main is `87c2b66`+ (eject button on by
-  default); flash it before wiring the button. The mechanism server and U2/U4
-  are on from boot; the floppy is the SmartPort disk (`sp disk ram` for the M6
+- Pico 2 flashed with `m8-loopback` `31e3e0a` plus the uncommitted chain
+  firmware (pass-through, stale-reply fix; eject button on by default). The mechanism server, U2 and U4 (shared
+  GP21) are on from boot; the floppy is the SmartPort disk (`sp disk ram` for the M6
   RAM disk).
-- Supply limits for mechanism work: about 0.5 A on +5, 1.0 A on +12. Lower
-  limits brown the board out at motor start (M7).
-- Power order: Pico, bench +5, +12, IIe. Shutdown: IIe, +12, +5, Pico USB.
-- Mechanism on the old CN104 tap; test disk 1 = `/M7TEST` (window open =
+- Power from the IIe through J1 (M7.5); no bench supply.
+- Power order: Pico USB, then IIe. Shutdown: IIe, then Pico USB.
+- Mechanism on the J2 breakout; test disk 1 = `/M7TEST` (window open =
   write-protected at the end of the session).
 - Our DB-19 cable on the Liron card (slot 5); the working UniDisk is off the
   card. A Disk II in slot 6 boots first on a cold start; `PR#5` boots our
