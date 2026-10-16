@@ -8,7 +8,7 @@ saves and loads files, ACK 5.3 us after /WRREQ rises (card window about
 out to track 72), Copy II Plus writes through it, and SPCOMPARE matches the
 working UniDisk byte for byte with a disk, write-protected and with no disk.
 J2 is on an off-the-shelf breakout, and M7.5 moved the rig onto IIe power
-(2026-10-15). **M8 passed on the bench** (2026-10-15, uncommitted firmware):
+(2026-10-15). **M8 passed on the bench** and is merged (2026-10-15, `a1e51db`):
 daisy chain with the working UniDisk in both orders, full disk copied to it.
 Next: commit, then M9. Bench photo of the whole rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
 
@@ -55,8 +55,8 @@ Next: commit, then M9. Bench photo of the whole rig: `docs/photos/m7/2026-10-12_
    breakout, ribbon crimped flat, DB-19 soldered in Apple mapping, J1.n ->
    J3.n except 8/12/14, plus J1.12 -> GND). Rear port wired and proven
    2026-10-15 (`docs/build_log/m8.md`): U4 and U5 fitted, cable loopback
-   with the `loop` command (branch `m8-loopback`), end-to-end DB-19 beep.
-   Chain firmware on the bench 2026-10-15 (uncommitted on `m8-loopback`):
+   with the `loop` command, end-to-end DB-19 beep.
+   Chain firmware on the bench 2026-10-15 (`a1e51db`, main):
    PIO2 pass-through of PH3 and /ENBL after our INIT, stale-reply fix. Both
    orders work; ProDOS lists S5,D1 and S5,D2. /ENBL rule confirmed. Full
    disk copied D1 -> D2 (UniDisk) and the sentinel boots from the copy.
@@ -68,8 +68,8 @@ Next: commit, then M9. Bench photo of the whole rig: `docs/photos/m7/2026-10-12_
 
 ## Bench state at shutdown
 
-- Pico 2 flashed with `m8-loopback` `31e3e0a` plus the uncommitted chain
-  firmware (pass-through, stale-reply fix; eject button on by default). The mechanism server, U2 and U4 (shared
+- Pico 2 flashed with main `a1e51db` (chain pass-through, stale-reply fix;
+  eject button on by default). The mechanism server, U2 and U4 (shared
   GP21) are on from boot; the floppy is the SmartPort disk (`sp disk ram` for the M6
   RAM disk).
 - Power from the IIe through J1 (M7.5); no bench supply.
