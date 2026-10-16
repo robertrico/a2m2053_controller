@@ -1,0 +1,10 @@
+# 2026-10-15 M9: counters after the long ADTPro copy run to D1 (USB plugged in after the run, IIe on)
+> sp
+sp
+SP on id=1 last=0 pass=1 img=819200 ovl=0/384
+SP disk=floppy server=on wedged=0 exec_ms last=123 max=884 mech st=00 soft=00 tries=1
+SP pkts=4744 acks=3891 cksum=0 bad=0 ign=853 tmo=0 resets=1 rereads=0 replies=2281
+SP ack_us last=6 max=7 data_max=32 late=0 late_entry=0
+SP cmds status=32 readblk=637 writeblk=1610 format=1 control=0 init=1 other=0
+SP pins PH0=0 PH1=1 PH2=0 PH3=1 WRREQ=1 HSTEN=1 WR=1 LASTONE=0
+OK

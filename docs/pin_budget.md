@@ -169,7 +169,9 @@ them when it's not answering, which is why U3 needs its own /OE.
 2. ~~LASTONE/~~ Resolved: rear pin 16, 2k pull-up to +5V on our output port;
    ground on input-side pin 16 (CN102.12). Our board: J1.12 -> GND, 2k
    pull-up on rear pin 16 (J3.12), into U5.
-3. ~~Eject button + LED~~ Resolved 2026-10-14. Eject cable, 3 pins: the outer
-   two are tied in the cable (black wire) and go to GND; the button shorts the
-   middle pin to them. Middle pin straight to GP22 (J4). LED: two wires, RED
+3. ~~Eject button + LED~~ Resolved 2026-10-14. Eject cable, 3 pins, a changeover
+   switch (meter, 2026-10-15): released, the two outer pins are connected;
+   pressed, that opens and the middle pin connects to one outer pin. Middle
+   pin straight to GP22, both outer pins to GND (J4): released shorts GND to
+   GND, pressed pulls GP22 low, whichever outer pin is the common. LED: two wires, RED
    and BLK, to a small LED board; U4 B3 through R17 to RED, BLK to GND (J5).

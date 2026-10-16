@@ -161,8 +161,11 @@ VCCA so the chip stays tristated through power-up and RP2350 boot.
   schematic is missing the LSTRB pull-down:** `/MECH_LSTRB` (U2.B4, J2.8)
   needs 10k to GND, as on the bench since M0. Every other pull on the list
   is in the schematic (checked 2026-10-14).
-- **3V3 supervisor** (`docs/build_log/m0.md`): consider one that holds U2
-  and U4 off below a valid VCCA. Decide at M9.
+- **No 3V3 supervisor.** Dropped at M9 (Rico, 2026-10-15). The M0 power-edge
+  strobe on LSTRB (`docs/build_log/m0.md`) can at worst make the mechanism
+  step or blip at power-on, as the stock UniDisk and DuoDisk do anyway; no
+  disk spins and nothing is written then. Many IIe and Pico power cycles in
+  M9 showed no stray mechanism action.
 - **CN104 pin 20 (/PWM)** tied to +5V, as on the original board.
 - **Rear daisy-chain port** (`docs/pin_budget.md`): PH3_OUT, ENBL_OUT and
   LASTONE/ (rear pin 16, 2k pull-up).
@@ -173,18 +176,20 @@ VCCA so the chip stays tristated through power-up and RP2350 boot.
 Guesses in the schematic, picked to be safe if wrong. Check each one on the
 perfboard prototype before the PCB order.
 
-- **In-use LED (J5):** polarity is from the wire colors only (RED +, BLK
-  GND); the meter's diode test showed nothing either way. If it stays dark,
-  flip the plug. R17 = 330 is a starting value; the LED board probably has
-  its own resistor, so lower R17 if the LED is dim.
-- **Eject button (J4):** pin 2 to GP22, pins 1 and 3 to GND (meter, cable
-  only). Confirm a press reads low on GP22 with the cable on the board.
+- **In-use LED (J5):** polarity confirmed at M9 (RED +, BLK GND): the LED
+  blinks with drive activity. Blink timing is a firmware detail. R17 = 330
+  is a starting value; lower it if the LED is dim on the PCB.
+- **Eject button (J4):** pin 2 to GP22, pins 1 and 3 to GND. The button is a
+  changeover switch (meter, 2026-10-15): released, pins 1 and 3 connect;
+  pressed, pin 2 connects to one outer pin. With both outer pins on GND a
+  press pulls GP22 low whichever outer pin is the common. Still to confirm
+  with the real cable on the board.
 - **J4/J5 pitch:** 2.54 mm headers are a placeholder until the plugs are
   measured.
 - **J2/J3 positions:** from calipers, not printed. Print once more if the
   ribbons don't reach.
 - **J1 pins-to-face distance:** 12.68 mm stock value; it only moves the
   silkscreen.
-- **Pico on D1:** VSYS from +5V through the Schottky. Check that the Pico
-  boots from the IIe alone, and that USB plugged in with the IIe off leaves
-  the host +5V rail dead.
+- **Pico on D1:** confirmed on the prototype (M8, a small diode in place of
+  the Schottky): the Pico boots from the IIe alone, and the diode was tested
+  live against USB back-feed.

@@ -124,8 +124,9 @@ CXD1013. **[guess, strongly supported; confirm mechanism pinout on a real unit]*
    (pin 1 = GND, pin 8 = LSTRB). Resolved.
 3. ~~Host connector pinout on CN102 vs SmartPort DB-19.~~ Resolved: sec. 10
    and "Host bus on the Liron card (M6)" (ACK on CN102/flat 20).
-4. ~~Eject button and LED wiring~~ Eject cable: 3 pins, the outer two tied
-   together (black wire), the button shorts the middle pin to them. LED cable:
+4. ~~Eject button and LED wiring~~ Eject cable: 3 pins, a changeover switch.
+   Released, the outer two are connected; pressed, they open and the middle
+   pin connects to one outer pin. **[measured]** 2026-10-15. LED cable:
    RED and BLK to a small LED board; meter diode test shows nothing either
    way (likely a series resistor on that board). **[measured]** 2026-10-14.
    Polarity from the wire colors only. **[guess]**

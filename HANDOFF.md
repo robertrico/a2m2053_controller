@@ -10,7 +10,7 @@ working UniDisk byte for byte with a disk, write-protected and with no disk.
 J2 is on an off-the-shelf breakout, and M7.5 moved the rig onto IIe power
 (2026-10-15). **M8 passed on the bench** and is merged (2026-10-15, `a1e51db`):
 daisy chain with the working UniDisk in both orders, full disk copied to it.
-Next: M9 robustness (spec sec. 4.2). Bench photo of the whole rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
+**M9 passed on the bench** (2026-10-15, `docs/build_log/m9.md`). Next: the PCB. Bench photo of the whole rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
 
 ## Where things stand
 
@@ -61,10 +61,21 @@ Next: M9 robustness (spec sec. 4.2). Bench photo of the whole rig: `docs/photos/
    orders work; ProDOS lists S5,D1 and S5,D2. /ENBL rule confirmed. Full
    disk copied D1 -> D2 (UniDisk) and the sentinel boots from the copy.
    **M8 passed on the bench.** Firmware committed (`a1e51db`). Clean-boot
-   check: 0 timeouts, 0 re-reads. Next: M9 robustness.
+   check: 0 timeouts, 0 re-reads.
 3. Eject button: wired 2026-10-15 (GP22 pin 29 to GND pin 28, internal
    pull-up, on by default). Works.
-4. Re-format disk 2 with our board (`imgcopy` puts the M6 image on it). Not
+4. **M9 robustness: passed 2026-10-15** (`docs/build_log/m9.md`). Swaps,
+   swap-then-write, write-protect, empty drive, eject and resets
+   mid-transfer, 1610 writes with 0 errors. No 3V3 supervisor. Next: PCB.
+5. **PCB design: revisit the eject button (J4).** The front-panel button is a
+   changeover switch, not a plain one (meter, 2026-10-15): released, the two
+   outer pins connect; pressed, the middle pin connects to one outer pin.
+   The current J4 (pin 2 to GP22, pins 1 and 3 to GND) works either way.
+   Options: put the second contact on a spare GPIO if one is free, or
+   ignore it (it may just have been the switch Sony had on hand). The J4
+   Description in the schematic still says the outer pins are tied; fix it
+   then.
+6. Re-format disk 2 with our board (`imgcopy` puts the M6 image on it). Not
    time critical.
 
 ## Bench state at shutdown
