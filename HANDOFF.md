@@ -10,7 +10,7 @@ working UniDisk byte for byte with a disk, write-protected and with no disk.
 J2 is on an off-the-shelf breakout, and M7.5 moved the rig onto IIe power
 (2026-10-15). **M8 passed on the bench** and is merged (2026-10-15, `a1e51db`):
 daisy chain with the working UniDisk in both orders, full disk copied to it.
-**M9 passed on the bench** (2026-10-15, `docs/build_log/m9.md`). **PCB** (2026-10-16): R18 (LSTRB pull-down) added, shifter channels re-ordered for routing (see "Make prototype match PCB"), parts placed, routing and pours done, DRC clean except one stray via (see "PCB layout state"). Bench photo of the whole rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
+**M9 passed on the bench** (2026-10-15, `docs/build_log/m9.md`). **PCB** (2026-10-16): R18 (LSTRB pull-down) added, shifter channels re-ordered for routing (see "Make prototype match PCB"), parts placed, routing and pours done, DRC clean (see "PCB layout state"). Bench photo of the whole rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
 
 ## Where things stand
 
@@ -83,17 +83,19 @@ daisy chain with the working UniDisk in both orders, full disk copied to it.
 2026-10-16, end of the layout session. Everything below was done through
 Konnect over IPC and saved from pcbnew; no hand edits of the KiCad files.
 
-- Routing complete: 113 vias, F.Cu signals 0.25 mm, power 0.5 to 1.5 mm.
+- Routing complete: 112 vias, F.Cu signals 0.25 mm, power 0.5 to 1.5 mm.
 - Zones: `5V_F` (+5V, F.Cu, whole board), `12V_F` (+12V, F.Cu band
   x 133.5-155.2 / y 73.3-84.3, priority 1, carved out of the +5 pour),
   `GND_B` (GND, B.Cu, whole board).
-- DRC (`kicad-cli pcb drc --refill-zones`, errors): **0 errors**, 1
-  unconnected item (a 2 mm2 sliver of the +5 pour between J2 pins 9-12 with
-  nothing in it; harmless), 1 dangling via.
-- **To do in pcbnew:** delete the stray via at (120.03, 72.95). It was placed
-  by mistake on the /MECH_WRTGATE corner, Konnect cannot delete vias, it
-  carries no track now. Then Edit > Fill All Zones (B) and save: the fills in
-  the file are stale, the DRC above refilled in memory only.
+- DRC (`kicad-cli pcb drc --refill-zones`, errors): **0 errors, 0
+  unconnected.** Warnings left: silk overlaps/edge clearance, two
+  lib-footprint mismatches (A1, R18), all pre-existing.
+- 2026-10-16 late: the mechanism +5 group (J2.11, J2.20, C12, U5 feed) was
+  its own island, cut off from the host +5 by the SEL/ENBL/WRTDATA drops and
+  the +12 band. Fixed with a 1.2 mm B.Cu run at y 76.3 from the J2 strap to
+  the x 151 host feed. +5 and +12 each verified as one connectivity cluster.
+- **In pcbnew before ordering:** Edit > Fill All Zones (B), DRC, save. The
+  fills in the file are only as fresh as the last save from pcbnew.
 - Power paths worth a look before ordering:
   - +12: host J3.13/15 and rear J1.7/8 on a 1.0 mm B.Cu strap, via at
     (154.3, 74.6) into the F.Cu band, C11 on the band, via (137.5, 79.5) to a
