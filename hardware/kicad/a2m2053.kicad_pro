@@ -568,7 +568,7 @@
       "idf": "",
       "netlist": "",
       "plot": "",
-      "specctra_dsn": "a2m2053.dsn",
+      "specctra_dsn": "../a2m2053_1.dsn",
       "vrml": ""
     },
     "page_layout_descr_file": ""

@@ -28,3 +28,7 @@ docs/captures/**/*.csv
 # routing scratch (Freerouting DSN/SES, DRC dumps, helper scripts): local only
 hardware/kicad/scratch/*
 !hardware/kicad/scratch/.gitkeep
+
+# Freerouting exchange files (derived)
+hardware/*.dsn
+hardware/*.ses
