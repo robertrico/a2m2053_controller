@@ -10,7 +10,7 @@ working UniDisk byte for byte with a disk, write-protected and with no disk.
 J2 is on an off-the-shelf breakout, and M7.5 moved the rig onto IIe power
 (2026-10-15). **M8 passed on the bench** and is merged (2026-10-15, `a1e51db`):
 daisy chain with the working UniDisk in both orders, full disk copied to it.
-**M9 passed on the bench** (2026-10-15, `docs/build_log/m9.md`). **PCB** (2026-10-16): R18 (LSTRB pull-down) added, shifter channels re-ordered for routing (see "Make prototype match PCB"), board named Disk Hamr, routed (Freerouting + hand fixes), DRC and parity clean (see "PCB layout state"). Bench photo of the whole rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
+**M9 passed on the bench** (2026-10-15, `docs/build_log/m9.md`). **PCB** (2026-10-16): R18 (LSTRB pull-down) added, shifter channels re-ordered for routing (see "Make prototype match PCB"), board named Disk Hamr, routed, DRC clean, STL/STEP exported for the case print (see "PCB layout state" and its "Next" list). Bench photo of the whole rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
 
 ## Where things stand
 
@@ -80,36 +80,58 @@ daisy chain with the working UniDisk in both orders, full disk copied to it.
 
 ## PCB layout state
 
-2026-10-16, end of day. Board named **Disk Hamr** (silk: Byte Hamr logo,
-"Rev. 1.0", ID block). Routing is the Freerouting 2.5 result, hand-fixed
-in pcbnew; the earlier hand-routed board is in history at `746e44e` if
-ever needed.
+2026-10-16, end of day. Board named **Disk Hamr**, rev 1.0, ID `DH-1-0`.
+Silk: Byte Hamr hammer (`a2m2053.pretty/logo_sm`), title, rev and ID block
+in Katari 0.1 mm, left/bottom justified. Katari lives in
+`~/Library/Fonts/Katari.ttc` (copied from Apple's font asset cache so
+KiCad's fontconfig finds it). `main` at `d8d5f31`, pushed.
+
+Routing is the Freerouting 2.5 clean-field result, hand-fixed in pcbnew.
+The earlier hand-routed board is in history at `746e44e`.
 
 - How it was made: all tracks wiped, pours hidden from the router, every
-  net autorouted in 12 s (`hardware/a2m2053_clean.dsn`, git-ignored),
-  session imported, zones refilled, neck-down segments widened, ENBL_OUT
-  completed, GND stitch vias added by hand. 870 segments, 86 vias.
+  net autorouted in 12 s, session imported, zones refilled, neck-down
+  segments widened, ENBL_OUT completed, GND stitch vias and the mech +5
+  feed added by hand, dangling vias removed. 870 segments, 84 vias.
 - Zones: `5V_F` (+5V, F.Cu, whole board), `12V_F` (+12V band, priority 1),
-  `GND_B` (GND, B.Cu, whole board). GND pins of the ICs reach the plane
-  through hand-placed stitch vias; GND also runs as traces on F.Cu.
-- Checks: DRC with zone refill 0 errors / 0 unconnected, schematic parity
-  0, ERC only the Pico AGND/GND pin-type error. +5V, +12V and GND each one
-  connectivity cluster. Fab numbers: 100 x 110 mm, min track 0.25, min
-  clearance 0.2, min drill 0.3, via ring 0.15.
+  `GND_B` (GND, B.Cu, whole board). IC GND pins reach the plane through
+  stitch vias; GND also runs as traces on F.Cu.
+- Checks (2026-10-16 14:05): DRC with zone refill 0 errors / 0 unconnected;
+  schematic parity only "extra footprint G1" (the logo, board-only); ERC
+  only the Pico AGND/GND pin-type error. +5V, +12V and GND each one
+  connectivity cluster. Warnings left: silk overlaps, footprint/library
+  mismatches on A1, R18, G1, two "dangling" vias that are fine (GND stitch
+  at 161.85/58.0, +5V via feeding R15 through the pour at 197.05/62.0).
+- Fab numbers: 100 x 110 mm, min track 0.25, clearance 0.2, drill 0.3,
+  via ring 0.15, 46 parts all on top.
 - FG is gone: H1, H2 and the J1 shield are GND in schematic and PCB.
-- Known soft spots: a 30 x 4 mm slot in the GND plane between J2 and J3
-  where the 1 mm +5/+12 B.Cu runs sit side by side; three dangling vias
-  left from hand edits (+5V 197.05/62.0, PH0_A 131.3/144.9, LED_B
-  137.5/64.7), delete in pcbnew; silk text should be Katari 0.1 mm,
-  left/bottom justified (font now in ~/Library/Fonts); ID line reads
-  `A2M-1-0`, should be `DH-1-0`.
-- Freerouting notes: jar and standalone CLI need Java 25 (Homebrew
-  openjdk@25). Headless runs bail early on this board; the GUI with the
-  pours stripped from the DSN is what worked. Locked pre-routes and the
-  pour-as-plane heuristic made it fail, not the layout.
-- Still open from FABRICATION.md: J4/J5 header pitch, J2/J3 positions
-  (print once more), J1 pins-to-face, J4 pinout on the real front-panel
-  cable.
+- Known soft spot: a 30 x 4 mm slot in the GND plane between J2 and J3
+  where the 1 mm +5/+12 B.Cu runs sit side by side. Plane still one piece.
+  Fix if wanted: move one run to F.Cu.
+- Exports (git-ignored `hardware/export/`): `disk_hamr_rev1.stl` and
+  `.step`, board plus parts, no DB-19 body (no 3D model; real connector
+  already fit-tested). Rico has the STL in PrusaSlicer for a case print.
+- Freerouting: v2.5.0 needs Java 25 (`/opt/homebrew/opt/openjdk@25`).
+  Jar: `gh release download v2.5.0 -R freerouting/freerouting -p
+  freerouting-2.5.0.jar`. Headless runs bail early on this board; the GUI
+  with the pours stripped from the DSN worked. Locked pre-routes and the
+  pour-as-plane heuristic were the problem, not the layout. DSN/SES files
+  under `hardware/` are git-ignored scratch.
+- Site: log "Disk Hamr: the PCB is routed" published 2026-10-16 on the
+  unidisk-controller project. Site logs never name internal docs; drafts
+  until Rico has proofread.
+
+### Next
+
+1. Print the STL, try it in the case with the mechanism and the IF-83
+   rails. Note anything that collides.
+2. Rewire the prototype to the PCB's channel order (table below), boot the
+   sentinel, run SPCOMPARE. Only then order.
+3. Measurements before ordering: J4/J5 header pitch, J2/J3 positions on
+   one more print, J1 pins-to-face, J4 pinout on the real front-panel
+   cable.
+4. Decide on the GND-plane slot and the eject button's second contact.
+5. Fab outputs (gerbers, drill, BOM, position) once 1-4 are done.
 
 ## Make prototype match PCB
 
