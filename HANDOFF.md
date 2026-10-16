@@ -14,7 +14,7 @@ daisy chain with the working UniDisk in both orders, full disk copied to it.
 
 ## Where things stand
 
-- M0 to M5 done (`docs/build_log/m5.md`). No remote.
+- M0 to M5 done (`docs/build_log/m5.md`). Remote: private GitHub repo `robertrico/a2m2053_controller` (2026-10-16).
 - M6 (`docs/build_log/m6.md`):
   - 2026-10-11: homemade DB-19 adapter bridged -12 V onto /WRREQ. U1 burned
     (replaced); Liron IWM replaced with a donor from a dead IF-83 (socketed at
