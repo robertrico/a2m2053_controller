@@ -24,3 +24,7 @@ firmware/test/build/
 
 # raw scope waveforms (MBs each): local only
 docs/captures/**/*.csv
+
+# routing scratch (Freerouting DSN/SES, DRC dumps, helper scripts): local only
+hardware/kicad/scratch/*
+!hardware/kicad/scratch/.gitkeep
