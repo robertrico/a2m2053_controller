@@ -1,0 +1,17 @@
+; Daisy-chain pass-through (parent spec sec. 3.5, M8). One instruction: copy the IN pin to the
+; OUT pin every cycle. Two SMs share it on PIO2: host PH3 (GP5) -> PH3_OUT (GP0) and host /ENBL
+; (GP7) -> ENBL_OUT (GP27). Runs only once INIT gave us an ID (ROM: PH3EN, $44).
+.program sp_chain
+.pio_version 0
+.wrap_target
+    mov pins, pins
+.wrap
+
+% c-sdk {
+static inline pio_sm_config sp_chain_config(uint offset, uint in_pin, uint out_pin) {
+    pio_sm_config c = sp_chain_program_get_default_config(offset);
+    sm_config_set_in_pins(&c, in_pin);
+    sm_config_set_out_pins(&c, out_pin, 1);
+    return c;
+}
+%}

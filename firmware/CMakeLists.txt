@@ -12,6 +12,7 @@ add_executable(a2m_bringup
 pico_generate_pio_header(a2m_bringup ${CMAKE_CURRENT_LIST_DIR}/src/flux_rx.pio)
 pico_generate_pio_header(a2m_bringup ${CMAKE_CURRENT_LIST_DIR}/src/flux_tx.pio)
 pico_generate_pio_header(a2m_bringup ${CMAKE_CURRENT_LIST_DIR}/src/sp_fm.pio)
+pico_generate_pio_header(a2m_bringup ${CMAKE_CURRENT_LIST_DIR}/src/sp_chain.pio)
 
 # M6 RAM disk base image (spec sec. 6.2). Git-ignored: it holds Apple's ProDOS.
 set(A2M_DISK_IMAGE "${CMAKE_CURRENT_LIST_DIR}/../docs/private/ref/m6_boot800k.po" CACHE FILEPATH

@@ -34,6 +34,13 @@ bool sp_bus_log_pop(sp_bus_t *b, sp_log_t *e) {
     return true;
 }
 
+// Rear port follows the device: pass-through on once INIT gave us an ID, off on bus reset.
+static void chain_sync(sp_bus_t *b) {
+    if (b->chain_on == b->dev->passthrough) return;
+    b->chain_on = b->dev->passthrough;
+    H->set_chain(H->ctx, b->chain_on);
+}
+
 static void release(sp_bus_t *b) {
     H->set_enbus(H->ctx, false);
     H->set_ack(H->ctx, true);
@@ -42,6 +49,7 @@ static void release(sp_bus_t *b) {
 static void reset_state(sp_bus_t *b) {
     b->reset_latch = false;
     sp_dev_bus_reset(b->dev);
+    chain_sync(b);
     b->tx_valid = false;
     b->cmd_len = 0;
     b->st.resets++;
@@ -63,6 +71,8 @@ void sp_bus_init(sp_bus_t *b, const sp_hal_t *hal, sp_dev_t *dev) {
     b->hal = hal;
     b->dev = dev;
     b->st.ack_us_last = b->st.ack_us_max = b->st.data_ack_us_max = INT32_MIN;
+    b->chain_on = true;
+    chain_sync(b);                              // off until INIT
     release(b);
     hal->rx_arm(hal->ctx);
 }
@@ -110,6 +120,7 @@ static rxres_t SP_RAM(receive)(sp_bus_t *b, uint8_t want_type, uint64_t *t_up, b
     b->st.packets++;
     if (sp_decode(b->rx.wire, b->rx.n, &b->hdr, b->data) != SP_OK) {
         b->st.cksum++;
+        if (want_type == SP_TYPE_CMD) b->tx_valid = false;     // may have been for another drive
         log_push(b, SP_LOG_CKSUM, 0, INT32_MIN);
         return RX_IGNORE;
     }
@@ -119,6 +130,9 @@ static rxres_t SP_RAM(receive)(sp_bus_t *b, uint8_t want_type, uint64_t *t_up, b
     if (!ours) {
         b->st.ignored++;
         if (want_type == SP_TYPE_CMD) {             // inside get_data b->cmd is the pending command
+            // A command for another drive (daisy chain): the next REQ high is the card reading
+            // that drive's reply, never a re-read of ours.
+            b->tx_valid = false;
             b->cmd_len = b->hdr.len < SP_CMD_LEN ? b->hdr.len : SP_CMD_LEN;
             memcpy(b->cmd, b->data, b->cmd_len);
             b->reply.stat = 0;
@@ -268,6 +282,7 @@ static void transaction(sp_bus_t *b) {
     sp_dev_execute(b->dev, dest, b->cmd, b->cmd_len, b->data, dlen, &b->reply);
     b->st.exec_ms_last = (uint32_t)((NOW() - t_exec) / 1000u);
     if (b->st.exec_ms_last > b->st.exec_ms_max) b->st.exec_ms_max = b->st.exec_ms_last;
+    chain_sync(b);                              // INIT: on before our reply, as the ROM ($44)
     if (b->reset_latch) {                       // the card reset while we worked: no stale reply
         release(b);
         reset_state(b);

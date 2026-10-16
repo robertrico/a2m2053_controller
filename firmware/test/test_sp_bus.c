@@ -284,6 +284,9 @@ static void sim_update(double now) {
 static void advance(double dt) { t += dt; sim_update(t); }
 
 // ---------------------------------------------------------------- HAL
+static bool chain;                      // rear-port pass-through as the engine set it
+static int chain_sets;
+static bool chain_first_tx, tx_seen;    // pass-through state when the first reply started
 static uint32_t h_inputs(void *c) { (void)c; advance(T_CALL); return phases | (wrreq_low ? 0 : SP_IN_WRREQ); }
 static void h_set_ack(void *c, bool high) {
     (void)c; advance(T_CALL);
@@ -310,6 +313,7 @@ static size_t h_rx_count(void *c) {
 static void h_tx_start(void *c, const uint8_t *buf, size_t len) {
     (void)c; advance(T_CALL);
     if (cur >= nops || ops[cur].k != OP_READ || sub != 2 || !(phases & SP_IN_PH0) || !enbus) proto_err++;
+    if (!tx_seen) { tx_seen = true; chain_first_tx = chain; }
     memcpy(txbytes, buf, len);
     txlen = len;
     tx_t0 = t;
@@ -320,10 +324,11 @@ static uint64_t h_now(void *c) { (void)c; return (uint64_t)t; }
 static void h_delay(void *c, uint32_t us) { (void)c; advance((double)us); }
 static uint32_t h_irq_off(void *c) { (void)c; return 0; }
 static void h_irq_restore(void *c, uint32_t s) { (void)c; (void)s; }
+static void h_set_chain(void *c, bool on) { (void)c; chain = on; chain_sets++; }
 
 static const sp_hal_t hal = {
     h_inputs, h_set_ack, h_set_enbus, h_rx_arm, h_rx_count, rxbuf, sizeof rxbuf,
-    h_tx_start, h_tx_busy, h_now, h_delay, h_irq_off, h_irq_restore, NULL,
+    h_tx_start, h_tx_busy, h_now, h_delay, h_irq_off, h_irq_restore, h_set_chain, NULL,
 };
 
 // ---------------------------------------------------------------- scripts
@@ -352,6 +357,10 @@ static void sim_reset(void) {
     rx_chunks = 0; rx_started = false; rx_arm_t = 0; rx_ei = 0;
     tx_t0 = tx_end = -1;
     max_ack_after_underrun = 0;
+    chain = true;                       // sp_bus_init must turn it off
+    chain_sets = 0;
+    chain_first_tx = tx_seen = false;
+    lastone_high = true;
     ramdisk_init(&rd, base, sizeof base, slots, 8);
     store = ramdisk_store(&rd);
     sp_dev_init(&dev, sim_store ? sim_store : &store, lastone_cb, NULL);
@@ -404,7 +413,7 @@ int main(void) {
     run_script(2e6);
     CHECK(init->ok && init->attempts == 1);
     CHECK(init_r->ok && init_r->h.stat == SP_E_LAST && init_r->h.src == 1 && init_r->h.dest == 0);
-    CHECK(dev.id == 1);
+    CHECK(dev.id == 1 && chain);                    // INIT turned the rear port on
     CHECK(st->ok && st->attempts == 1 && st_r->ok && st_r->h.len == 4);
     CHECK(st_r->data[0] == 0xF8 && st_r->data[1] == 0x40 && st_r->data[2] == 0x06);
     CHECK(rb->ok && rb_r->ok && rb_r->h.stat == 0 && rb_r->h.len == 512);
@@ -487,6 +496,8 @@ int main(void) {
     CHECK(cut->ok);
     CHECK(init2->ok && init2_r->ok && dev.id == 2 && init2_r->h.src == 2);
     CHECK(bus.st.resets == 2 && !enbus);
+    CHECK(chain && chain_sets == 4);                // off at init, on, off at reset, on
+
 
     // 7. Card cannot decode our reply once: REQ held 1 ms, then re-read; we send it again
     sim_reset();
@@ -565,6 +576,31 @@ int main(void) {
     hold->us = 2e6;
     run_script(5e6);
     CHECK(bus.st.rereads == SP_REREAD_MAX && !enbus);
+
+    // 14. Daisy chain: a drive behind us (LASTONE/ low). INIT 1 is ours (not last: status $00),
+    // rear port on before our reply; INIT 2 is for the drive behind us and gets no ACK from us.
+    // A bus reset turns the rear port off again.
+    sim_reset();
+    lastone_high = false;
+    op(OP_RESET);
+    op_t *ci1 = send_cmd(1, SP_INIT, 2, 0, 0, 1);
+    op_t *ci1_r = read_reply();
+    op_t *ci2 = send_cmd(2, SP_INIT, 2, 0, 0, 1);
+    op_t *cs = send_cmd(1, SP_STATUS, 3, 0, 0, 3000);
+    op_t *cs_r = read_reply();
+    // A READBLOCK for the drive behind us, then the card holds REQ high to read that drive's
+    // reply. We must stay off RD: no re-send of our last (STATUS) reply.
+    send_cmd(2, SP_READBLOCK, 3, 0, 0, 1);
+    op_t *hold2 = op(OP_HOLDREQ);
+    hold2->us = 2000;
+    op(OP_RESET);
+    run_script(2e6);
+    CHECK(ci1->ok && ci1_r->ok && ci1_r->h.stat == SP_E_OK && !dev.last);
+    CHECK(chain_first_tx);                          // on before the INIT reply went out
+    CHECK(!ci2->ok && ci2->attempts == 1 && dev.inits == 1);
+    CHECK(cs->ok && cs_r->ok && cs_r->h.src == 1 && proto_err == 0);
+    CHECK(!chain && chain_sets == 3 && dev.id == 0 && !dev.passthrough);   // off, on, off at reset
+    CHECK(bus.st.rereads == 0 && bus.st.replies == 2);
 
     // 9. sp off: nothing is ACKed, the bus stays released
     sim_reset();

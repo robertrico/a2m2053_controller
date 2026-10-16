@@ -9,8 +9,10 @@
 #include "hardware/structs/sio.h"
 #include "pico/time.h"
 #include "sp_fm.pio.h"
+#include "sp_chain.pio.h"
 
 #define SP_PIO       pio0
+#define CHAIN_PIO    pio2               // PIO0 is full (fm_rx + fm_tx), PIO1 has the flux side
 #define RX_SM        0
 #define TX_SM        1
 #define CELL_US      (28.0 / 7.15909)   // Liron IWM slow mode: 28 FCLK at 7.159 MHz
@@ -27,6 +29,13 @@ static uint8_t rx_buf[RX_BUF_LEN];
 static uint rx_off, tx_off;
 static int rx_dma, tx_dma;
 static pio_sm_config rx_cfg, tx_cfg;
+
+// Rear-port pass-through: {host input, rear output, idle level}.
+static const struct { uint in, out; bool idle; } chain_pins[2] = {
+    {PIN_PH3, PIN_PH3_OUT, 0}, {PIN_HOST_HSTEN, PIN_ENBL_OUT, 1},
+};
+static uint chain_off;
+static int chain_sm[2];
 
 static uint32_t SP_RAM(h_inputs)(void *c) { (void)c; return (sio_hw->gpio_in >> PIN_PH0) & 0x1Fu; }
 static void SP_RAM(h_set_ack)(void *c, bool high) { (void)c; gpio_put(PIN_ACK, high); }
@@ -77,9 +86,31 @@ static void h_delay(void *c, uint32_t us) { (void)c; busy_wait_us_32(us); }
 static uint32_t SP_RAM(h_irq_off)(void *c) { (void)c; return save_and_disable_interrupts(); }
 static void SP_RAM(h_irq_restore)(void *c, uint32_t s) { (void)c; restore_interrupts(s); }
 
+void sp_hw_chain(bool on) {
+    for (int i = 0; i < 2; i++) {
+        uint out = chain_pins[i].out;
+        uint sm = (uint)chain_sm[i];
+        if (on) {
+            // Start the SM at the input's level, then hand it the pad: no glitch on the rear port.
+            uint32_t m = 1u << out;
+            pio_sm_set_enabled(CHAIN_PIO, sm, false);
+            pio_sm_set_pins_with_mask(CHAIN_PIO, sm, gpio_get(chain_pins[i].in) ? m : 0, m);
+            pio_sm_set_pindirs_with_mask(CHAIN_PIO, sm, m, m);
+            pio_sm_set_enabled(CHAIN_PIO, sm, true);
+            pio_gpio_init(CHAIN_PIO, out);
+        } else {
+            gpio_put(out, chain_pins[i].idle);          // latch the idle level, then take the pad back
+            gpio_set_function(out, GPIO_FUNC_SIO);
+            pio_sm_set_enabled(CHAIN_PIO, sm, false);
+        }
+    }
+}
+
+static void h_set_chain(void *c, bool on) { (void)c; sp_hw_chain(on); }
+
 static const sp_hal_t hal = {
     h_inputs, h_set_ack, h_set_enbus, h_rx_arm, h_rx_count, rx_buf, RX_BUF_LEN,
-    h_tx_start, h_tx_busy, h_now, h_delay, h_irq_off, h_irq_restore, NULL,
+    h_tx_start, h_tx_busy, h_now, h_delay, h_irq_off, h_irq_restore, h_set_chain, NULL,
 };
 
 const sp_hal_t *sp_hw_hal(void) { return &hal; }
@@ -104,9 +135,15 @@ void sp_hw_init(void) {
     pio_sm_claim(SP_PIO, TX_SM);
     rx_cfg = fm_rx_config(rx_off, PIN_HOST_WR, sys * (float)CELL_US / 1e6f / RX_CYCLES);
     tx_cfg = fm_tx_config(tx_off, PIN_HOST_RD, sys * (float)CELL_US / 1e6f / TX_CYCLES);
+    chain_off = pio_add_program(CHAIN_PIO, &sp_chain_program);
+    for (int i = 0; i < 2; i++) {
+        chain_sm[i] = pio_claim_unused_sm(CHAIN_PIO, true);
+        pio_sm_config c = sp_chain_config(chain_off, chain_pins[i].in, chain_pins[i].out);
+        pio_sm_init(CHAIN_PIO, (uint)chain_sm[i], chain_off, &c);       // stays disabled; pads stay SIO
+    }
     rx_dma = dma_claim_unused_channel(true);
     tx_dma = dma_claim_unused_channel(true);
-    gpio_pull_up(PIN_LASTONE);                                          // U5 not fitted in M6: read high
+    gpio_pull_up(PIN_LASTONE);                                          // reads high if U5 is unpowered
     // RD: hand the pad to the PIO at its idle level (high). U3 /OE is still high, so nothing
     // reaches the host until the engine turns ENBUS on.
     gpio_put(PIN_HOST_RD, 1);

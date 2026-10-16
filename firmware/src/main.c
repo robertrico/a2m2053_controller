@@ -495,6 +495,7 @@ static void do_loop(void) {
     static uint32_t in[LOOP_STEPS];
     loop_pattern(drv);
 
+    sp_hw_chain(false);                 // PH3_OUT and ENBL_OUT back to SIO for the test
     for (size_t d = 0; d < LOOP_N(loop_drv); d++) gpio_put(loop_drv[d].pin, loop_drv[d].idle);
     sp_hw_rd_gpio(true);
     hw_mech_enbl(false);                // mechanism stays deselected; U2 drives idle levels
@@ -536,6 +537,7 @@ static void do_loop(void) {
     hw_mech_outputs_enable(false);
     oe_on = enbl_on = motor_on = false;
     sp_hw_rd_gpio(false);
+    sp_hw_chain(spbus.chain_on);
     printf("LOOP mixed=%d\n", mixed);
     puts("OK");
 }

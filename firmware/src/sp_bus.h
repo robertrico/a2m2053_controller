@@ -31,6 +31,7 @@ typedef struct {
     void (*delay_us)(void *ctx, uint32_t us);
     uint32_t (*irq_off)(void *ctx);
     void (*irq_restore)(void *ctx, uint32_t saved);
+    void (*set_chain)(void *ctx, bool on);              // PH3 and /ENBL pass-through to the rear port
     void *ctx;
 } sp_hal_t;
 
@@ -74,6 +75,7 @@ typedef struct {
     const sp_hal_t *hal;
     sp_dev_t *dev;
     bool enabled, in_reset;
+    bool chain_on;                           // pass-through as last set through the HAL
     volatile bool reset_latch;               // a reset seen while core 0 was busy elsewhere
     uint64_t reread_t;
     uint64_t t_low_last;                     // last time receive() saw /WRREQ low
