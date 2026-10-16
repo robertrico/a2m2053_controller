@@ -73,7 +73,10 @@ Next: commit, then M9. Bench photo of the whole rig: `docs/photos/m7/2026-10-12_
   GP21) are on from boot; the floppy is the SmartPort disk (`sp disk ram` for the M6
   RAM disk).
 - Power from the IIe through J1 (M7.5); no bench supply.
-- Power order: Pico USB, then IIe. Shutdown: IIe, then Pico USB.
+- Pico powered from the IIe (2026-10-15): board +5 -> small diode (red
+  glass, black band to VSYS) -> VSYS, pin 39. The IIe switch powers
+  everything. With USB plugged in for the console, unplug it too when the
+  IIe goes off, or the Pico keeps running across the IIe power cycle.
 - Mechanism on the J2 breakout; test disk 1 = `/M7TEST` (window open =
   write-protected at the end of the session).
 - Our DB-19 cable on the Liron card (slot 5); the working UniDisk is off the
