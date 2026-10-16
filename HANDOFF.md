@@ -1,6 +1,6 @@
 # Handoff
 
-Last updated: 2026-10-15. **M6 passed on the bench** and is merged
+Last updated: 2026-10-16. **M6 passed on the bench** and is merged
 to main: ProDOS boots from the board's RAM disk through the Liron card,
 saves and loads files, ACK 5.3 us after /WRREQ rises (card window about
 105 us). **M7 passed on the bench** and is merged: ProDOS boots from a real
@@ -10,7 +10,7 @@ working UniDisk byte for byte with a disk, write-protected and with no disk.
 J2 is on an off-the-shelf breakout, and M7.5 moved the rig onto IIe power
 (2026-10-15). **M8 passed on the bench** and is merged (2026-10-15, `a1e51db`):
 daisy chain with the working UniDisk in both orders, full disk copied to it.
-**M9 passed on the bench** (2026-10-15, `docs/build_log/m9.md`). Next: the PCB. Bench photo of the whole rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
+**M9 passed on the bench** (2026-10-15, `docs/build_log/m9.md`). **PCB** (2026-10-16): R18 (LSTRB pull-down) added, shifter channels re-ordered for routing (see "Make prototype match PCB"), parts placed, routing and pours done, DRC clean except one stray via (see "PCB layout state"). Bench photo of the whole rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
 
 ## Where things stand
 
@@ -77,6 +77,93 @@ daisy chain with the working UniDisk in both orders, full disk copied to it.
    then.
 6. Re-format disk 2 with our board (`imgcopy` puts the M6 image on it). Not
    time critical.
+
+## PCB layout state
+
+2026-10-16, end of the layout session. Everything below was done through
+Konnect over IPC and saved from pcbnew; no hand edits of the KiCad files.
+
+- Routing complete: 113 vias, F.Cu signals 0.25 mm, power 0.5 to 1.5 mm.
+- Zones: `5V_F` (+5V, F.Cu, whole board), `12V_F` (+12V, F.Cu band
+  x 133.5-155.2 / y 73.3-84.3, priority 1, carved out of the +5 pour),
+  `GND_B` (GND, B.Cu, whole board).
+- DRC (`kicad-cli pcb drc --refill-zones`, errors): **0 errors**, 1
+  unconnected item (a 2 mm2 sliver of the +5 pour between J2 pins 9-12 with
+  nothing in it; harmless), 1 dangling via.
+- **To do in pcbnew:** delete the stray via at (120.03, 72.95). It was placed
+  by mistake on the /MECH_WRTGATE corner, Konnect cannot delete vias, it
+  carries no track now. Then Edit > Fill All Zones (B) and save: the fills in
+  the file are stale, the DRC above refilled in memory only.
+- Power paths worth a look before ordering:
+  - +12: host J3.13/15 and rear J1.7/8 on a 1.0 mm B.Cu strap, via at
+    (154.3, 74.6) into the F.Cu band, C11 on the band, via (137.5, 79.5) to a
+    0.8 mm B.Cu jumper under the mech RD trace, via (131.46, 82.2) and a
+    0.6 mm F.Cu stub to J2 pin 19, then the 1.5 mm B.Cu bridge across J2
+    pins 13-19. The jumper is the narrowest point.
+  - +5 host pull-ups R8, R9, R16 sit in pour strips walled in by the bus
+    columns; a 0.5 mm B.Cu bus at y 90 from the U4 feed with a via in each
+    strip ties them in.
+  - +3V3: Pico pin 36 to the west trunk; a B.Cu hop at y 97 under U5 carries
+    it east to U4/U3/U1; U3 pin 1 is fed through two vias under the U3 body.
+  - Pico GND: all eight GND castellations stitched (west column x 108.4,
+    east column stubs to vias at x 132.3 / 135 / 139). Pads 23 and 28 share
+    a short B.Cu link because the plane there is an island.
+- Tightest clearances: 0.275 mm between the east Pico GND vias and the GP0
+  B.Cu lane at x 131.6, 0.3 mm around the +12 jumper. Rule is 0.2 mm.
+- Still open from FABRICATION.md: J4/J5 header pitch, J2/J3 positions (print
+  once more), J1 pins-to-face, J4 pinout on the real front-panel cable.
+
+## Make prototype match PCB
+
+2026-10-16: the PCB schematic moved eight signals to different 8T245
+channels so the host bus drops straight from J3 into U1, mech RD sits
+next to J2, and the CA0-2/LSTRB fan from U2 to the Pico does not cross
+itself (U2 channels 1-4 reversed). Same chips, same DIR and /OE, same pull values, same Pico pins.
+Only the channel changes. Rewire the breadboard to match before the board
+order, then rerun the M9 checks (SPCOMPARE, chain both orders, eject,
+disk swap).
+
+Bench board names: bench J1 = host IDC20 (PCB J3), bench J2 = mechanism
+(same on both), bench J3 = rear IDC40 (PCB J1 DB-19).
+
+| Signal | Was | Now | 8T245 pins (B / A) | Pico pin | Pull (B side) |
+|---|---|---|---|---|---|
+| LASTONE/ | U5 B1 / A1 | **U1 B6 / A6** | 16 / 8 | 2 | 2k to +5V, moves with it |
+| /HSTEN | U1 B6 / A6 | **U1 B7 / A7** | 15 / 9 | 10 | 10k to +5V, moves with it |
+| WR (host WRDATA) | U1 B7 / A7 | **U1 B8 / A8** | 14 / 10 | 11 | 100k to GND, moves with it |
+| Mech RD | U1 B8 / A8 | **U5 B1 / A1** | 21 / 3 | 26 | 10k to +5V, moves with it |
+| LSTRB | U2 B4 / A4 | **U2 B1 / A1** | 21 / 3 | 20 | 10k to GND (R18), moves with it |
+| CA2 | U2 B3 / A3 | **U2 B2 / A2** | 20 / 4 | 19 | none |
+| CA1 | U2 B2 / A2 | **U2 B3 / A3** | 19 / 5 | 17 | none |
+| CA0 | U2 B1 / A1 | **U2 B4 / A4** | 18 / 6 | 16 | none |
+
+Cable ends that move:
+
+| Wire | From | To |
+|---|---|---|
+| Rear LASTONE/ (bench J3.12) | U5 B1 | U1 B6 |
+| Host /HSTEN (bench J1.14) | U1 B6 | U1 B7 |
+| Host WR (bench J1.18) | U1 B7 | U1 B8 |
+| Mech RD (J2.16) | U1 B8 | U5 B1 |
+| Mech LSTRB (J2.8) | U2 B4 | U2 B1 |
+| Mech CA2 (J2.6) | U2 B3 | U2 B2 |
+| Mech CA1 (J2.4) | U2 B2 | U2 B3 |
+| Mech CA0 (J2.2) | U2 B1 | U2 B4 |
+| Pico pin 2 (GP1) | U5 A1 | U1 A6 |
+| Pico pin 10 (GP7) | U1 A6 | U1 A7 |
+| Pico pin 11 (GP8) | U1 A7 | U1 A8 |
+| Pico pin 26 (GP20) | U1 A8 | U5 A1 |
+| Pico pin 20 (GP15, LSTRB) | U2 A4 | U2 A1 |
+| Pico pin 19 (GP14, CA2) | U2 A3 | U2 A2 |
+| Pico pin 17 (GP13, CA1) | U2 A2 | U2 A3 |
+| Pico pin 16 (GP12, CA0) | U2 A1 | U2 A4 |
+
+Unchanged: U1 B1-B5 (PH0-3, /WRREQ), U2 B5-B8 (SEL, /ENBL, /WRTGATE, WRTDATA), U3, U4, U5 DIR and
+/OE straps, the LSTRB 10k pull-down (now R18 in the schematic, to GND on
+J2.8, fixed on the rig 2026-10-16). U5 B2-B8 stay on GND.
+
+Full U1 order after the change, top to bottom: B1 PH0, B2 PH1, B3 PH2,
+B4 PH3, B5 /WRREQ, B6 LASTONE/, B7 /HSTEN, B8 WR. That is J3's pin order.
 
 ## Bench state at shutdown
 

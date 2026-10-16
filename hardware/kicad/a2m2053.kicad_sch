@@ -5782,16 +5782,6 @@
 		)
 		(uuid "9c89ce90-88af-447f-9935-2661eb42eac0")
 	)
-	(label "HSTEN_A"
-		(at 142.24 83.82 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "eef06f96-bf23-4b0d-9f06-fcac4e4c95e2")
-	)
 	(label "WR_A"
 		(at 40.64 119.38 180)
 		(effects
@@ -5802,16 +5792,6 @@
 		)
 		(uuid "e7e75fef-3e94-4f8a-82ad-7a3d364aa2df")
 	)
-	(label "WR_A"
-		(at 142.24 88.9 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "4aaab7a3-451c-4be2-b9c8-b307a292e51e")
-	)
 	(label "MECH_RD_A"
 		(at 86.36 111.76 0)
 		(effects
@@ -5821,16 +5801,6 @@
 			(justify left bottom)
 		)
 		(uuid "fca82045-c567-40c5-935e-79abb9696351")
-	)
-	(label "MECH_RD_A"
-		(at 142.24 93.98 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "1c6f6380-50a5-4baa-a7bd-0c0cff4aa23d")
 	)
 	(label "HOST_RD_A"
 		(at 40.64 124.46 180)
@@ -5912,16 +5882,6 @@
 		)
 		(uuid "0c54c83b-f10d-4ae8-895f-2ea47cceb6e8")
 	)
-	(label "CA0_A"
-		(at 142.24 134.62 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "015fbae7-91a2-46c0-96c6-77bfee5d166e")
-	)
 	(label "CA1_A"
 		(at 40.64 132.08 180)
 		(effects
@@ -5931,16 +5891,6 @@
 			(justify right bottom)
 		)
 		(uuid "fc3e419f-9279-4b60-a82a-443b9e03915e")
-	)
-	(label "CA1_A"
-		(at 142.24 139.7 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "750b4184-cd0b-4ce1-9cf5-835254274b0e")
 	)
 	(label "CA2_A"
 		(at 40.64 134.62 180)
@@ -5952,16 +5902,6 @@
 		)
 		(uuid "889a553c-6ceb-420d-a7b7-d347953b2a4d")
 	)
-	(label "CA2_A"
-		(at 142.24 144.78 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "c26e082b-321a-4c67-ac17-d7c4795f3d63")
-	)
 	(label "LSTRB_A"
 		(at 40.64 137.16 180)
 		(effects
@@ -5971,16 +5911,6 @@
 			(justify right bottom)
 		)
 		(uuid "d273f2e1-aa0f-4ea2-a35a-8a7a216cb950")
-	)
-	(label "LSTRB_A"
-		(at 142.24 149.86 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "2dc48762-7b2d-4675-bd8d-93f51d4fbc0e")
 	)
 	(label "SEL_A"
 		(at 86.36 101.6 0)
@@ -6171,16 +6101,6 @@
 			(justify right bottom)
 		)
 		(uuid "396efc82-0c76-43b7-8363-ad0d47f8b072")
-	)
-	(label "LASTONE_A"
-		(at 269.24 58.42 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "da8e5047-c789-490f-b28c-13f3f0cd2b1a")
 	)
 	(label "EJECT"
 		(at 86.36 116.84 0)
@@ -6383,16 +6303,6 @@
 		(uuid "c25e878b-7c50-468e-9c19-125718791acc")
 	)
 	(label "HOST_HSTEN"
-		(at 162.56 83.82 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "63963bba-59b6-43fe-983b-568b7d8ee9d0")
-	)
-	(label "HOST_HSTEN"
 		(at 335.28 156.21 0)
 		(effects
 			(font
@@ -6411,16 +6321,6 @@
 			(justify left bottom)
 		)
 		(uuid "34c9a520-f74d-415c-bae8-327805759cb3")
-	)
-	(label "HOST_WR"
-		(at 162.56 88.9 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "27c1a313-ad10-4338-bb66-92743a89f25a")
 	)
 	(label "HOST_WR"
 		(at 335.28 161.29 0)
@@ -6451,16 +6351,6 @@
 			(justify left bottom)
 		)
 		(uuid "f0220813-0ca7-4136-9f96-e9f692da42ac")
-	)
-	(label "MECH_RD"
-		(at 162.56 93.98 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "16508376-5956-4697-88e3-db463af29462")
 	)
 	(label "MECH_RD"
 		(at 335.28 82.55 0)
@@ -6553,16 +6443,6 @@
 		(uuid "fd7e65ab-790f-435b-8838-08d13324f03c")
 	)
 	(label "MECH_CA0"
-		(at 162.56 134.62 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "bbe18029-9137-4883-a583-048e9d79055d")
-	)
-	(label "MECH_CA0"
 		(at 335.28 64.77 0)
 		(effects
 			(font
@@ -6571,16 +6451,6 @@
 			(justify left bottom)
 		)
 		(uuid "4a03525c-f5b9-4588-ac1a-b5139f6f103f")
-	)
-	(label "MECH_CA1"
-		(at 162.56 139.7 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "f37e3dc8-5b16-4da8-ad99-2e05e70a0927")
 	)
 	(label "MECH_CA1"
 		(at 335.28 67.31 0)
@@ -6593,16 +6463,6 @@
 		(uuid "307364af-0e46-4028-a7d6-5eb862a7bc50")
 	)
 	(label "MECH_CA2"
-		(at 162.56 144.78 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "a2cf26e1-bfac-464b-bf0d-ab13335250c6")
-	)
-	(label "MECH_CA2"
 		(at 335.28 69.85 0)
 		(effects
 			(font
@@ -6611,16 +6471,6 @@
 			(justify left bottom)
 		)
 		(uuid "c92076f7-f37c-4d7f-b045-3806c2447fa1")
-	)
-	(label "MECH_LSTRB"
-		(at 162.56 149.86 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "b9afa8d6-4514-4674-9f3a-5d1b7c911076")
 	)
 	(label "MECH_LSTRB"
 		(at 335.28 72.39 0)
@@ -6811,16 +6661,6 @@
 			(justify left bottom)
 		)
 		(uuid "701f09d8-68bc-4aa1-8eb6-7670e21831d6")
-	)
-	(label "LASTONE"
-		(at 289.56 58.42 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "5e0eed23-eead-4566-94b7-66729b83ea87")
 	)
 	(label "LASTONE"
 		(at 365.76 118.11 180)
@@ -8072,6 +7912,236 @@
 		)
 		(uuid "1192a4cf-42bd-49fb-9295-06fd4b9dea23")
 	)
+	(label "EJECT"
+		(at 274.32 152.4 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "d9eea609-ed03-4724-b324-d2090dd25577")
+	)
+	(label "GND"
+		(at 274.32 149.86 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "4e80d20e-e4d2-43b2-b1f7-34feeac703b8")
+	)
+	(label "GND"
+		(at 274.32 180.34 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "feaab30b-7494-482c-b9e7-f91307ccb31d")
+	)
+	(label "LED"
+		(at 243.84 219.71 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "12b406b3-a9fd-4a6e-b643-6164b5cf36bb")
+	)
+	(label "LED"
+		(at 274.32 177.8 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "655107b5-96de-4f59-b685-7690768571e2")
+	)
+	(label "MECH_LSTRB"
+		(at 256.54 212.09 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "7b5a7c05-79ef-4958-89da-d9c208efa507")
+	)
+	(label "GND"
+		(at 256.54 219.71 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "fe785e36-c367-4d2d-881b-40a92c6edf28")
+	)
+	(label "LASTONE_A"
+		(at 142.24 83.82 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "84e2981b-0d77-47ac-b8c5-787cc5821776")
+	)
+	(label "HSTEN_A"
+		(at 142.24 88.9 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "86ced14a-59a6-441e-b28c-4fa7dc36fb9e")
+	)
+	(label "WR_A"
+		(at 142.24 93.98 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "3aa92999-d469-4704-b2d3-a7f35069932e")
+	)
+	(label "LASTONE"
+		(at 162.56 83.82 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "ed6705cd-27ac-4949-9611-521fc0250dfc")
+	)
+	(label "HOST_HSTEN"
+		(at 162.56 88.9 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "fcb9b534-40a8-48ba-9b6d-18a58aa3fc7b")
+	)
+	(label "HOST_WR"
+		(at 162.56 93.98 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d85084f5-e6fe-40bc-b660-4a6660032570")
+	)
+	(label "MECH_RD_A"
+		(at 269.24 58.42 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "bcf3035d-0656-420e-b27c-3a83cf1d6ad2")
+	)
+	(label "MECH_RD"
+		(at 289.56 58.42 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "7ac521c7-4fe5-4fde-a063-d67c40fe97d9")
+	)
+	(label "LSTRB_A"
+		(at 142.24 134.62 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "3eb685a2-28b0-4ffb-9a0c-2a1d8cd0afef")
+	)
+	(label "CA2_A"
+		(at 142.24 139.7 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "2f67a621-d3f4-4e6b-9150-fab479c12eeb")
+	)
+	(label "CA1_A"
+		(at 142.24 144.78 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "04b29aee-cfab-414f-b74a-07103266e01b")
+	)
+	(label "CA0_A"
+		(at 142.24 149.86 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "669a7e53-4860-4ab5-b8f3-ffbafeaa5032")
+	)
+	(label "MECH_LSTRB"
+		(at 162.56 134.62 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "ba6da493-8008-4354-b926-7cb0b10b5417")
+	)
+	(label "MECH_CA2"
+		(at 162.56 139.7 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "33e4ad21-5c83-40e3-bbd9-3ebc4f9254df")
+	)
+	(label "MECH_CA1"
+		(at 162.56 144.78 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "94c14275-02f2-4862-bf4e-d9e5172cc987")
+	)
+	(label "MECH_CA0"
+		(at 162.56 149.86 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d4281555-9d16-4793-8959-ef97fedfe687")
+	)
 	(global_label "FG"
 		(shape passive)
 		(at 370.84 130.81 270)
@@ -8140,36 +8210,6 @@
 			)
 		)
 	)
-  (label "EJECT"
-    (at 274.32 152.4 180)
-    (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right bottom))
-    (uuid "d9eea609-ed03-4724-b324-d2090dd25577")
-  )
-  (label "GND"
-    (at 274.32 149.86 180)
-    (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right bottom))
-    (uuid "4e80d20e-e4d2-43b2-b1f7-34feeac703b8")
-  )
-  (label "GND"
-    (at 274.32 180.34 180)
-    (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right bottom))
-    (uuid "feaab30b-7494-482c-b9e7-f91307ccb31d")
-  )
-  (label "LED"
-    (at 243.84 219.71 0)
-    (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid "12b406b3-a9fd-4a6e-b643-6164b5cf36bb")
-  )
-  (label "LED"
-    (at 274.32 177.8 180)
-    (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right bottom))
-    (uuid "655107b5-96de-4f59-b685-7690768571e2")
-  )
 	(symbol
 		(lib_id "Connector_Generic:Conn_02x10_Odd_Even")
 		(at 327.66 74.93 0)
@@ -8355,7 +8395,7 @@
 				)
 			)
 		)
-		(property "Description" "A->B, /OE = GP21: CA0-2, LSTRB, SEL, /ENBL, /WRTGATE, WRTDATA"
+		(property "Description" "A->B, /OE = GP21: LSTRB, CA2, CA1, CA0, SEL, /ENBL, /WRTGATE, WRTDATA. Channels 1-4 reversed so the fan to the Pico does not cross"
 			(at 152.4 152.4 0)
 			(hide yes)
 			(show_name no)
@@ -9320,7 +9360,7 @@
 				)
 			)
 		)
-		(property "Description" "B->A, /OE tied low: LASTONE/"
+		(property "Description" "B->A, /OE tied low: mech RD (sits next to J2 on the PCB)"
 			(at 279.4 76.2 0)
 			(hide yes)
 			(show_name no)
@@ -9707,7 +9747,7 @@
 				)
 			)
 		)
-		(property "Description" "B->A, /OE tied low: PH0-3, /WRREQ, /HSTEN, host WR, mech RD"
+		(property "Description" "B->A, /OE tied low: PH0-3, /WRREQ, LASTONE/, /HSTEN, host WR. Channel order = J3 pin order for a straight bus"
 			(at 152.4 76.2 0)
 			(hide yes)
 			(show_name no)
@@ -12815,6 +12855,66 @@
 			(project "a2m2053"
 				(path "/a667a28b-9b2a-40ce-b2bb-952e798c6355"
 					(reference "#PWR006")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 256.54 215.9 0)
+		(unit 1)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "0870a877-e96c-4e84-978f-9aa51ff5b5ec")
+		(property "Reference" "R18"
+			(at 258.572 215.9 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10k"
+			(at 256.54 215.9 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric"
+			(at 256.54 215.9 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 256.54 215.9 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Mech LSTRB pull-down: idle low, no stray strobe while U2 is Hi-Z (bench since M0)"
+			(at 256.54 215.9 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(instances
+			(project "a2m2053"
+				(path "/a667a28b-9b2a-40ce-b2bb-952e798c6355"
+					(reference "R18")
 					(unit 1)
 				)
 			)
