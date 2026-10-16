@@ -10,7 +10,7 @@ working UniDisk byte for byte with a disk, write-protected and with no disk.
 J2 is on an off-the-shelf breakout, and M7.5 moved the rig onto IIe power
 (2026-10-15). **M8 passed on the bench** and is merged (2026-10-15, `a1e51db`):
 daisy chain with the working UniDisk in both orders, full disk copied to it.
-**M9 passed on the bench** (2026-10-15, `docs/build_log/m9.md`). **PCB** (2026-10-16): R18 (LSTRB pull-down) added, shifter channels re-ordered for routing (see "Make prototype match PCB"), parts placed, routing and pours done, DRC clean (see "PCB layout state"). Bench photo of the whole rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
+**M9 passed on the bench** (2026-10-15, `docs/build_log/m9.md`). **PCB** (2026-10-16): R18 (LSTRB pull-down) added, shifter channels re-ordered for routing (see "Make prototype match PCB"), board named Disk Hamr, routed (Freerouting + hand fixes), DRC and parity clean (see "PCB layout state"). Bench photo of the whole rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
 
 ## Where things stand
 
@@ -80,40 +80,36 @@ daisy chain with the working UniDisk in both orders, full disk copied to it.
 
 ## PCB layout state
 
-2026-10-16, end of the layout session. Everything below was done through
-Konnect over IPC and saved from pcbnew; no hand edits of the KiCad files.
+2026-10-16, end of day. Board named **Disk Hamr** (silk: Byte Hamr logo,
+"Rev. 1.0", ID block). Routing is the Freerouting 2.5 result, hand-fixed
+in pcbnew; the earlier hand-routed board is in history at `746e44e` if
+ever needed.
 
-- Routing complete: 112 vias, F.Cu signals 0.25 mm, power 0.5 to 1.5 mm.
-- Zones: `5V_F` (+5V, F.Cu, whole board), `12V_F` (+12V, F.Cu band
-  x 133.5-155.2 / y 73.3-84.3, priority 1, carved out of the +5 pour),
-  `GND_B` (GND, B.Cu, whole board).
-- DRC (`kicad-cli pcb drc --refill-zones`, errors): **0 errors, 0
-  unconnected.** Warnings left: silk overlaps/edge clearance, two
-  lib-footprint mismatches (A1, R18), all pre-existing.
-- 2026-10-16 late: the mechanism +5 group (J2.11, J2.20, C12, U5 feed) was
-  its own island, cut off from the host +5 by the SEL/ENBL/WRTDATA drops and
-  the +12 band. Fixed with a 1.2 mm B.Cu run at y 76.3 from the J2 strap to
-  the x 151 host feed. +5 and +12 each verified as one connectivity cluster.
-- **In pcbnew before ordering:** Edit > Fill All Zones (B), DRC, save. The
-  fills in the file are only as fresh as the last save from pcbnew.
-- Power paths worth a look before ordering:
-  - +12: host J3.13/15 and rear J1.7/8 on a 1.0 mm B.Cu strap, via at
-    (154.3, 74.6) into the F.Cu band, C11 on the band, via (137.5, 79.5) to a
-    0.8 mm B.Cu jumper under the mech RD trace, via (131.46, 82.2) and a
-    0.6 mm F.Cu stub to J2 pin 19, then the 1.5 mm B.Cu bridge across J2
-    pins 13-19. The jumper is the narrowest point.
-  - +5 host pull-ups R8, R9, R16 sit in pour strips walled in by the bus
-    columns; a 0.5 mm B.Cu bus at y 90 from the U4 feed with a via in each
-    strip ties them in.
-  - +3V3: Pico pin 36 to the west trunk; a B.Cu hop at y 97 under U5 carries
-    it east to U4/U3/U1; U3 pin 1 is fed through two vias under the U3 body.
-  - Pico GND: all eight GND castellations stitched (west column x 108.4,
-    east column stubs to vias at x 132.3 / 135 / 139). Pads 23 and 28 share
-    a short B.Cu link because the plane there is an island.
-- Tightest clearances: 0.275 mm between the east Pico GND vias and the GP0
-  B.Cu lane at x 131.6, 0.3 mm around the +12 jumper. Rule is 0.2 mm.
-- Still open from FABRICATION.md: J4/J5 header pitch, J2/J3 positions (print
-  once more), J1 pins-to-face, J4 pinout on the real front-panel cable.
+- How it was made: all tracks wiped, pours hidden from the router, every
+  net autorouted in 12 s (`hardware/a2m2053_clean.dsn`, git-ignored),
+  session imported, zones refilled, neck-down segments widened, ENBL_OUT
+  completed, GND stitch vias added by hand. 870 segments, 86 vias.
+- Zones: `5V_F` (+5V, F.Cu, whole board), `12V_F` (+12V band, priority 1),
+  `GND_B` (GND, B.Cu, whole board). GND pins of the ICs reach the plane
+  through hand-placed stitch vias; GND also runs as traces on F.Cu.
+- Checks: DRC with zone refill 0 errors / 0 unconnected, schematic parity
+  0, ERC only the Pico AGND/GND pin-type error. +5V, +12V and GND each one
+  connectivity cluster. Fab numbers: 100 x 110 mm, min track 0.25, min
+  clearance 0.2, min drill 0.3, via ring 0.15.
+- FG is gone: H1, H2 and the J1 shield are GND in schematic and PCB.
+- Known soft spots: a 30 x 4 mm slot in the GND plane between J2 and J3
+  where the 1 mm +5/+12 B.Cu runs sit side by side; three dangling vias
+  left from hand edits (+5V 197.05/62.0, PH0_A 131.3/144.9, LED_B
+  137.5/64.7), delete in pcbnew; silk text should be Katari 0.1 mm,
+  left/bottom justified (font now in ~/Library/Fonts); ID line reads
+  `A2M-1-0`, should be `DH-1-0`.
+- Freerouting notes: jar and standalone CLI need Java 25 (Homebrew
+  openjdk@25). Headless runs bail early on this board; the GUI with the
+  pours stripped from the DSN is what worked. Locked pre-routes and the
+  pour-as-plane heuristic made it fail, not the layout.
+- Still open from FABRICATION.md: J4/J5 header pitch, J2/J3 positions
+  (print once more), J1 pins-to-face, J4 pinout on the real front-panel
+  cable.
 
 ## Make prototype match PCB
 

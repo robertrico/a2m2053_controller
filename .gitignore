@@ -32,3 +32,4 @@ hardware/kicad/scratch/*
 # Freerouting exchange files (derived)
 hardware/*.dsn
 hardware/*.ses
+hardware/export/
