@@ -1,0 +1,217 @@
+# Bill of materials: Disk Hamr rev 1.0 (A2M2053 controller)
+
+Source of truth: `hardware/kicad/a2m2053.kicad_sch` (45 parts, all on the
+top side; the 46th footprint on the PCB is the logo). This file adds part
+numbers, vendors, quantities and the reason for each part. Regenerate the
+reference list from the schematic if the two disagree; the schematic wins.
+
+Machine-readable copy for ordering: `hardware/bom.csv`.
+
+**Price provenance.** None of the prices in this file or in `bom.csv`
+were checked against a distributor when the BOM was written (2026-10-18;
+the distributor sites were unreachable from the writing environment).
+
+- SN74LVC8T245DWR: copied from `FABRICATION.md` (Digikey 296-23280-1-ND,
+  about $1.10 at qty 25, $0.98 at qty 100, noted there as Oct 2026).
+- Pico 2: $12 minimum per unit, Rico 2026-10-18 (what it actually costs
+  to buy one, not the $5 launch list price).
+- Everything else: from memory of typical distributor pricing, `[guess]`.
+  The vendor part numbers for the passives and headers in `bom.csv` are
+  also from memory. Put them in a cart and check before ordering.
+
+Every price is "per board", not per reel.
+
+## Summary
+
+| Group | Parts | Qty | Est. cost per board |
+|---|---|---|---|
+| MCU module | A1 | 1 | $12.00 |
+| Level shifters | U1-U5 | 5 | $5.50 |
+| Schottky | D1 | 1 | $0.50 |
+| Decoupling, 100 nF 0805 | C1-C10 | 10 | $0.30 |
+| Bulk, 4.7 uF 50 V radial | C11-C13 | 3 | $0.45 |
+| Resistors, 1206 | R1-R18 | 18 | $0.40 |
+| Connectors | J1-J5 | 5 | $8.00 [guess, J1 dominates] |
+| Mounting | H1, H2 | 2 | $0.00 (holes) plus M3 hardware |
+| Bare PCB, 2 layer 100 x 110 mm | - | 1 | $4.00 to $8.00 at qty 5 [guess] |
+| **Total** | | **45 + PCB** | **about $35 to $40** |
+
+Well under the $150 target (`CLAUDE.md`, "Cost matters").
+
+## Parts
+
+### A1: Raspberry Pi Pico 2 (RP2350A module)
+
+| Ref | Value | Footprint | MPN | Qty |
+|---|---|---|---|---|
+| A1 | Pico 2 | `Module:RaspberryPi_Pico_SMD_HandSolder` | Raspberry Pi SC1631 (Pico 2, no headers) | 1 |
+
+- Soldered flat by its castellated edge pads, no headers (`FABRICATION.md`,
+  Rico 2026-10-13). Order the plain Pico 2, **not** the "H" variant with
+  pre-soldered headers and **not** Pico 2 W (no need for radio, and the
+  antenna keep-out costs board area).
+- Flashing is SWD through the 3-pin JST-SH debug connector on the module.
+  A Raspberry Pi Debug Probe (SC0889) is bench equipment, not a board part.
+- The bare RP2350A (QFN-60, 0.4 mm) fails the hand-solder rule.
+- Price: $12 minimum per unit (Rico, 2026-10-18). The $5 launch list price
+  is not what one costs to buy.
+
+### U1-U5: level shifters, SN74LVC8T245DWR
+
+| Ref | Role | DIR | /OE |
+|---|---|---|---|
+| U1 | Host inputs: PH0-3, /WRREQ, LASTONE/, /HSTEN, host WR | B->A | tied low |
+| U2 | Mechanism outputs: LSTRB, CA2, CA1, CA0, SEL, /ENBL, /WRTGATE, WRTDATA | A->B | GP21 + R13 |
+| U3 | Host outputs: RD, ACK (ENBUS) | A->B | GP11 + R12 |
+| U4 | Rear port outputs + LED: PH3_OUT, ENBL_OUT, LED | A->B | GP21 + R13 (shared with U2) |
+| U5 | Mechanism RD | B->A | tied low |
+
+- Package SOIC-24 wide (DW), 7.5 mm body, 1.27 mm pitch. Footprint
+  `Package_SO:SOIC-24W_7.5x15.4mm_P1.27mm`.
+- Digikey 296-23280-1-ND, about $1.10 each at qty 25, $0.98 at qty 100
+  (`FABRICATION.md`, Oct 2026).
+- Alternates if the DW package dries up (both TSSOP-24, 0.65 mm, the
+  hand-solder floor): Nexperia 74LVC8T245PW, TI SN74LXC8T245PWR. Different
+  footprint, so they need a board respin, not a drop-in.
+- Never substitute TXB0108 (auto-direction) or an AVC-family part (3.6 V
+  max).
+
+### D1: Schottky, Pico VSYS feed
+
+| Ref | Value | Footprint | MPN | Qty |
+|---|---|---|---|---|
+| D1 | STPS2L40AF | `Diode_SMD:D_SMA` | STMicro STPS2L40AF (2 A, 40 V, SMA) | 1 |
+
+- IIe +5V -> D1 -> Pico VSYS. Blocks USB VBUS from back-feeding the host
+  rail when the console cable is plugged in. Same part as Byte Hamr rev2.
+- Any SMA Schottky with Vf under about 0.4 V at 200 mA and 2 A rating
+  will do (SS24, B240A). Keep Vf low: the Pico's 3V3 regulator wants VSYS
+  above about 3.0 V after the drop, and the IIe rail reads 4.5 to 4.7 V on
+  the bench.
+- About $0.40 to $0.60. [guess]
+
+### C1-C10: decoupling, 100 nF 0805
+
+| Ref | Rail | Where |
+|---|---|---|
+| C1, C3, C5, C7, C9 | +3V3 | U1-U5 VCCA (one each) |
+| C2, C4, C6, C8, C10 | +5V | U1-U5 VCCB (one each) |
+
+- 100 nF, 50 V, X7R, 0805. Footprint `Capacitor_SMD:C_0805_2012Metric`.
+- Any brand. Example: Samsung CL21B104KBCNNNC, Kemet C0805C104K5RAC.
+- Order 15 to allow for losses. About $0.03 each. [guess]
+
+### C11-C13: bulk, 4.7 uF 50 V electrolytic, radial
+
+| Ref | Rail | Where |
+|---|---|---|
+| C11 | +12V | at J2 (CN104), as on the IF-83 |
+| C12 | +5V | at J2 (CN104), as on the IF-83 |
+| C13 | +3V3 | 3V3 bulk at the Pico |
+
+- 4.7 uF, 50 V, radial, 5 mm diameter, 2.0 mm lead pitch. Footprint
+  `Capacitor_THT:CP_Radial_D5.0mm_P2.00mm`. Polarized: watch the stripe.
+- Same value and voltage the IF-83 uses at CN104 (read off the board,
+  `docs/research_notes.md` sec. on +5V sag, `docs/build_log/m3.md`). The
+  read amp fails silently when +5V sags at the connector; these stay.
+- C13 could be 16 V, but one part number for all three is simpler.
+- Example: Panasonic ECA-1HM4R7, Nichicon UVR1H4R7MDD, Rubycon
+  50YXF4R7M5X11. About $0.15 each. [guess]
+
+### R1-R18: resistors, 1206
+
+All 1206, 1% or 5%, 1/4 W. Footprint `Resistor_SMD:R_1206_3216Metric`.
+Any brand (Yageo RC1206, Panasonic ERJ-8). About $0.02 each. [guess]
+
+| Ref | Value | Net | Purpose |
+|---|---|---|---|
+| R1 | 10k | /MECH_RD to +5V | Mech RD pull-up (IWM has a 10k on RDDATA; drive may tri-state RD) |
+| R2 | 10k | /MECH_ENBL to +5V | Mech /ENBL inactive while U2 is Hi-Z |
+| R3 | 10k | /MECH_WRTGATE to +5V | Mech /WRTGATE inactive while U2 is Hi-Z |
+| R4 | 10k | /HOST_PH0 to GND | Host PH0 reads 0 with no host |
+| R5 | 10k | /HOST_PH1 to GND | Host PH1 reads 0 with no host |
+| R6 | 10k | /HOST_PH2 to GND | Host PH2 reads 0 with no host |
+| R7 | 10k | /HOST_PH3 to GND | Host PH3 reads 0 with no host |
+| R8 | 10k | /HOST_WRREQ to +5V | Host /WRREQ inactive with no host |
+| R9 | 10k | /HOST_HSTEN to +5V | Host /HSTEN inactive with no host |
+| R10 | **100k** | /HOST_WR to GND | Host WR idle. 10k dragged the Liron's idle to 3.40 V, under VIH; 100k idles at 3.96 V **[measured]** |
+| R11 | 10k | /HOST_ACK to +5V | ACK reads "ready" to the Liron **[measured]** |
+| R12 | 10k | /U3_OE to +3V3 | U3 Hi-Z through reset and SWD flash |
+| R13 | 10k | /U2_OE to +3V3 | U2 and U4 Hi-Z through boot |
+| R14 | 10k | /PH3_OUT to GND | Rear PH3 quiet while U4 is Hi-Z (chain blocked until INIT) |
+| R15 | 10k | /ENBL_OUT to +5V | Rear /ENBL inactive while U4 is Hi-Z |
+| R16 | **2k** | /LASTONE to +5V | Rear pin 16 pull-up, parity with the IF-83 |
+| R17 | **330** | /LED_B to /LED | In-use LED series resistor, about 9 mA from 5 V. Starting value; lower it if dim. The LED board may carry its own resistor |
+| R18 | 10k | /MECH_LSTRB to GND | Mech LSTRB idle low, no stray strobe while U2 is Hi-Z (bench since M0) |
+
+Order: 15 x 10k, 1 x 100k, 1 x 2k, 1 x 330, plus a few spares of each.
+Keep 220 and 470 on hand for R17.
+
+### J1-J5: connectors
+
+| Ref | What | Footprint | Qty | Notes |
+|---|---|---|---|---|
+| J1 | DB-19 female, right angle, PCB mount, with board locks | `a2m2053:DSUB-19_Female_Horizontal_P2.77x2.84mm_MountingHoles38.8mm` | 1 | Rear daisy-chain port. Board locks 38.8 mm apart, both on GND. Fit-tested on a 3D print 2026-10-14 against the real connector |
+| J2 | 2x10 shrouded box header, 2.54 mm, vertical | `Connector_IDC:IDC-Header_2x10_P2.54mm_Vertical` | 1 | CN104, mechanism ribbon. Pin 20 (/PWM) tied to +5V on the board |
+| J3 | 2x10 shrouded box header, 2.54 mm, vertical | `Connector_IDC:IDC-Header_2x10_P2.54mm_Vertical` | 1 | CN102, host SmartPort ribbon ("FROM HOST"). ACK on pin 20, pin 19 no wire |
+| J4 | 1x3 pin header, 2.54 mm, vertical | `Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical` | 1 | Front-panel eject button: pin 2 GP22, pins 1 and 3 GND. **Placeholder pitch** until the plug is measured |
+| J5 | 1x2 pin header, 2.54 mm, vertical | `Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical` | 1 | Front-panel in-use LED: pin 1 RED (+), pin 2 BLK (GND). **Placeholder pitch** until the plug is measured |
+
+- **J1 is the one hard-to-source part.** DB-19 is out of production at the
+  big distributors. Female right-angle PCB-mount parts turn up on eBay and
+  AliExpress as "DB19 female right angle" or under the Apple drive /
+  Atari ST / NeXT keywords, typically $5 to $15. Buy one spare. The
+  footprint matches KiCad's stock D-sub pitch (2.77 x 2.84 mm) and
+  38.8 mm board-lock spacing, so check a new seller's part against those
+  numbers before ordering more. [guess on price]
+- J2 and J3: any shrouded 2x10 0.1" box header with the key notch
+  (Wurth 61202021621, Amphenol 10056845-120LF, Sullins SBH11-PBPC-D10-ST-BK,
+  or generic). About $0.30 to $0.60 each. [guess]
+- J4 and J5: 2.54 mm pin header strips, cut to length. Or JST/Molex if the
+  real front-panel plugs turn out to be something else (open item in
+  `FABRICATION.md`, "Confirm on the prototype at M9").
+- The cables (mechanism ribbon, host SmartPort ribbon, front-panel LED and
+  eject leads) come with the drive and are reused. Nothing to order.
+
+### H1, H2: mounting holes
+
+| Ref | What | Footprint | Qty |
+|---|---|---|---|
+| H1 | M3, 3.2 mm drill, 5.2 mm pad | `a2m2053:MountingHole_3.2mm_M3_Pad_5.2mm` | 1 |
+| H2 | M3, 3.2 mm drill, 6.4 mm pad | `MountingHole:MountingHole_3.2mm_M3_Pad_Via` | 1 |
+
+- Plated, on GND (FG merged into GND, 2026-10-16). Line up with the IF-83
+  mounting points (3D-print check 2026-10-13).
+- Hardware: the drive's own M3 screws and standoffs. Nothing to order
+  unless the originals are missing.
+
+### Bare PCB
+
+- 2 layer, 100 x 110 mm, 1.6 mm FR-4, HASL or ENIG (ENIG is nicer for the
+  Pico castellations and the SOIC drag-solder).
+- Min track 0.25 mm, clearance 0.2 mm, drill 0.3 mm, via ring 0.15 mm.
+  Within any prototype house's standard rules (JLCPCB, PCBWay, OSH Park).
+- Outline matches the IF-83 (`FABRICATION.md`, "Board outline"). The DB-19
+  shell overhangs the edge on purpose.
+- Qty 5 at a Chinese prototype house: about $4 to $8 per board plus
+  shipping. OSH Park (US, ENIG, 3 boards) is about $55 for the set. [guess]
+
+## Not on the board (bench and build)
+
+| Item | Why |
+|---|---|
+| Raspberry Pi Debug Probe (SC0889) | SWD flashing via OpenOCD. One per bench, not per board |
+| Micro-USB cable | Console (USB CDC) |
+| 3-pin JST-SH debug cable | Comes with the Debug Probe |
+| Flux, 60/40 or SAC solder, chisel tip | Hand-solder rule: drag solder the SOIC-24s and the Pico castellations |
+
+## Open items that change this BOM
+
+From `FABRICATION.md` "Confirm on the prototype at M9" and `HANDOFF.md`
+"Next":
+
+1. J4 and J5 pitch and plug type, measured on the real front-panel cable.
+2. R17 value once the LED is seen on the PCB (330 is a start).
+3. Whether the eject button's second contact gets a spare GPIO (GP28) and
+   so a 4th J4 pin. Current J4 works either way.
+4. J1: a confirmed seller and part number for the DB-19 female right angle.

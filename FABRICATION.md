@@ -6,6 +6,9 @@ the perfboard prototype so they aren't rediscovered at layout time.
 
 ## Board outline
 
+Parts list with part numbers, vendors and cost: `hardware/bom.md` (CSV for
+ordering: `hardware/bom.csv`).
+
 KiCad project: `hardware/kicad/a2m2053.kicad_pro`. The outline on Edge.Cuts
 is drawn by `tools/kicad_outline.py` (KiCad IPC API, run against the open
 PCB editor). It matches the original IF-83 board (photo of the solder side,

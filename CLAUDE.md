@@ -56,6 +56,7 @@ Research digest: `docs/research_notes.md`. Start there.
 | `docs/superpowers/specs/` | Design spec(s) |
 | `docs/build_log/` | Per-milestone notes and measurements (create as we go) |
 | `hardware/kicad/` | KiCad project for the PCB (outline only so far) |
+| `hardware/bom.md`, `hardware/bom.csv` | Bill of materials with part numbers, vendors and cost |
 | `FABRICATION.md` | PCB phase: hand-solder rule, 8T245 package, board requirements from the bench |
 
 Tag every new fact in `research_notes.md` with its source. Mark guesses
