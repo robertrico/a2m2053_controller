@@ -32,4 +32,8 @@ hardware/kicad/scratch/*
 # Freerouting exchange files (derived)
 hardware/*.dsn
 hardware/*.ses
+hardware/*.rules
 hardware/export/
+
+# vendor 3D models (third party, see docs/SOURCES.md): local only
+hardware/kicad/3d/
