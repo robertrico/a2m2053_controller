@@ -14,3 +14,4 @@ Item,Qty,References,Value,Package / footprint,Manufacturer,MPN,Vendor,Vendor par
 13,1,J5,AMP CT header 1x2 2.0 mm vertical,TE_AMP_CT_1x02_P2.00mm_Vertical (custom),TE Connectivity,292161-2,Digikey,A98588-ND,0.38,"In-use LED (CN107). Black alternate 6-292161-2. Mates the drive's own lead."
 14,2,"H1,H2",M3 mounting hole,3.2 mm plated on GND,-,-,-,-,0.00,"Drive's own M3 screws and standoffs. Not a purchased part."
 15,1,PCB,Disk Hamr rev 1.0,2 layer 100 x 110 mm 1.6 mm FR-4,-,-,JLCPCB / PCBWay / OSH Park,-,6.00,"Min track 0.25, clearance 0.2, drill 0.3. ENIG preferred. Qty 5 pricing."
+16,1,CBL1,20-way IDC ribbon cable; socket to socket,-,-,-,DigiKey,-,2.50,"Ships with the board. Disk Hamr J2 to the mechanism 20-pin header; the IF-83 mechanism ribbon ends in a flat connector that does not fit the shrouded J2. Length and part number [guess]: about 150 mm; confirm against the drive before ordering."

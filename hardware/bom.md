@@ -41,8 +41,9 @@ column is what was paid divided by five.
 | DB-19 female right angle | J1 | **$14.50** (eBay) |
 | Bare PCB | | **$7.32** (PCBWay, 5 at $36.61) |
 | Stencil, one for the run | | $2.00 ($10 / 5) |
+| 20-way IDC ribbon, ships with the board | CBL1 | $2.50 [guess] |
 | Mounting | H1, H2 | $0.00, the drive's own M3 screws |
-| **Parts and board, per unit** | | **$41.75** |
+| **Parts and board, per unit** | | **about $44** |
 
 Landed cost, with shipping, tariff, tax and fees spread over five:
 
@@ -51,7 +52,7 @@ Landed cost, with shipping, tariff, tax and fees spread over five:
 | DigiKey, web ID 378380678, 2026-10-25 | $109.20 | $21.84 |
 | PCBWay, PCB + stencil, DHL quote | about $103 | about $20.70 |
 | DB-19 | | $14.50 |
-| **Landed, per unit** | | **about $57** |
+| **Landed, per unit** | | **about $60** |
 
 Well under the $150 target (`CLAUDE.md`, "Cost matters").
 

@@ -159,6 +159,14 @@ top, 0.12 mm) for hot-plate paste reflow.
    mech RD and U5 LASTONE/, the BOM and board are right.
 6. Assembly plan: hot plate + stencil + paste for the SMD, then the
    through-hole headers and electrolytics by iron.
+7. User manual started: `docs/manual/disk_hamr_manual.md`, 2026-10-25.
+   Markdown now, styled later, hosted as a PDF that a QR card in the box
+   points to. Sections 1-11 drafted; `[PHOTO: ...]` marks the swap
+   photos to take on a clean disassembly, `[CONFIRM: ...]` marks facts
+   to check (screw count, mechanism pin 1 mark, LED at power-on, BOOTSEL
+   reach in the case, repo URL). Ships with a 20-way IDC ribbon (BOM
+   CBL1, part number and length still a guess). An iFixit-style UniDisk
+   3.5 teardown page is a later side project for findability.
 
 ## Make prototype match PCB
 
