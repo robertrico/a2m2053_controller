@@ -26,15 +26,15 @@ Every price is "per board", not per reel.
 | Group | Parts | Qty | Est. cost per board |
 |---|---|---|---|
 | MCU module | A1 | 1 | $12.00 |
-| Level shifters | U1-U5 | 5 | $5.50 |
+| Level shifters | U1-U5 | 5 | $8.30 (DigiKey 2026-10-25) |
 | Schottky | D1 | 1 | $0.50 |
 | Decoupling, 100 nF 0805 | C1-C10 | 10 | $0.30 |
 | Bulk, 4.7 uF 50 V radial | C11-C13 | 3 | $0.45 |
 | Resistors, 1206 | R1-R18 | 18 | $0.40 |
-| Connectors | J1-J5 | 5 | $8.00 [guess, J1 dominates] |
+| Connectors | J1-J5 | 5 | $18.00 (J1 $15 on eBay, the rarest and most expensive part on the board) |
 | Mounting | H1, H2 | 2 | $0.00 (holes) plus M3 hardware |
 | Bare PCB, 2 layer 100 x 110 mm | - | 1 | $4.00 to $8.00 at qty 5 [guess] |
-| **Total** | | **45 + PCB** | **about $35 to $40** |
+| **Total** | | **45 + PCB** | **about $45 to $50** |
 
 Well under the $150 target (`CLAUDE.md`, "Cost matters").
 
@@ -156,8 +156,9 @@ Order: 15 x 10k, 1 x 100k, 1 x 2k, 1 x 180, plus a few spares of each.
 | J4 | TE AMP CT header, 1x3, 2.0 mm, vertical, 3-wall shroud | `a2m2053:TE_AMP_CT_1x03_P2.00mm_Vertical` (to draw; no stock KiCad footprint) | 1 | Front-panel eject button, CN108 on the IF-83: pin 2 GP22, pins 1 and 3 GND. TE 292161-3 (natural) or 6-292161-3 (black, as original). Identified 2026-10-24 from the TE drawing and calipers [measured] |
 | J5 | TE AMP CT header, 1x2, 2.0 mm, vertical, 3-wall shroud | `a2m2053:TE_AMP_CT_1x02_P2.00mm_Vertical` (to draw) | 1 | Front-panel in-use LED, CN107 on the IF-83: pin 1 RED (+), pin 2 BLK (GND). TE 292161-2 (natural) or 6-292161-2 (black). Same ID as J4 |
 
-- **J1:** DB-19 female right angle, purchased (eBay) and fit-tested in the
-  printed outline and the case opening (M7.2, 2026-10-14). Footprint pitch
+- **J1:** DB-19 female right angle, $15 each on eBay: the rarest and most
+  expensive part on the board. Purchased and fit-tested in the printed
+  outline and the case opening (M7.2, 2026-10-14). Footprint pitch
   2.77 x 2.84 mm, board locks 38.8 mm apart, matching the part in hand.
 - J2 and J3: any shrouded 2x10 0.1" box header with the key notch
   (Wurth 61202021621, Amphenol 10056845-120LF, Sullins SBH11-PBPC-D10-ST-BK,

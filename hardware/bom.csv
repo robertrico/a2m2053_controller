@@ -8,7 +8,7 @@ Item,Qty,References,Value,Package / footprint,Manufacturer,MPN,Vendor,Vendor par
 7,1,R10,100k,1206,Yageo,RC1206FR-07100KL,Digikey,311-100KFRCT-ND,0.02,"Host WR pull-down. 100k not 10k (measured, m6)."
 8,1,R16,2k,1206,Yageo,RC1206FR-072KL,Digikey,311-2.00KFRCT-ND,0.02,"LASTONE/ pull-up on the rear port, pin 16."
 9,1,R17,180,1206,Yageo,RC1206FR-07180RL,Digikey,311-180FRCT-ND,0.02,"In-use LED series resistor. Same value as the IF-83 LED anode pull-up (180 ohm, measured 2026-10-25). About 17 mA from 5 V, inside the 8T245 32 mA rating."
-10,1,J1,DB-19 female right angle PCB mount,D-sub 19 with board locks 38.8 mm apart,-,-,eBay / AliExpress,"""DB19 female right angle""",10.00,"Rear daisy-chain port. Purchased (eBay); fit-tested in the printed outline and the case opening, M7.2 2026-10-14."
+10,1,J1,DB-19 female right angle PCB mount,D-sub 19 with board locks 38.8 mm apart,-,-,eBay / AliExpress,"""DB19 female right angle""",15.00,"Rear daisy-chain port. Rarest and most expensive part on the board, $15 each on eBay. Purchased; fit-tested in the printed outline and the case opening, M7.2 2026-10-14."
 11,2,"J2,J3",2x10 shrouded box header 2.54 mm vertical,IDC-Header_2x10_P2.54mm_Vertical,Wurth,61202021621,Digikey,732-2096-ND,0.885,"J2 = CN104 mechanism ribbon, J3 = CN102 host ribbon."
 12,1,J4,AMP CT header 1x3 2.0 mm vertical,TE_AMP_CT_1x03_P2.00mm_Vertical (custom),TE Connectivity,292161-3,Digikey,A98589-ND,0.72,"Eject button (CN108). Black alternate 6-292161-3. Mates the drive's own lead (TE 173977 receptacle)."
 13,1,J5,AMP CT header 1x2 2.0 mm vertical,TE_AMP_CT_1x02_P2.00mm_Vertical (custom),TE Connectivity,292161-2,Digikey,A98588-ND,0.38,"In-use LED (CN107). Black alternate 6-292161-2. Mates the drive's own lead."
