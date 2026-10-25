@@ -1,6 +1,6 @@
 # Handoff
 
-Last updated: 2026-10-25, end of day.
+Last updated: 2026-10-25, end of day (bring-up plan added).
 
 ## Where it is
 
@@ -13,8 +13,10 @@ notes with measurements: `docs/build_log/m0.md` to `m9.md`.
 
 The PCB, **Disk Hamr rev 1.0** (ID `DH-1-0`), is in its second layout,
 DRC clean, Gerbers re-plotted after the J5 fix and uploaded to PCBWay.
-Parts are ordered from DigiKey. The owner's manual is drafted. **Paused
-until the parts and the boards land.** Both repos clean and pushed; the
+Parts are ordered from DigiKey. The owner's manual is drafted. The
+bring-up plan for the first assembled board is written
+(`PCB_BRINGUP.md`, four gates). **Paused until the parts and the boards
+land.** Both repos clean and pushed; the
 site log for the fit and the orders went out 2026-10-25.
 
 ## Next
@@ -42,9 +44,30 @@ Nothing on the bench until the deliveries.
 5. **Build**, when the boards land: paste, stencil and hot plate for every
    SMD except the Pico; Pico castellations by iron afterwards; through-hole
    by iron; DB-19 tacked on one pin and squared to the case opening first.
-   Then the M9 checks on the real board, LED brightness against the stock
-   drive, and whether the LED lights as J5 is wired.
-6. **Manual**: `docs/manual/disk_hamr_manual.md` is the source,
+   Then `PCB_BRINGUP.md`, Gate 0 (meter checks, no power).
+6. **PCB bring-up firmware**, before Gate 1 and doable now, no hardware
+   needed. `PCB_BRINGUP.md` asks for three console commands: `vsys` (ADC3
+   on GP29, VSYS/3), `led on|off` (direct LED drive through U4), and
+   `sp clear` (zero the `sp_stats_t` counters and the command counts).
+   Process: brainstorm, then spec in
+   `docs/superpowers/specs/2026-MM-DD-pcb-bringup-firmware-design.md`,
+   then plan in `docs/superpowers/plans/`, TDD against the host test
+   harness (`firmware/test/`, fake bus) as M1 to M9 were. Small enough
+   for one branch. Optional in the same spec: a `tools/a2m/cli.py`
+   `test` subcommand that drives the gates over the console, prompts the
+   human steps (insert disk, flip tab, pull a pin) and writes
+   `docs/build_log/pcb_rev1.md` sections per board serial. Keep SPCOMPARE
+   as is for Gate 3; the expanded edge cases (bad unit, bad command,
+   CONTROL codes) are a later spec.
+7. **PCB bring-up on the bench**, when a board is soldered: the four
+   gates in order, nothing skipped. Gate 1 (contention proof, boot-safety
+   scope) before any mechanism; Gate 2 before the Apple; Gate 3 brings
+   the working UniDisk out for two boots and two copies only; Gate 4 is
+   the RAM-disk soak. Mechanism wear budget per board is in the file.
+   Numbers go in `docs/build_log/pcb_rev1.md`, captures in
+   `docs/captures/pcb_rev1/`. First passing board updates `HANDOFF.md`,
+   the manual's "Tested on", and gets the site log that the manual joins.
+8. **Manual**: `docs/manual/disk_hamr_manual.md` is the source,
    `Disk_Hamr_Owners_Guide_DRAFT.pdf` the styled draft (hammer logo from
    `docs/manual/assets/hamr_logo.svg`). Waiting on the photo session (shot
    list in the file's design notes), the `[CONFIRM]` facts, the repository
@@ -53,11 +76,11 @@ Nothing on the bench until the deliveries.
    and tested board. Manual edits fold into the one manual commit
    (`1846492`) and force-push with lease until it ships, with later
    commits re-applied on top.
-7. **Dropped**: rewiring the prototype to the PCB's channel order. Same
+9. **Dropped**: rewiring the prototype to the PCB's channel order. Same
    chips, same Pico pins, only the shifter channel moves, so it proves
    nothing the PCB won't and risks the prototype. The first assembled
    board is the test. The channel map is kept below for reference.
-8. **Rev 1.1 notes**: U5 carries one signal (mech RD); a SN74LVC1G17 at
+10. **Rev 1.1 notes**: U5 carries one signal (mech RD); a SN74LVC1G17 at
    3.3 V would do. `docs/pin_budget.md` shifter table still says U1 carries
    mech RD and U5 LASTONE/; the BOM and board are right. A UniDisk 3.5
    teardown page (iFixit style) for findability. The prototype's +5
@@ -128,7 +151,7 @@ The PCB schematic moved eight signals to different 8T245 channels so the
 host bus drops straight from J3 into U1, mech RD sits next to J2, and the
 CA0-2/LSTRB fan from U2 to the Pico does not cross itself (U2 channels 1-4
 reversed). Same chips, same DIR and /OE, same pull values, same Pico pins.
-The breadboard still has the old order; rewiring it was dropped (Next, 7).
+The breadboard still has the old order; rewiring it was dropped (Next, 9).
 
 Bench board names: bench J1 = host IDC20 (PCB J3), bench J2 = mechanism
 (same on both), bench J3 = rear IDC40 (PCB J1 DB-19).
