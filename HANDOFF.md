@@ -1,6 +1,6 @@
 # Handoff
 
-Last updated: 2026-10-16. **M6 passed on the bench** and is merged
+Last updated: 2026-10-25. **M6 passed on the bench** and is merged
 to main: ProDOS boots from the board's RAM disk through the Liron card,
 saves and loads files, ACK 5.3 us after /WRREQ rises (card window about
 105 us). **M7 passed on the bench** and is merged: ProDOS boots from a real
@@ -10,7 +10,7 @@ working UniDisk byte for byte with a disk, write-protected and with no disk.
 J2 is on an off-the-shelf breakout, and M7.5 moved the rig onto IIe power
 (2026-10-15). **M8 passed on the bench** and is merged (2026-10-15, `a1e51db`):
 daisy chain with the working UniDisk in both orders, full disk copied to it.
-**M9 passed on the bench** (2026-10-15, `docs/build_log/m9.md`). **PCB** (2026-10-16): R18 (LSTRB pull-down) added, shifter channels re-ordered for routing (see "Make prototype match PCB"), board named Disk Hamr, routed, DRC clean, STL/STEP exported for the case print (see "PCB layout state" and its "Next" list). Bench photo of the whole rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
+**M9 passed on the bench** (2026-10-15, `docs/build_log/m9.md`). **PCB** (2026-10-16): R18 (LSTRB pull-down) added, shifter channels re-ordered for routing (see "Make prototype match PCB"), board named Disk Hamr, routed, DRC clean. **PCB second layout** (2026-10-24/25): J2 moved 11 mm toward the edge after the print, board re-placed by hand and re-routed, +5V as 1 mm traces (no top pour), +12V on B.Cu, J4/J5 in the IF-83's order, R17 = 180 from the IF-83 measurement, Gerbers sent to PCBWay 2026-10-25 (see "PCB layout state"). Bench photo of the whole rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
 
 ## Where things stand
 
@@ -82,60 +82,74 @@ daisy chain with the working UniDisk in both orders, full disk copied to it.
 
 ## PCB layout state
 
-2026-10-16, end of day. Board named **Disk Hamr**, rev 1.0, ID `DH-1-0`.
-Silk: Byte Hamr hammer (`a2m2053.pretty/logo_sm`), title, rev and ID block
-in Katari 0.1 mm, left/bottom justified. Katari lives in
-`~/Library/Fonts/Katari.ttc` (copied from Apple's font asset cache so
-KiCad's fontconfig finds it). `main` at `d8d5f31`, pushed.
+2026-10-25. Board **Disk Hamr** rev 1.0, ID `DH-1-0`. `main` at `783fccf`,
+pushed. Gerbers and drills uploaded to PCBWay 2026-10-25
+(`hardware/kicad/fabrication/`, zip `hardware/kicad/disk_hamr_2026_10_25.zip`),
+5 pcs, 2 layer, 1.6 mm, FR-4 TG150, 1 oz, HASL lead-free, green, 6/6 mil,
+0.3 mm min hole, product number location specified. Order on hold until
+PCBWay answers about sponsorship. Stencil ordered with it (non-framework,
+top, 0.12 mm) for hot-plate paste reflow.
 
-Routing is the Freerouting 2.5 clean-field result, hand-fixed in pcbnew.
-The earlier hand-routed board is in history at `746e44e`.
-
-- How it was made: all tracks wiped, pours hidden from the router, every
-  net autorouted in 12 s, session imported, zones refilled, neck-down
-  segments widened, ENBL_OUT completed, GND stitch vias and the mech +5
-  feed added by hand, dangling vias removed. 870 segments, 84 vias.
-- Zones: `5V_F` (+5V, F.Cu, whole board), `12V_F` (+12V band, priority 1),
-  `GND_B` (GND, B.Cu, whole board). IC GND pins reach the plane through
-  stitch vias; GND also runs as traces on F.Cu.
-- Checks (2026-10-16 14:05): DRC with zone refill 0 errors / 0 unconnected;
-  schematic parity only "extra footprint G1" (the logo, board-only); ERC
-  only the Pico AGND/GND pin-type error. +5V, +12V and GND each one
-  connectivity cluster. Warnings left: silk overlaps, footprint/library
-  mismatches on A1, R18, G1, two "dangling" vias that are fine (GND stitch
-  at 161.85/58.0, +5V via feeding R15 through the pour at 197.05/62.0).
-- Fab numbers: 100 x 110 mm, min track 0.25, clearance 0.2, drill 0.3,
-  via ring 0.15, 46 parts all on top.
-- FG is gone: H1, H2 and the J1 shield are GND in schematic and PCB.
-- Known soft spot: a 30 x 4 mm slot in the GND plane between J2 and J3
-  where the 1 mm +5/+12 B.Cu runs sit side by side. Plane still one piece.
-  Fix if wanted: move one run to F.Cu.
-- Exports (git-ignored `hardware/export/`): `disk_hamr_rev1.stl` and
-  `.step`, board plus parts, no DB-19 body (no 3D model; real connector
-  already fit-tested). Rico has the STL in PrusaSlicer for a case print.
-- Freerouting: v2.5.0 needs Java 25 (`/opt/homebrew/opt/openjdk@25`).
-  Jar: `gh release download v2.5.0 -R freerouting/freerouting -p
-  freerouting-2.5.0.jar`. Headless runs bail early on this board; the GUI
-  with the pours stripped from the DSN worked. Locked pre-routes and the
-  pour-as-plane heuristic were the problem, not the layout. DSN/SES files
-  under `hardware/` are git-ignored scratch.
-- Site: log "Disk Hamr: the PCB is routed" published 2026-10-16 on the
-  unidisk-controller project. Site logs never name internal docs; drafts
-  until Rico has proofread.
+- Second layout, 2026-10-24: J2 moved from y 74.2 to 62.9 (the print put
+  it 11 mm too far from the edge). All parts re-placed by hand: U2/U5 by
+  J2, U1/U3/U4 in a column under J1/J3, Pico along the left edge.
+  Freerouting 2.4.1 headless on the exported DSN with the +5V plane block
+  cut out (`strip_planes.py` variant in `hardware/kicad/scratch/`),
+  session imported, hand fixes. 768 segments, 123 vias (47 GND stitches).
+- Power: no top pour. +5V is the Power net class, 1 mm track / 1 mm via,
+  routed as traces (436 mm). `GND_B` plane on B.Cu, `12V_F` zone on B.Cu
+  (priority 1). Freerouting treats any pour as an already-connected plane
+  and routes nothing on that net; the old +5V pour was in 11 islands.
+- A GND pocket under J1 (J3 pin 12 + two vias, fenced by /WRREQ, +5V,
+  +12V, /HSTEN, LASTONE) was bridged with a top-side GND jumper.
+- J4 (3-pin eject) and J5 (2-pin LED) swapped to the IF-83's order, TE AMP
+  CT 2.00 mm footprints (`a2m2053.pretty/TE_AMP_CT_1x0N_P2.00mm_Vertical`)
+  with the vendor STEP models (`hardware/kicad/3d/`, git-ignored, see
+  `docs/SOURCES.md`). Shroud open side toward the board edge.
+- R17 = 180 (IF-83 LED anode pull-up measured 2026-10-25). Schematic,
+  board, BOM and docs agree.
+- G1 logo re-placed from the library with `board_only`, so Update PCB
+  from Schematic leaves it alone (it had deleted it twice).
+- DRC with zone refill (2026-10-25): 0 errors, 0 unconnected. Warnings
+  left: J1 silk over the tab edge x2, A1 library groups, title text
+  thickness (TrueType; plots as filled regions, fine).
+- DigiKey list "Disk Hamr" (12 lines, about $20) matches `hardware/bom.csv`
+  with the Stackpole RMCF1206FT2K00 standing in for the out-of-stock Yageo
+  2k and 180 ohm for R17. Quantities bumped (100 nF 15, 10k 20). Order
+  waits on the print fit.
+- Exports (git-ignored `hardware/export/`): `disk_hamr_rev1_flat.stl`
+  for the case print: KiCad STL (`kicad-cli pcb export stl --subst-models`),
+  clipped at the board bottom with trimesh (no pins below), board body
+  thickened to 1.86 mm so every part's standoff is inside it, Pico USB
+  jack filled solid. Venv `hardware/kicad/scratch/mesh-venv/` (trimesh,
+  numpy, shapely, networkx). The build script lives only in the 2026-10-25
+  chat; rewrite from this description if needed. `disk_hamr_full.stl` and
+  `disk_hamr_board_only.stl` beside it. No DB-19 body (J1 has no 3D model).
+- Tooling: Konnect live writes (`update_footprints_from_library` apply,
+  `place_component`) crashed Pcbnew three times on 2026-10-24. Read-only
+  Konnect, `kicad-cli` on the saved file and GUI edits only. Freerouting
+  jar `~/Development/tools/freerouting/freerouting-2.4.1.jar`, Java 25:
+  `java -Djava.awt.headless=true -jar ... -de X.dsn -do X.ses -mp 50 -mt 8`.
+- Site: "Disk Hamr: laid out again, by hand this time" published
+  2026-10-25 (source commit `dbd26d5`). Site logs never name internal docs;
+  drafts until Rico has proofread.
 
 ### Next
 
-1. Print the STL, try it in the case with the mechanism and the IF-83
-   rails. Note anything that collides.
-2. Rewire the prototype to the PCB's channel order (table below), boot the
-   sentinel, run SPCOMPARE. Only then order.
-3. Measurements before ordering: ~~J4/J5 header pitch~~ (TE AMP CT, 2.0 mm,
-   2026-10-24; CT footprints placed in the IF-83's order and shroud
-   orientation; LED wire-to-pin still to confirm), J2/J3 positions on
-   one more print, J1 pins-to-face, J4 pinout on the real front-panel
-   cable.
-4. Decide on the GND-plane slot and the eject button's second contact.
-5. Fab outputs (gerbers, drill, BOM, position) once 1-4 are done.
+1. Print `disk_hamr_rev1_flat.stl`, fit it in the case with the mechanism
+   and the real DB-19. Note collisions. J2 position is the thing to check.
+2. If it fits: confirm the PCBWay order, place the DigiKey list.
+3. Rewire the prototype to the PCB's channel order (table below), boot the
+   sentinel, run SPCOMPARE, before boards arrive.
+4. Still open: which J5 pin the original's RED (pulled-up) wire lands on,
+   decides whether the LED net swaps at J5. J4 pinout on the real
+   front-panel cable. STEP-vs-footprint open-side chirality on the CT
+   headers (check on the print).
+5. Rev 1.1 candidates: U5 carries one signal (mech RD), a SN74LVC1G17 at
+   3.3 V would do; `docs/pin_budget.md` shifter table still says U1 carries
+   mech RD and U5 LASTONE/, the BOM and board are right.
+6. Assembly plan: hot plate + stencil + paste for the SMD, then the
+   through-hole headers and electrolytics by iron.
 
 ## Make prototype match PCB
 
