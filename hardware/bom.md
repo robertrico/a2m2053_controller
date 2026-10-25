@@ -141,11 +141,10 @@ Any brand (Yageo RC1206, Panasonic ERJ-8). About $0.02 each. [guess]
 | R14 | 10k | /PH3_OUT to GND | Rear PH3 quiet while U4 is Hi-Z (chain blocked until INIT) |
 | R15 | 10k | /ENBL_OUT to +5V | Rear /ENBL inactive while U4 is Hi-Z |
 | R16 | **2k** | /LASTONE to +5V | Rear pin 16 pull-up, parity with the IF-83 |
-| R17 | **330** | /LED_B to /LED | In-use LED series resistor, about 9 mA from 5 V. Starting value; lower it if dim. The LED board may carry its own resistor |
+| R17 | **180** | /LED_B to /LED | In-use LED series resistor, same value as the IF-83 LED anode pull-up (measured 2026-10-25). About 17 mA from 5 V, inside the 8T245 rating |
 | R18 | 10k | /MECH_LSTRB to GND | Mech LSTRB idle low, no stray strobe while U2 is Hi-Z (bench since M0) |
 
-Order: 15 x 10k, 1 x 100k, 1 x 2k, 1 x 330, plus a few spares of each.
-Keep 220 and 470 on hand for R17.
+Order: 15 x 10k, 1 x 100k, 1 x 2k, 1 x 180, plus a few spares of each.
 
 ### J1-J5: connectors
 
@@ -220,8 +219,7 @@ From `FABRICATION.md` "Confirm on the prototype at M9" and `HANDOFF.md`
 1. ~~J4 and J5 pitch and plug type.~~ TE AMP CT, 2.0 mm, 2026-10-24.
    Footprints drawn and placed in the IF-83's order (2-pin outboard, 3-pin
    inboard, shrouds open toward the board edge).
-2. R17 value once the LED is seen on the PCB (330 is a start). The IF-83
-   has the equivalent resistor as the LED anode pull-up to +5V; read it.
+2. ~~R17 value.~~ 180, the IF-83's LED anode pull-up, measured 2026-10-25.
 3. Whether the eject button's second contact gets a spare GPIO (GP28) and
    so a 4th J4 pin. Current J4 works either way. The IF-83 reads both
    contacts (two header pins to separate CXD1013 pins, 2026-10-24).

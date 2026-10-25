@@ -121,9 +121,9 @@
 			(subtractmaskfromsilk no)
 			(outputformat 1)
 			(mirror no)
-			(drillshape 1)
+			(drillshape 0)
 			(scaleselection 1)
-			(outputdirectory "")
+			(outputdirectory "fabrication/")
 		)
 	)
 	(footprint "Resistor_SMD:R_1206_3216Metric"
@@ -14036,7 +14036,7 @@
 				)
 			)
 		)
-		(property "Value" "330"
+		(property "Value" "180"
 			(at 0 1.83 180)
 			(layer "F.Fab")
 			(uuid "a9f49463-f706-473f-86e5-f2648521a9de")
@@ -21106,8 +21106,8 @@
 	)
 	(via
 		(at 155.325 87.3)
-		(size 0.5)
-		(drill 0.3)
+		(size 1)
+		(drill 0.5)
 		(layers "F.Cu" "B.Cu")
 		(net "+5V")
 		(uuid "ed1d70e4-4167-4879-bcec-322f72ad7b40")

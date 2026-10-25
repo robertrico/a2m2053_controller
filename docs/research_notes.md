@@ -134,7 +134,8 @@ CXD1013. **[guess, strongly supported; confirm mechanism pinout on a real unit]*
    (LED) and 292161-3 (eject), black 6- prefix on the original.
    **[measured]** 2026-10-24.
    IF-83 LED circuit, traced on the board **[measured]** 2026-10-24: one
-   LED pin is pulled high (resistor to +5V); the other goes to the
+   LED pin is pulled high (180 ohm to +5V, measured 2026-10-25); the
+   other goes to the
    collector of Q101 (3-leg, two legs one side and one the other, marked
    "L-5"). Q101 emitter to GND, base through 10k to a CXD1013 pin. So the
    CXD1013 drives the LED active high through Q101 and the connector-side

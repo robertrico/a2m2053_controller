@@ -180,12 +180,12 @@ Guesses in the schematic, picked to be safe if wrong. Check each one on the
 perfboard prototype before the PCB order.
 
 - **In-use LED (J5):** polarity confirmed at M9 (RED +, BLK GND): the LED
-  blinks with drive activity. Blink timing is a firmware detail. R17 = 330
-  is a starting value; lower it if the LED is dim on the PCB. On the IF-83
-  the LED anode is pulled to +5V through a resistor and the cathode is
-  pulled low by Q101 (base from the CXD1013 through 10k), traced
-  2026-10-24. Same current direction as ours. Read that pull-up's value
-  off the IF-83 and use it for R17.
+  blinks with drive activity. Blink timing is a firmware detail. On the
+  IF-83 the LED anode is pulled to +5V through 180 ohm (measured
+  2026-10-25) and the cathode is pulled low by Q101 (base from the CXD1013
+  through 10k), traced 2026-10-24. Same current direction as ours, so
+  R17 = 180 for the same brightness: about 17 mA from 5 V, inside the
+  8T245's 32 mA output rating.
 - **Eject button (J4):** pin 2 to GP22, pins 1 and 3 to GND. The button is a
   changeover switch (meter, 2026-10-15): released, pins 1 and 3 connect;
   pressed, pin 2 connects to one outer pin. With both outer pins on GND a
