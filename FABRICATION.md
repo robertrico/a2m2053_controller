@@ -205,8 +205,6 @@ perfboard prototype before the PCB order.
   lands on once the plug is keyed by the shroud.
 - **J2/J3 positions:** from calipers, not printed. Print once more if the
   ribbons don't reach.
-- **J1 pins-to-face distance:** 12.68 mm stock value; it only moves the
-  silkscreen.
 - **Pico on D1:** confirmed on the prototype (M8, a small diode in place of
   the Schottky): the Pico boots from the IIe alone, and the diode was tested
   live against USB back-feed.

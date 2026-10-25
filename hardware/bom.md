@@ -156,13 +156,9 @@ Order: 15 x 10k, 1 x 100k, 1 x 2k, 1 x 180, plus a few spares of each.
 | J4 | TE AMP CT header, 1x3, 2.0 mm, vertical, 3-wall shroud | `a2m2053:TE_AMP_CT_1x03_P2.00mm_Vertical` (to draw; no stock KiCad footprint) | 1 | Front-panel eject button, CN108 on the IF-83: pin 2 GP22, pins 1 and 3 GND. TE 292161-3 (natural) or 6-292161-3 (black, as original). Identified 2026-10-24 from the TE drawing and calipers [measured] |
 | J5 | TE AMP CT header, 1x2, 2.0 mm, vertical, 3-wall shroud | `a2m2053:TE_AMP_CT_1x02_P2.00mm_Vertical` (to draw) | 1 | Front-panel in-use LED, CN107 on the IF-83: pin 1 RED (+), pin 2 BLK (GND). TE 292161-2 (natural) or 6-292161-2 (black). Same ID as J4 |
 
-- **J1 is the one hard-to-source part.** DB-19 is out of production at the
-  big distributors. Female right-angle PCB-mount parts turn up on eBay and
-  AliExpress as "DB19 female right angle" or under the Apple drive /
-  Atari ST / NeXT keywords, typically $5 to $15. Buy one spare. The
-  footprint matches KiCad's stock D-sub pitch (2.77 x 2.84 mm) and
-  38.8 mm board-lock spacing, so check a new seller's part against those
-  numbers before ordering more. [guess on price]
+- **J1:** DB-19 female right angle, purchased (eBay) and fit-tested in the
+  printed outline and the case opening (M7.2, 2026-10-14). Footprint pitch
+  2.77 x 2.84 mm, board locks 38.8 mm apart, matching the part in hand.
 - J2 and J3: any shrouded 2x10 0.1" box header with the key notch
   (Wurth 61202021621, Amphenol 10056845-120LF, Sullins SBH11-PBPC-D10-ST-BK,
   or generic). About $0.30 to $0.60 each. [guess]
@@ -223,4 +219,3 @@ From `FABRICATION.md` "Confirm on the prototype at M9" and `HANDOFF.md`
 3. Whether the eject button's second contact gets a spare GPIO (GP28) and
    so a 4th J4 pin. Current J4 works either way. The IF-83 reads both
    contacts (two header pins to separate CXD1013 pins, 2026-10-24).
-4. J1: a confirmed seller and part number for the DB-19 female right angle.
