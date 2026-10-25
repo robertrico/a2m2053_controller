@@ -181,14 +181,28 @@ perfboard prototype before the PCB order.
 
 - **In-use LED (J5):** polarity confirmed at M9 (RED +, BLK GND): the LED
   blinks with drive activity. Blink timing is a firmware detail. R17 = 330
-  is a starting value; lower it if the LED is dim on the PCB.
+  is a starting value; lower it if the LED is dim on the PCB. On the IF-83
+  the LED anode is pulled to +5V through a resistor and the cathode is
+  pulled low by Q101 (base from the CXD1013 through 10k), traced
+  2026-10-24. Same current direction as ours. Read that pull-up's value
+  off the IF-83 and use it for R17.
 - **Eject button (J4):** pin 2 to GP22, pins 1 and 3 to GND. The button is a
   changeover switch (meter, 2026-10-15): released, pins 1 and 3 connect;
   pressed, pin 2 connects to one outer pin. With both outer pins on GND a
   press pulls GP22 low whichever outer pin is the common. Still to confirm
-  with the real cable on the board.
-- **J4/J5 pitch:** 2.54 mm headers are a placeholder until the plugs are
-  measured.
+  with the real cable on the board. The IF-83 runs two of the three pins to
+  separate CXD1013 pins (traced 2026-10-24), so it reads both contacts; we
+  read one. Decision on the second contact (GP28) is still open.
+- **J4/J5 plug:** identified 2026-10-24 as TE AMP CT, 2.0 mm pitch, round
+  0.6 mm posts, 3-wall shroud (TE drawing C-292161 plus calipers). Headers
+  292161-3 (J4) and 292161-2 (J5). CT footprints drawn and placed on the
+  routed board 2026-10-24 (`a2m2053.pretty`). Placed to match the IF-83
+  (photo plus the board in hand, 2026-10-24): with the DB-19 at the top,
+  the 2-pin LED header (J5) sits nearer the board's left edge, the 3-pin
+  eject header (J4) toward the middle, and both shrouds open toward the
+  board edge (back wall facing inboard), so the drive's own plugs seat
+  without re-pinning. Still to confirm: which J5 pin the RED (anode) wire
+  lands on once the plug is keyed by the shroud.
 - **J2/J3 positions:** from calipers, not printed. Print once more if the
   ribbons don't reach.
 - **J1 pins-to-face distance:** 12.68 mm stock value; it only moves the

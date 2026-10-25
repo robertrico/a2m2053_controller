@@ -71,6 +71,8 @@ daisy chain with the working UniDisk in both orders, full disk copied to it.
    changeover switch, not a plain one (meter, 2026-10-15): released, the two
    outer pins connect; pressed, the middle pin connects to one outer pin.
    The current J4 (pin 2 to GP22, pins 1 and 3 to GND) works either way.
+   The IF-83 does read both contacts: two of the three header pins run to
+   separate CXD1013 pins (traced 2026-10-24).
    Options: put the second contact on a spare GPIO if one is free, or
    ignore it (it may just have been the switch Sony had on hand). The J4
    Description in the schematic still says the outer pins are tied; fix it
@@ -127,7 +129,9 @@ The earlier hand-routed board is in history at `746e44e`.
    rails. Note anything that collides.
 2. Rewire the prototype to the PCB's channel order (table below), boot the
    sentinel, run SPCOMPARE. Only then order.
-3. Measurements before ordering: J4/J5 header pitch, J2/J3 positions on
+3. Measurements before ordering: ~~J4/J5 header pitch~~ (TE AMP CT, 2.0 mm,
+   2026-10-24; CT footprints placed in the IF-83's order and shroud
+   orientation; LED wire-to-pin still to confirm), J2/J3 positions on
    one more print, J1 pins-to-face, J4 pinout on the real front-panel
    cable.
 4. Decide on the GND-plane slot and the eject button's second contact.

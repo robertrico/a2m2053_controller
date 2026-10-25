@@ -13,8 +13,8 @@ the distributor sites were unreachable from the writing environment).
 
 - SN74LVC8T245DWR: copied from `FABRICATION.md` (Digikey 296-23280-1-ND,
   about $1.10 at qty 25, $0.98 at qty 100, noted there as Oct 2026).
-- Pico 2: $12 minimum per unit, Rico 2026-10-18 (what it actually costs
-  to buy one, not the $5 launch list price).
+- Pico 2: $6.12 at DigiKey (2648-SC1631CT-ND, quote 19455158, 2026-10-24).
+  Earlier estimate was $12 (Rico 2026-10-18).
 - Everything else: from memory of typical distributor pricing, `[guess]`.
   The vendor part numbers for the passives and headers in `bom.csv` are
   also from memory. Put them in a cart and check before ordering.
@@ -53,8 +53,8 @@ Well under the $150 target (`CLAUDE.md`, "Cost matters").
 - Flashing is SWD through the 3-pin JST-SH debug connector on the module.
   A Raspberry Pi Debug Probe (SC0889) is bench equipment, not a board part.
 - The bare RP2350A (QFN-60, 0.4 mm) fails the hand-solder rule.
-- Price: $12 minimum per unit (Rico, 2026-10-18). The $5 launch list price
-  is not what one costs to buy.
+- Price: $6.12 at DigiKey, 2648-SC1631CT-ND (quote 19455158, 2026-10-24).
+  The earlier $12 figure was the eBay/Amazon price.
 
 ### U1-U5: level shifters, SN74LVC8T245DWR
 
@@ -154,8 +154,8 @@ Keep 220 and 470 on hand for R17.
 | J1 | DB-19 female, right angle, PCB mount, with board locks | `a2m2053:DSUB-19_Female_Horizontal_P2.77x2.84mm_MountingHoles38.8mm` | 1 | Rear daisy-chain port. Board locks 38.8 mm apart, both on GND. Fit-tested on a 3D print 2026-10-14 against the real connector |
 | J2 | 2x10 shrouded box header, 2.54 mm, vertical | `Connector_IDC:IDC-Header_2x10_P2.54mm_Vertical` | 1 | CN104, mechanism ribbon. Pin 20 (/PWM) tied to +5V on the board |
 | J3 | 2x10 shrouded box header, 2.54 mm, vertical | `Connector_IDC:IDC-Header_2x10_P2.54mm_Vertical` | 1 | CN102, host SmartPort ribbon ("FROM HOST"). ACK on pin 20, pin 19 no wire |
-| J4 | 1x3 pin header, 2.54 mm, vertical | `Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical` | 1 | Front-panel eject button: pin 2 GP22, pins 1 and 3 GND. **Placeholder pitch** until the plug is measured |
-| J5 | 1x2 pin header, 2.54 mm, vertical | `Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical` | 1 | Front-panel in-use LED: pin 1 RED (+), pin 2 BLK (GND). **Placeholder pitch** until the plug is measured |
+| J4 | TE AMP CT header, 1x3, 2.0 mm, vertical, 3-wall shroud | `a2m2053:TE_AMP_CT_1x03_P2.00mm_Vertical` (to draw; no stock KiCad footprint) | 1 | Front-panel eject button, CN108 on the IF-83: pin 2 GP22, pins 1 and 3 GND. TE 292161-3 (natural) or 6-292161-3 (black, as original). Identified 2026-10-24 from the TE drawing and calipers [measured] |
+| J5 | TE AMP CT header, 1x2, 2.0 mm, vertical, 3-wall shroud | `a2m2053:TE_AMP_CT_1x02_P2.00mm_Vertical` (to draw) | 1 | Front-panel in-use LED, CN107 on the IF-83: pin 1 RED (+), pin 2 BLK (GND). TE 292161-2 (natural) or 6-292161-2 (black). Same ID as J4 |
 
 - **J1 is the one hard-to-source part.** DB-19 is out of production at the
   big distributors. Female right-angle PCB-mount parts turn up on eBay and
@@ -167,9 +167,16 @@ Keep 220 and 470 on hand for R17.
 - J2 and J3: any shrouded 2x10 0.1" box header with the key notch
   (Wurth 61202021621, Amphenol 10056845-120LF, Sullins SBH11-PBPC-D10-ST-BK,
   or generic). About $0.30 to $0.60 each. [guess]
-- J4 and J5: 2.54 mm pin header strips, cut to length. Or JST/Molex if the
-  real front-panel plugs turn out to be something else (open item in
-  `FABRICATION.md`, "Confirm on the prototype at M9").
+- J4 and J5: TE AMP CT series (AMP Japan's 2.0 mm wire-to-board, the
+  original CN107/CN108 on the IF-83). Round 0.6 mm posts, 3.6 mm wide
+  housing, 6.8 mm tall, 3-wall shroud with end-wall lock windows. DigiKey
+  stocks the natural 292161-2 / 292161-3 at about $0.70 each; black is the
+  6- prefix (6-292161-2, 6-292161-3), check stock. Mating receptacle is TE
+  173977, already on the drive's own LED and eject leads. Drawing:
+  `docs/private/datasheets/TE_AMP_CT_292161_header_drawing.pdf`.
+  Footprint from the drawing: 2.0 mm pitch, 0.8 mm hole (0.85 drilled),
+  body 5.8 (2 pos) / 7.8 (3 pos) x 3.6 mm, pin row 1.1 mm from the back
+  wall, pin 1 at the 1.6 mm end.
 - The cables (mechanism ribbon, host SmartPort ribbon, front-panel LED and
   eject leads) come with the drive and are reused. Nothing to order.
 
@@ -210,8 +217,12 @@ Keep 220 and 470 on hand for R17.
 From `FABRICATION.md` "Confirm on the prototype at M9" and `HANDOFF.md`
 "Next":
 
-1. J4 and J5 pitch and plug type, measured on the real front-panel cable.
-2. R17 value once the LED is seen on the PCB (330 is a start).
+1. ~~J4 and J5 pitch and plug type.~~ TE AMP CT, 2.0 mm, 2026-10-24.
+   Footprints drawn and placed in the IF-83's order (2-pin outboard, 3-pin
+   inboard, shrouds open toward the board edge).
+2. R17 value once the LED is seen on the PCB (330 is a start). The IF-83
+   has the equivalent resistor as the LED anode pull-up to +5V; read it.
 3. Whether the eject button's second contact gets a spare GPIO (GP28) and
-   so a 4th J4 pin. Current J4 works either way.
+   so a 4th J4 pin. Current J4 works either way. The IF-83 reads both
+   contacts (two header pins to separate CXD1013 pins, 2026-10-24).
 4. J1: a confirmed seller and part number for the DB-19 female right angle.

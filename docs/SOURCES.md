@@ -49,8 +49,11 @@ Base: https://mirrors.apple2.org.za/www.bitsavers.org/pdf/apple/disk/sony/
 | File | Source |
 |---|---|
 | `datasheets/sn74lvc8t245.pdf` | Texas Instruments SN74LVC8T245 datasheet (SCES584B): https://www.ti.com/product/SN74LVC8T245 |
+| `datasheets/TE_AMP_CT_292161_header_drawing.pdf` | TE Connectivity customer drawing C-292161 (AMP CT 2 mm post header, vertical), from the product page: https://www.te.com/en/product-292161-3.html (Documents, "Customer Drawing") |
 | `photos/661-0307_*_ebay.webp` (3) | eBay listing for a spare 661-0307 board (not our unit) |
 | `photos/IF-83_802_top_unshielded.webp` | IF-83 board with the shield removed. Found online, not Rico's. |
+| `../hardware/kicad/3d/292161-2.step` | TE 292161-2 STEP model, SnapEDA/SnapMagic export (license next to it). Not in git. |
+| `../hardware/kicad/3d/292161-3.step` | TE 292161-3 STEP model from https://www.te.com/en/product-292161-3.html (Documents, 3D model). Not in git. |
 
 Our own photos (e.g. `docs/photos/mechanism_board_cx23077a_cx20185.jpeg`)
 stay public in `docs/photos/`.

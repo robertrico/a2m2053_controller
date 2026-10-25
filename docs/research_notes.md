@@ -91,7 +91,7 @@ Top side (unshielded photo):
 | CN102 | 20-pin, silk "FROM HOST" | Silk (bottom): ACK, HSTPH0-3, +5V, +12V, -12V, FG. Host SmartPort cable. |
 | D-sub | Rear connector | Daisy-chain out. |
 | CN104 | 20-pin + ribbon | Silk (bottom): ENBL1/ENBL2, CA0, CA1, CA2, LSTRB, HDSEL, RD, WR, GND. **Mechanism cable.** |
-| CN105-CN108 | Small 2/3-pin headers | Silk "DRIVE 1", "DRIVE 2", "DRIVE 2 (UPPER)". Per-drive LED / eject switch? Ties to firmware DRIVE1/DRIVE2 (DuoDisk). |
+| CN105-CN108 | TE AMP CT headers, 2.0 mm, black (6-292161-2 / 6-292161-3) | Silk "DRIVE 1", "DRIVE 2", "DRIVE 2 (UPPER)". CN107 (2-pin) = in-use LED, CN108 (3-pin) = eject switch. Per-drive pairs, ties to firmware DRIVE1/DRIVE2 (DuoDisk). Connector ID **[measured]** 2026-10-24: calipers against TE drawing C-292161 (2.0 mm pitch, 0.6 mm round posts, 3-wall shroud). Layout **[photo]** `photos/IF-83_505_top_with_mechanism.jpeg`: with the DB-19 edge toward you and the silk upright, the 3-pin (CN108/CN106) sits left of the 2-pin (CN107/CN105), pin 1 at the right end of each. |
 
 Bottom side (eBay photo): **Sony CXD1013** QFP gate array (date 8838) lives
 on the bottom. Test pads: TRIGGER, SENSE, /RST IWM, DEVSEL, PH0, RSTCAP.
@@ -129,7 +129,22 @@ CXD1013. **[guess, strongly supported; confirm mechanism pinout on a real unit]*
    pin connects to one outer pin. **[measured]** 2026-10-15. LED cable:
    RED and BLK to a small LED board; meter diode test shows nothing either
    way (likely a series resistor on that board). **[measured]** 2026-10-14.
-   Polarity from the wire colors only. **[guess]**
+   Polarity from the wire colors only. **[guess]** Plugs on both leads are
+   TE AMP CT (2.0 mm, receptacle 173977); board headers are TE 292161-2
+   (LED) and 292161-3 (eject), black 6- prefix on the original.
+   **[measured]** 2026-10-24.
+   IF-83 LED circuit, traced on the board **[measured]** 2026-10-24: one
+   LED pin is pulled high (resistor to +5V); the other goes to the
+   collector of Q101 (3-leg, two legs one side and one the other, marked
+   "L-5"). Q101 emitter to GND, base through 10k to a CXD1013 pin. So the
+   CXD1013 drives the LED active high through Q101 and the connector-side
+   signal is active low (cathode pulled to GND). Our board drives the anode
+   from U4 through R17 and grounds the cathode: same current direction, no
+   change needed. Eject switch: two of the three header pins run to
+   individual CXD1013 pins **[measured]** 2026-10-24, so the original reads
+   both contacts of the changeover switch; the third pin is the common
+   (GND assumed, confirm). Our J4 (middle pin to GP22, outer pins to GND)
+   reads only the pressed contact.
 5. ~~IWM inside CXD1013?~~ No: discrete AMI 344-0041-B (IC103). Resolved.
 6. ~~Working unit to sniff?~~ Resolved: one working UniDisk, used through its
    cable only (never opened); M7 compares against it with SPCOMPARE.
