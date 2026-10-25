@@ -23,18 +23,35 @@ Every price is "per board", not per reel.
 
 ## Summary
 
-| Group | Parts | Qty | Est. cost per board |
-|---|---|---|---|
-| MCU module | A1 | 1 | $12.00 |
-| Level shifters | U1-U5 | 5 | $8.30 (DigiKey 2026-10-25) |
-| Schottky | D1 | 1 | $0.50 |
-| Decoupling, 100 nF 0805 | C1-C10 | 10 | $0.30 |
-| Bulk, 4.7 uF 50 V radial | C11-C13 | 3 | $0.45 |
-| Resistors, 1206 | R1-R18 | 18 | $0.40 |
-| Connectors | J1-J5 | 5 | $18.00 (J1 $15 on eBay, the rarest and most expensive part on the board) |
-| Mounting | H1, H2 | 2 | $0.00 (holes) plus M3 hardware |
-| Bare PCB, 2 layer 100 x 110 mm | - | 1 | $4.00 to $8.00 at qty 5 [guess] |
-| **Total** | | **45 + PCB** | **about $45 to $50** |
+Real numbers from the orders of 2026-10-25, five boards. DigiKey quantities
+carry 10% attrition and the price breaks DigiKey applied, so the parts
+column is what was paid divided by five.
+
+| Group | Parts | Per board |
+|---|---|---|
+| Pico 2 | A1 | $6.12 |
+| Level shifters | U1-U5 | $6.18 (28 at $1.10) |
+| Schottky | D1 | $0.77 |
+| 100 nF 0805 | C1-C10 | $0.34 |
+| 4.7 uF 50 V radial | C11-C13 | $0.49 |
+| Resistors 1206 | R1-R18 | $0.74 |
+| Box headers | J2, J3 | $1.95 |
+| TE CT headers | J4, J5 | $1.32 |
+| DigiKey parts, subtotal | | **$17.93** |
+| DB-19 female right angle | J1 | **$14.50** (eBay) |
+| Bare PCB | | **$7.32** (PCBWay, 5 at $36.61) |
+| Stencil, one for the run | | $2.00 ($10 / 5) |
+| Mounting | H1, H2 | $0.00, the drive's own M3 screws |
+| **Parts and board, per unit** | | **$41.75** |
+
+Landed cost, with shipping, tariff, tax and fees spread over five:
+
+| | Order | Per board |
+|---|---|---|
+| DigiKey, web ID 378380678, 2026-10-25 | $109.20 | $21.84 |
+| PCBWay, PCB + stencil, DHL quote | about $103 | about $20.70 |
+| DB-19 | | $14.50 |
+| **Landed, per unit** | | **about $57** |
 
 Well under the $150 target (`CLAUDE.md`, "Cost matters").
 

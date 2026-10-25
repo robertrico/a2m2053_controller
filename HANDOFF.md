@@ -114,10 +114,15 @@ top, 0.12 mm) for hot-plate paste reflow.
 - DRC with zone refill (2026-10-25): 0 errors, 0 unconnected. Warnings
   left: J1 silk over the tab edge x2, A1 library groups, title text
   thickness (TrueType; plots as filled regions, fine).
-- DigiKey list "Disk Hamr" (12 lines, about $20) matches `hardware/bom.csv`
-  with the Stackpole RMCF1206FT2K00 standing in for the out-of-stock Yageo
-  2k and 180 ohm for R17. Quantities bumped (100 nF 15, 10k 20). Order
-  waits on the print fit.
+- DigiKey order placed 2026-10-25 14:23, web ID 378380678: the "Disk
+  Hamr" list for 5 assemblies with 10% attrition (Pico 0%), Stackpole
+  RMCF1206FT2K00 for the 2k, 180 ohm for R17. $89.64 parts, $109.20
+  landed, USPS Ground Advantage. Parts will arrive before the boards.
+- PCBWay: PCB order W936711ASX11 (5 pcs, $36.61, auto-passed) and stencil
+  S-X12W936711A ($10, under audit) in the cart, unpaid, waiting on
+  PCBWay's sponsorship answer. Pay both together so they ship as one.
+  Per-unit cost worked out in `hardware/bom.md`: $41.75 parts and board,
+  about $57 landed.
 - Exports (git-ignored `hardware/export/`): `disk_hamr_rev1_flat.stl`
   for the case print: KiCad STL (`kicad-cli pcb export stl --subst-models`),
   clipped at the board bottom with trimesh (no pins below), board body
