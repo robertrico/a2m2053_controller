@@ -201,8 +201,11 @@ perfboard prototype before the PCB order.
   the 2-pin LED header (J5) sits nearer the board's left edge, the 3-pin
   eject header (J4) toward the middle, and both shrouds open toward the
   board edge (back wall facing inboard), so the drive's own plugs seat
-  without re-pinning. Still to confirm: which J5 pin the RED (anode) wire
-  lands on once the plug is keyed by the shroud.
+  without re-pinning. J5 pin order measured on the IF-83 2026-10-25: the
+  CN107 pin nearer the 3-pin header goes to Q101 (cathode side), the far
+  pin is the 180 ohm pull-up (anode side). Our J5 was mirrored and is
+  fixed: pin 1 (nearer J4) is GND, pin 2 (toward the board edge) is /LED
+  through R17. Gerbers re-plotted the same day.
 - **J2/J3 positions:** from calipers, not printed. Print once more if the
   ribbons don't reach.
 - **Pico on D1:** confirmed on the prototype (M8, a small diode in place of

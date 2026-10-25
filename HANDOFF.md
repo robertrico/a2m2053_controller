@@ -10,7 +10,7 @@ working UniDisk byte for byte with a disk, write-protected and with no disk.
 J2 is on an off-the-shelf breakout, and M7.5 moved the rig onto IIe power
 (2026-10-15). **M8 passed on the bench** and is merged (2026-10-15, `a1e51db`):
 daisy chain with the working UniDisk in both orders, full disk copied to it.
-**M9 passed on the bench** (2026-10-15, `docs/build_log/m9.md`). **PCB** (2026-10-16): R18 (LSTRB pull-down) added, shifter channels re-ordered for routing (see "Make prototype match PCB"), board named Disk Hamr, routed, DRC clean. **PCB second layout** (2026-10-24/25): J2 moved 11 mm toward the edge after the print, board re-placed by hand and re-routed, +5V as 1 mm traces (no top pour), +12V on B.Cu, J4/J5 in the IF-83's order, R17 = 180 from the IF-83 measurement, Gerbers sent to PCBWay 2026-10-25 (see "PCB layout state"). Bench photo of the whole rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
+**M9 passed on the bench** (2026-10-15, `docs/build_log/m9.md`). **PCB** (2026-10-16): R18 (LSTRB pull-down) added, shifter channels re-ordered for routing (see "Make prototype match PCB"), board named Disk Hamr, routed, DRC clean. **PCB second layout** (2026-10-24/25): J2 moved 11 mm toward the edge after the print, board re-placed by hand and re-routed, +5V as 1 mm traces (no top pour), +12V on B.Cu, J4/J5 in the IF-83's order, R17 = 180 from the IF-83 measurement, J5 pin order swapped to match the IF-83, Gerbers re-plotted 2026-10-25 for PCBWay (see "PCB layout state"). Bench photo of the whole rig: `docs/photos/m7/2026-10-12_bench-all-wired.jpg`.
 
 ## Where things stand
 
@@ -83,8 +83,9 @@ daisy chain with the working UniDisk in both orders, full disk copied to it.
 ## PCB layout state
 
 2026-10-25. Board **Disk Hamr** rev 1.0, ID `DH-1-0`. `main` at `783fccf`,
-pushed. Gerbers and drills uploaded to PCBWay 2026-10-25
-(`hardware/kicad/fabrication/`, zip `hardware/kicad/disk_hamr_2026_10_25.zip`),
+pushed. Gerbers and drills for PCBWay, re-plotted 2026-10-25 after the J5 swap
+(`hardware/kicad/fabrication/`, zip `hardware/kicad/disk_hamr_2026_10_25b.zip`;
+the earlier `disk_hamr_2026_10_25.zip` has J5 mirrored, do not use),
 5 pcs, 2 layer, 1.6 mm, FR-4 TG150, 1 oz, HASL lead-free, green, 6/6 mil,
 0.3 mm min hole, product number location specified. Order on hold until
 PCBWay answers about sponsorship. Stencil ordered with it (non-framework,
@@ -141,10 +142,13 @@ top, 0.12 mm) for hot-plate paste reflow.
 2. If it fits: confirm the PCBWay order, place the DigiKey list.
 3. Rewire the prototype to the PCB's channel order (table below), boot the
    sentinel, run SPCOMPARE, before boards arrive.
-4. Still open: which J5 pin the original's RED (pulled-up) wire lands on,
-   decides whether the LED net swaps at J5. J4 pinout on the real
-   front-panel cable. STEP-vs-footprint open-side chirality on the CT
-   headers (check on the print).
+4. ~~J5 pin order~~ measured 2026-10-25 and fixed: on the IF-83 the CN107
+   pin nearer the 3-pin header is the Q101 sink, the far pin the 180 ohm
+   pull-up. Our J5 swapped to pin 1 GND (nearer J4), pin 2 /LED. Gerbers
+   re-plotted (`hardware/kicad/fabrication/`, zip `disk_hamr_2026_10_25b.zip`),
+   re-upload to PCBWay. Still open: J4 pinout on the real front-panel
+   cable. STEP-vs-footprint open-side chirality on the CT headers (check
+   on the print).
 5. Rev 1.1 candidates: U5 carries one signal (mech RD), a SN74LVC1G17 at
    3.3 V would do; `docs/pin_budget.md` shifter table still says U1 carries
    mech RD and U5 LASTONE/, the BOM and board are right.

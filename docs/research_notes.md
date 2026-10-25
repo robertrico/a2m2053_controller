@@ -137,7 +137,11 @@ CXD1013. **[guess, strongly supported; confirm mechanism pinout on a real unit]*
    LED pin is pulled high (180 ohm to +5V, measured 2026-10-25); the
    other goes to the
    collector of Q101 (3-leg, two legs one side and one the other, marked
-   "L-5"). Q101 emitter to GND, base through 10k to a CXD1013 pin. So the
+   "L-5"). Q101 emitter to GND, base through 10k to a CXD1013 pin. Which
+   pin is which **[measured]** 2026-10-25: the CN107 pin nearer CN108 (the
+   3-pin eject header) goes to Q101; the pin farther from it is the pull-up.
+   Our J5 is wired the same way since 2026-10-25 (pin 1, nearer J4, GND;
+   pin 2 /LED). So the
    CXD1013 drives the LED active high through Q101 and the connector-side
    signal is active low (cathode pulled to GND). Our board drives the anode
    from U4 through R17 and grounds the cathode: same current direction, no

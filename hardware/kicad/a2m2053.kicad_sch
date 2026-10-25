@@ -6382,7 +6382,7 @@
 		(uuid "6515fd0b-6310-49d2-afb5-904997d0e407")
 	)
 	(label "LED"
-		(at 274.32 177.8 180)
+		(at 274.32 180.34 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -7932,7 +7932,7 @@
 		(uuid "fea2465b-ebe6-48c0-be1b-f218ecf59433")
 	)
 	(label "GND"
-		(at 274.32 180.34 180)
+		(at 274.32 177.8 180)
 		(effects
 			(font
 				(size 1.27 1.27)

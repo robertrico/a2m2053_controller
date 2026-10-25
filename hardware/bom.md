@@ -154,7 +154,7 @@ Order: 15 x 10k, 1 x 100k, 1 x 2k, 1 x 180, plus a few spares of each.
 | J2 | 2x10 shrouded box header, 2.54 mm, vertical | `Connector_IDC:IDC-Header_2x10_P2.54mm_Vertical` | 1 | CN104, mechanism ribbon. Pin 20 (/PWM) tied to +5V on the board |
 | J3 | 2x10 shrouded box header, 2.54 mm, vertical | `Connector_IDC:IDC-Header_2x10_P2.54mm_Vertical` | 1 | CN102, host SmartPort ribbon ("FROM HOST"). ACK on pin 20, pin 19 no wire |
 | J4 | TE AMP CT header, 1x3, 2.0 mm, vertical, 3-wall shroud | `a2m2053:TE_AMP_CT_1x03_P2.00mm_Vertical` (to draw; no stock KiCad footprint) | 1 | Front-panel eject button, CN108 on the IF-83: pin 2 GP22, pins 1 and 3 GND. TE 292161-3 (natural) or 6-292161-3 (black, as original). Identified 2026-10-24 from the TE drawing and calipers [measured] |
-| J5 | TE AMP CT header, 1x2, 2.0 mm, vertical, 3-wall shroud | `a2m2053:TE_AMP_CT_1x02_P2.00mm_Vertical` (to draw) | 1 | Front-panel in-use LED, CN107 on the IF-83: pin 1 RED (+), pin 2 BLK (GND). TE 292161-2 (natural) or 6-292161-2 (black). Same ID as J4 |
+| J5 | TE AMP CT header, 1x2, 2.0 mm, vertical, 3-wall shroud | `a2m2053:TE_AMP_CT_1x02_P2.00mm_Vertical` (to draw) | 1 | Front-panel in-use LED, CN107 on the IF-83. Pin 1 (nearer J4) GND, pin 2 (toward the board edge) /LED through R17; matches the IF-83, where the far pin carries the 180 ohm pull-up and the near pin the Q101 sink (measured 2026-10-25). TE 292161-2 (natural) or 6-292161-2 (black). Same ID as J4 |
 
 - **J1:** DB-19 female right angle, $15 each on eBay: the rarest and most
   expensive part on the board. Purchased and fit-tested in the printed
