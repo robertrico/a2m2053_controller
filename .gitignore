@@ -40,3 +40,6 @@ hardware/kicad/3d/
 
 # personal workflow notes (resume order, order numbers, bench state): local only
 HANDOFF.md
+
+# local tool paths (see .env.example)
+.env.local

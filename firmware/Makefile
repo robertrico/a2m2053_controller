@@ -1,13 +1,22 @@
-PICO_SDK_PATH ?= $(HOME)/Development/pico-sdk
+# Local tool paths come from ../.env.local (copy ../.env.example). Each line
+# there is KEY=value; it only fills in what the environment or the command
+# line did not set.
+ENV_LOCAL := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))../.env.local)
+ifneq ($(wildcard $(ENV_LOCAL)),)
+  $(foreach line,$(shell grep -v '^\#' $(ENV_LOCAL) | grep '='),$(eval $(subst =,?=,$(line))))
+endif
+ifeq ($(strip $(PICO_SDK_PATH)),)
+  $(error PICO_SDK_PATH is not set. Put it in ../.env.local (see ../.env.example) or export it)
+endif
 export PICO_SDK_PATH
 BUILD   := build
 ELF     := $(BUILD)/a2m_bringup.elf
 
 # SWD via picoprobe / Debug Probe (CMSIS-DAP). USE_CORE 0: attach to core 0 only;
-# in SMP mode OpenOCD leaves core 1 debug-halted after programming (M4 bench).
-# Default: Raspberry Pi's prebuilt
-# OpenOCD (pico-sdk-tools v2.3.1-0, has target/rp2350.cfg). Override with OPENOCD=.
-OPENOCD ?= $(HOME)/Development/tooling/openocd-rpi/current/openocd
+# in SMP mode OpenOCD leaves core 1 debug-halted after programming. OpenOCD needs
+# RP2350 support (target/rp2350.cfg): Raspberry Pi's build from pico-sdk-tools
+# v2.3.1-0 or newer. Set OPENOCD in ../.env.local if it is not on PATH.
+OPENOCD ?= openocd
 OCD_CFG := -f interface/cmsis-dap.cfg -c "set USE_CORE 0" -f target/rp2350.cfg -c "adapter speed 5000"
 GDB     ?= arm-none-eabi-gdb
 

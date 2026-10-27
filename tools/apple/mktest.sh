@@ -1,11 +1,10 @@
 #!/bin/sh
 # M7 sentinel test disk: docs/private/ref/m7_test800k.po (git-ignored: it holds Apple's ProDOS).
-# Write it to a floppy with ADTPro through the working UniDisk, then boot it through our board.
+# Write it to a floppy with ADTPro on a known-good drive, then boot it through this board.
 set -e
 here=$(cd "$(dirname "$0")" && pwd)
 root=$here/../..
-ac="java -jar $HOME/Development/AppleCommander-ac-13.0.jar"
-src=${PRODOS_SRC:-$HOME/Development/project_byte_hamr/software/SMARTPORT/images/ProDOS_2_4_1.po}
+. "$here/env.sh"
 work=${TMPDIR:-/tmp}/m7test.$$
 out=$root/docs/private/ref/m7_test800k.po
 python3 "$here/mktest.py" "$work"

@@ -146,8 +146,11 @@ make flash      # program over SWD (OpenOCD)
 make reset      # reset the target
 ```
 
-`PICO_SDK_PATH` defaults to `~/Development/pico-sdk` and `OPENOCD` to a local
-Raspberry Pi OpenOCD build; override either on the command line.
+Tool paths live in `.env.local` at the repo root, git-ignored. Copy
+`.env.example`, fill in `PICO_SDK_PATH` and, if they are not on your PATH,
+`OPENOCD` and `GDB`. Anything already in your environment or on the `make`
+command line wins over the file. The test-disk scripts in `tools/apple/` read
+`AC_JAR` and `PRODOS_SRC` from the same file.
 
 ### Console
 
