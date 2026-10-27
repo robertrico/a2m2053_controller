@@ -203,7 +203,7 @@
   OK
 [10:29:18] $ a2m.cli capture --port /dev/cu.usbmodem114401 --track 4 --side 0 --count 20000 --out /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/t4s0.flux
   0 intervals -> /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/t4s0.flux
-# 10:3x Rico cold-rebooted the rig (probes attached to a live mechanism killed read flux)
+# 10:3x rig cold-rebooted (probes attached to a live mechanism killed read flux)
 [10:30:16] > oe on
   OK
 [10:30:16] > enbl on
@@ -256,7 +256,7 @@ track 4 side 0: 0/12 sectors good, bad headers 0, bad data 0, misplaced 0
   0 intervals -> /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/t0s1.flux
 [10:33:23] > motor off
   OK
-# Rico: +12/pin13, +5/pin11, /PWM pin20 all measure fine
+# bench: +12/pin13, +5/pin11, /PWM pin20 all measure fine
 [10:35:30] > motor on
   OK
 [10:35:30] > seek 0
@@ -286,7 +286,7 @@ track 4 side 0: 0/12 sectors good, bad headers 0, bad data 0, misplaced 0
 [10:36:56] > motor on
   'motor on': ERR not ready
 [10:36:58] > seek 0
-# rig rebooted again (Rico), disk 2 in
+# rig rebooted again, disk 2 in
 [10:37:11] > oe on
   OK
 [10:37:11] > enbl on
@@ -321,14 +321,14 @@ track 4 side 0: 0/12 sectors good, bad headers 0, bad data 0, misplaced 0
   OK
 [10:38:44] > head 0
   OK
-# Rico: +5 at pin 11 sagging under motor load again (M3 IR-drop symptom). Reworking wiring.
+# bench: +5 at pin 11 sagging under motor load again (M3 IR-drop symptom). Reworking wiring.
 [10:39:59] > motor off
   OK
 [10:39:59] > recal
   OK
 [10:39:59] > head 0
   OK
-# Rico replaced the +5V jumper with solid core
+# +5V jumper replaced with solid core
 [10:41:24] > oe on
   OK
 [10:41:24] > enbl on
@@ -909,7 +909,7 @@ all zero: True sectors [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 [11:19:36] $ a2m.cli readdisk --port /dev/cu.usbmodem114401 --out /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/disk2_formatted.po
   readdisk: 26214 ms, decode 1258 ns/interval (mean), ring backlog max 30 of 8192, 0 failed track sides, 0 with soft errors -> /private/tmp/claude-501/-Users-hambook-Development-a2m2053-controller/85122f4e-fb4c-4b1a-bec3-bbb845151fa5/scratchpad/disk2_formatted.po
 disk 2 after board format: all zero = True 819200
-# Rico: the board's format sounds just like a format on the Apple II (same step-and-write rhythm). Log note.
+# bench: the board's format sounds just like a format on the Apple II (same step-and-write rhythm). Log note.
 # step 9: writedisk REF800K.po onto disk 2 (board-formatted)
 [11:21:06] $ a2m.cli writedisk --port /dev/cu.usbmodem114401 --image /Applications/ADTPro-v.r.m/disks/REF800K.po
   TS 0 0 ok

@@ -6,7 +6,7 @@
 
 **Architecture:** RP2350 bring-up firmware (`firmware/`) exposes a line-based USB console: mechanism status reads, mechanism commands, seek/recal/eject, and raw flux capture (PIO1 interval timer + DMA, dumped as binary with CRC). A Python tool (`tools/`) does all the GCR decoding offline: flux intervals -> bits -> nibbles -> address/data fields -> 524-byte sectors -> disk image. Mechanism sequencing logic is pure C behind a small bus interface, so it is unit-tested on the host with a fake bus. Firmware-side GCR decode (M4) comes in a later plan.
 
-**Tech Stack:** C11, Raspberry Pi Pico SDK 2.2.0 (`~/Development/pico-sdk`), Arm GNU Toolchain 15.2 (`arm-none-eabi-gcc`, `arm-none-eabi-gdb`), CMake + Ninja, PIO + DMA on RP2350A (Pico 2). Load and debug over SWD: Raspberry Pi Debug Probe / picoprobe (CMSIS-DAP) + OpenOCD + GDB, Rico's usual flow. Python 3.14, pytest, pyserial.
+**Tech Stack:** C11, Raspberry Pi Pico SDK 2.2.0 (`~/Development/pico-sdk`), Arm GNU Toolchain 15.2 (`arm-none-eabi-gcc`, `arm-none-eabi-gdb`), CMake + Ninja, PIO + DMA on RP2350A (Pico 2). Load and debug over SWD: Raspberry Pi Debug Probe / picoprobe (CMSIS-DAP) + OpenOCD + GDB, the usual flow. Python 3.14, pytest, pyserial.
 
 **Spec:** `docs/superpowers/specs/2026-10-07-a2m2053-controller-design.md` (sections 1, 2, 4.2 M0-M3). Pin map: `docs/pin_budget.md`. Signal directions and shifters: `docs/level_shifting.md`. Mechanism facts: `docs/research_notes.md` sections 7, 8.
 
@@ -19,14 +19,14 @@
 - 8T245 rule: one DIR and one /OE per 8-channel board; all channels on a board share them.
 - The original drive ROM (`~/Development/project_byte_hamr/gateware/rev2/smart_hamr/liron.asm`) is the oracle for sequences and timing. Do not copy its structure.
 - Proven sources: `~/Development/project_byte_hamr` only. Never use `~/Development/ironsteel-fpga-disk-controller`.
-- No hardware action (power, flash, connect, plug/unplug) without Rico saying go. Bench tasks are run by Rico; the agent prepares, reads results, and records.
+- No hardware action (power, flash, connect, plug/unplug) without the operator saying go. Bench tasks are run by the operator; the agent prepares, reads results, and records.
 - Mechanism connector CN104 pin 20 (/PWM) is tied to +5V. Pin 9 is N/C.
 
 ## Execution order and milestone gates
 
 Tasks are numbered by subsystem, but they run **one milestone at a time**.
-Each phase ends at a hard stop: Rico runs the bench task, the results get
-documented (build note + Rico's own photo/log routine), and Rico says go
+Each phase ends at a hard stop: the operator runs the bench task, the results get
+documented (build note + the operator's own photo/log routine), and the operator says go
 before the next phase starts. An executor never starts the next phase on its
 own.
 
@@ -38,7 +38,7 @@ own.
 | M3 | Tasks 1 -> 2 -> 3 -> 4 (Python decoder) -> Task 8 (flux capture) -> **Task 12 [BENCH]** | `docs/build_log/m3.md`, then **STOP** |
 
 M0 blocker to clear first: an OpenOCD with `target/rp2350.cfg` (see Task 9
-step 3). Rico chooses and installs it.
+step 3). The operator chooses and installs it.
 
 ## Review Focus
 
@@ -1410,7 +1410,7 @@ $(BUILD)/build.ninja:
 test:
 	$(MAKE) -C test
 
-# Rico only (hardware actions):
+# Operator only (hardware actions):
 flash: all
 	$(OPENOCD) $(OCD_CFG) -c "program $(ELF) verify reset exit"
 
@@ -2557,9 +2557,9 @@ git commit -m "feat(fw): PIO+DMA flux capture with CRC-checked USB dump"
 
 ---
 
-### Task 9: [BENCH, Rico] M0: bench rig, power, boot safety
+### Task 9: [BENCH] M0: bench rig, power, boot safety
 
-The agent prepares this checklist and records results. **Rico does every physical step and says go before any power or flash.**
+The agent prepares this checklist and records results. **The operator does every physical step and says go before any power or flash.**
 
 **Files:**
 - Create: `docs/build_log/m0.md`
@@ -2577,11 +2577,11 @@ Mechanism power on the CN104 tap: pin 11 = +5V, pins 13/15/17/19 = +12V, pins 1/
 One common ground: Pico GND, both shifters, bench supply, mechanism.
 Pin 1 of CN104 = red stripe on the ribbon. Confirm orientation against `docs/research_notes.md` sec. 7 before power.
 
-- [ ] **Step 2: Power the mechanism with the Pico unplugged (Rico)**
+- [ ] **Step 2: Power the mechanism with the Pico unplugged**
 
 Pico **unplugged** (USB and probe). With VCCA unpowered the 8T245 outputs are Hi-Z, so the mechanism sees only the B-side pulls. Never power the mechanism while the Pico runs an unknown image: old firmware could drive GP21 low. Bench supply: +5 V limited to 1.0 A, +12 V limited to 1.5 A (starting values; raise only if spin-up trips the limit later). Measure and record: +5 V and +12 V idle current; voltage at CN104 pins 11 and 13. Power the mechanism down again.
 
-- [ ] **Step 3: Flash the bring-up firmware (Rico)**
+- [ ] **Step 3: Flash the bring-up firmware**
 
 Prerequisite: debugprobe firmware v2.x on the picoprobe (RP2350 support). OpenOCD: Raspberry Pi prebuilt at `~/Development/tooling/openocd-rpi/current/openocd` (the Makefile default; the oss-cad-suite `openocd` on PATH has no rp2350.cfg). Check: `~/Development/tooling/openocd-rpi/current/openocd -f interface/cmsis-dap.cfg -f target/rp2350.cfg -c "init; exit"`.
 
@@ -2589,7 +2589,7 @@ Mechanism supply **off** while flashing.
 
 Probe SWDIO/SWCLK/GND to the Pico 2 debug header. `cd firmware && make flash` (or `make openocd` in one terminal and `make gdb` in another, then `load` / `continue`). Open the console: `python3 -m serial.tools.miniterm /dev/tty.usbmodem* 115200` (or `screen`). The probe also enumerates as a tty, so pick the Pico's USB CDC port. Press Enter. Expected (Task 5 scaffold firmware): `OK a2m_bringup (scaffold)`. The full console arrives in M1 (Task 7).
 
-- [ ] **Step 4: Boot-safety scope check (Rico; agent may drive the oscope MCP if Rico connects probes and says go)**
+- [ ] **Step 4: Boot-safety scope check (operator; agent may drive the oscope MCP if the operator connects probes and says go)**
 
 CH1 on GP21 (U2 /OE), CH2 on CN104 pin 8 (LSTRB, B side), CH3 on CN104 pin 4 (CA1). Turn the mechanism supply on. Trigger on CH1, single shot, then reset the Pico: `make reset` (the Pico 2 has no reset button), or briefly ground the RUN pin, or replug USB. Expected: GP21 stays high through reset and boot; LSTRB stays low; no pulses on CA1. The mechanism doesn't move. Save the screenshot to `docs/captures/m0/`.
 
@@ -2603,7 +2603,7 @@ git commit -m "docs(m0): bench rig and boot-safety results"
 
 ---
 
-### Task 10: [BENCH, Rico] M1: mechanism status reads
+### Task 10: [BENCH] M1: mechanism status reads
 
 **Bench safety:** before any Pico USB unplug or replug, run `oe off` and switch the mechanism supply off (M0 build log Step 4b: the 8T245 drives LSTRB high on 3V3 power edges, and /ENBL can now be held low by firmware). SWD flash and `make reset` are fine.
 
@@ -2613,7 +2613,7 @@ Console: the firmware echoes typed characters and handles backspace, so `screen 
 - Create: `docs/build_log/m1.md`
 - Modify: `docs/research_notes.md`
 
-- [ ] **Step 1: Enable and read (Rico types, agent interprets)**
+- [ ] **Step 1: Enable and read (operator types, agent interprets)**
 
 Console: `oe on`, `enbl on`, `status`. Expected for an 800K drive (tashnotes drive identification): `DRVIN=0`, `SIDES=1`, `REVISED=1`, `SUPERDRIVE=0`, `MOTORON=1` (off).
 
@@ -2635,7 +2635,7 @@ git commit -m "docs(m1): mechanism status bits and settle time"
 
 ---
 
-### Task 11: [BENCH, Rico] M2: mechanism commands
+### Task 11: [BENCH] M2: mechanism commands
 
 **Files:**
 - Create: `docs/build_log/m2.md`
@@ -2655,7 +2655,7 @@ Time `seek 0` -> `seek 79` from the console (wall clock) and divide by 79 for th
 
 - [ ] **Step 4: Eject**
 
-`eject` -> expect the disk to come out and `OK`. If nothing happens: **stop**, record it, and ask Rico. (Alternative from tashnotes: hold LSTRB high ~0.5 s for eject. The ROM uses a short strobe repeated up to 3 times, which is what the firmware does now.)
+`eject` -> expect the disk to come out and `OK`. If nothing happens: **stop**, record it, and ask the operator. (Alternative from tashnotes: hold LSTRB high ~0.5 s for eject. The ROM uses a short strobe repeated up to 3 times, which is what the firmware does now.)
 
 - [ ] **Step 5: Record**
 
@@ -2667,13 +2667,13 @@ git commit -m "docs(m2): motor, seek, zone speeds and eject on the bench"
 
 ---
 
-### Task 12: [BENCH, Rico] M3: raw flux capture and full-disk decode
+### Task 12: [BENCH] M3: raw flux capture and full-disk decode
 
 **Files:**
 - Create: `docs/build_log/m3.md`, `docs/captures/m3/` (captures)
 - Modify: `tools/a2m/gcr.py` (only if probe says the byte orders differ)
 
-- [ ] **Step 1: Reference disk (Rico, normal use of the working UniDisk)**
+- [ ] **Step 1: Reference disk (operator; normal use of the working UniDisk)**
 
 Reference image: `/Applications/ADTPro-v.r.m/disks/REF800K.po` (built 2026-10-10 with AppleCommander, outside git). ProDOS volume /REF800K/, 1600 blocks: DATA0-DATA5 (BIN, 120K each, Python `random.Random(0xA22053 + i)`) and README (TXT). 1453 unique non-zero blocks, 147 zero (free). SHA-256 `bfed064fef52e30578723b3c9fcc6768ab52907f4bb1aa4670f70823657742ab`.
 
@@ -2705,7 +2705,7 @@ Expected: decode shows headers found (bad headers low). Probe's top line shows `
 git add tools/a2m/gcr.py
 git commit -m "fix(tools): GCR byte order confirmed on real media"
 ```
-If probe shows 0 good for every order but headers decode: **stop** and record. Check block 2 contents by hand with Rico before changing the decoder.
+If probe shows 0 good for every order but headers decode: **stop** and record. Check block 2 contents by hand with the operator before changing the decoder.
 
 - [ ] **Step 4: Full disk**
 

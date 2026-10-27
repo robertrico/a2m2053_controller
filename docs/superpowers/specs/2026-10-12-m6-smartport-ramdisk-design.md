@@ -1,9 +1,9 @@
 # M6: SmartPort on the RP2350, serving a RAM disk (design)
 
 Status: implemented and passed on the bench 2026-10-12 (`docs/build_log/m6.md`).
-Written without Rico in the loop (he asked for
-spec, plan and build in one go). Design choices that are his to overrule
-are marked **[choice]**. Rico's brief: functionality, timing, "does it
+Written without the owner in the loop (the brief was
+spec, plan and build in one go). Design choices that are the owner's to overrule
+are marked **[choice]**. The brief: functionality, timing, "does it
 work"; the bench is the final test.
 
 Parent spec: `2026-10-07-a2m2053-controller-design.md` (sec. 1, 3, 4.2).
@@ -269,7 +269,7 @@ the card does not check the type). STAT = `$80 | code`. SRC = our ID.
 - M5 mechanism commands stay. While one runs, the bus is not serviced; the
   card retries or reports no device.
 
-## 9. Bench plan (Rico)
+## 9. Bench plan
 
 Setup as at the end of 2026-10-12: J1 wired, bench +5 at 5.00 V, mechanism
 ribbon off, U3 present with the ACK pull-up.

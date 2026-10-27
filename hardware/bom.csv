@@ -1,5 +1,5 @@
 Item,Qty,References,Value,Package / footprint,Manufacturer,MPN,Vendor,Vendor part,Est. unit USD (unverified; see bom.md),Notes
-1,1,A1,Pico 2,Castellated module (RaspberryPi_Pico_SMD_HandSolder),Raspberry Pi,SC1631,Digikey,2648-SC1631CT-ND,6.12,"Plain Pico 2, no headers, not W. Soldered flat by castellations. $12 min per unit (Rico 2026-10-18)."
+1,1,A1,Pico 2,Castellated module (RaspberryPi_Pico_SMD_HandSolder),Raspberry Pi,SC1631,Digikey,2648-SC1631CT-ND,6.12,"Plain Pico 2, no headers, not W. Soldered flat by castellations. $12 min per unit (2026-10-18)."
 2,5,"U1,U2,U3,U4,U5",SN74LVC8T245DWR,SOIC-24W 7.5 mm 1.27 mm,Texas Instruments,SN74LVC8T245DWR,Digikey,296-23280-1-ND,1.10,"Level shifters. Alternates (TSSOP, respin): 74LVC8T245PW, SN74LXC8T245PWR."
 3,1,D1,STPS2L40AF,SMA,STMicroelectronics,STPS2L40AF,Digikey,497-18870-1-ND,0.63,"Pico VSYS feed from IIe +5V, blocks USB back-feed. Any 2 A low-Vf SMA Schottky."
 4,10,"C1,C2,C3,C4,C5,C6,C7,C8,C9,C10",100nF 50V X7R,0805,Samsung,CL21B104KBCNNNC,Digikey,1276-1003-1-ND,0.03,"Decoupling, one VCCA and one VCCB per shifter. Order 15."

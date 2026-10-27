@@ -14,7 +14,7 @@ the distributor sites were unreachable from the writing environment).
 - SN74LVC8T245DWR: copied from `FABRICATION.md` (Digikey 296-23280-1-ND,
   about $1.10 at qty 25, $0.98 at qty 100, noted there as Oct 2026).
 - Pico 2: $6.12 at DigiKey (2648-SC1631CT-ND, quote 19455158, 2026-10-24).
-  Earlier estimate was $12 (Rico 2026-10-18).
+  Earlier estimate was $12 (2026-10-18).
 - Everything else: from memory of typical distributor pricing, `[guess]`.
   The vendor part numbers for the passives and headers in `bom.csv` are
   also from memory. Put them in a cart and check before ordering.
@@ -65,7 +65,7 @@ Well under the $150 target (`CLAUDE.md`, "Cost matters").
 | A1 | Pico 2 | `Module:RaspberryPi_Pico_SMD_HandSolder` | Raspberry Pi SC1631 (Pico 2, no headers) | 1 |
 
 - Soldered flat by its castellated edge pads, no headers (`FABRICATION.md`,
-  Rico 2026-10-13). Order the plain Pico 2, **not** the "H" variant with
+  2026-10-13). Order the plain Pico 2, **not** the "H" variant with
   pre-soldered headers and **not** Pico 2 W (no need for radio, and the
   antenna keep-out costs board area).
 - Flashing is SWD through the 3-pin JST-SH debug connector on the module.

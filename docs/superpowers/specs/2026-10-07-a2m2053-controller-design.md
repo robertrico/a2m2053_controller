@@ -1,6 +1,6 @@
 # A2M2053 (UniDisk 3.5) replacement controller: design
 
-Status: **approved** by Rico on 2026-10-07 (written spec).
+Status: **approved** 2026-10-07 (written spec).
 
 ## 0. Goal and constraints
 
@@ -11,7 +11,7 @@ Status: **approved** by Rico on 2026-10-07 (written spec).
   The original drive ROM (`liron.asm`, Eric Smith disassembly) serves as an
   **oracle**: we check our sequencing, status, errors and timing against it,
   and match its behaviour at the protocol level only.
-- Phase 1: perfboard prototype on a Pico 2 (RP2350A) with Rico's 8T245
+- Phase 1: perfboard prototype on a Pico 2 (RP2350A) with the 8T245
   shifter boards. Phase 2: a low-cost, hand-solderable drop-in PCB (the
   only spare board on eBay has sat unsold at $150 for 7 months). PCB
   requirements and part choices: `FABRICATION.md`.

@@ -17,7 +17,7 @@ LOOP GP10 RD J1.16/J3.16 -> none
 LOOP GP9 ACK J1.20/J3.20 -> none
 LOOP mixed=0
 OK
-# bench +5 switched on (Rico), rerun
+# bench +5 switched on, rerun
 > loop
 LOOP idle GP1 LASTONE J3.12=1 GP2 PH0 J1.2/J3.2=0 GP3 PH1 J1.4/J3.4=0 GP4 PH2 J1.6/J3.6=0 GP5 PH3 J1.8=0 GP6 WRREQ J1.10/J3.10=1 GP7 HSTEN J1.14=1 GP8 WR J1.18/J3.18=0 GP20 mech RD J2.16=1
 LOOP GP0 PH3_OUT J3.8 -> GP5 PH3 J1.8(follows)
@@ -26,7 +26,7 @@ LOOP GP10 RD J1.16/J3.16 -> none
 LOOP GP9 ACK J1.20/J3.20 -> none
 LOOP mixed=0
 OK
-# J1.12 -> GND fitted (Rico), rerun
+# J1.12 -> GND fitted, rerun
 > loop
 LOOP idle GP1 LASTONE J3.12=0 GP2 PH0 J1.2/J3.2=0 GP3 PH1 J1.4/J3.4=0 GP4 PH2 J1.6/J3.6=0 GP5 PH3 J1.8=0 GP6 WRREQ J1.10/J3.10=1 GP7 HSTEN J1.14=1 GP8 WR J1.18/J3.18=0 GP20 mech RD J2.16=1
 LOOP GP0 PH3_OUT J3.8 -> GP5 PH3 J1.8(follows)

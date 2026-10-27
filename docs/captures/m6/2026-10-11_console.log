@@ -1,4 +1,4 @@
-# M6 console 2026-10-11 14:41:54  (Pico health check after U1 failure; U1 being replaced, bench +5 state per Rico)
+# M6 console 2026-10-11 14:41:54  (Pico health check after U1 failure; U1 being replaced, bench +5 state per the operator)
   Traceback (most recent call last):
     File "<stdin>", line 1, in <module>
   ModuleNotFoundError: No module named 'serial'
@@ -17,7 +17,7 @@
     pad GP2 now 0x5a, GP26 in=0
   pull-up: GP2=1 GP3=1 GP4=1 GP5=1 GP6=1 GP7=1 GP8=1 GP20=1
   restored pads: GP2=0x52 GP3=0x52 GP4=0x52 GP5=0x52 GP6=0x52 GP7=0x52 GP8=0x52 GP20=0x52
-  NOTE: both pull tests above ran while Rico was rewiring U1 (bench state unknown). Results discarded.
+  NOTE: both pull tests above ran while U1 was being rewired (bench state unknown). Results discarded.
 # 14:47:39 pull test: new U1 seated, Pico powered only (bench supply off, VCCB unpowered)
     pad GP2 now 0x56, GP26 in=0
   pull-down: GP2=0 GP3=0 GP4=0 GP5=0 GP6=0 GP7=0 GP8=0 GP20=0

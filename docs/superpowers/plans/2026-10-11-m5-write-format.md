@@ -21,7 +21,7 @@
 - Reply status bytes: `0x00` ok, `0xE7` ok after soft errors, `0xA7` I/O error, `0xAF` no disk, `0xAD` bad block / bad argument, `0xAB` write-protected (new). Soft flags as M4.
 - Never write REF800K. It stays write-protected.
 - Every wait has a timeout. No allocation in firmware code (static buffers only).
-- No hardware action (power, flash, plug/unplug, writing a disk) without Rico saying go. Bench rule: `oe off` and mechanism supply off before any Pico USB unplug/replug.
+- No hardware action (power, flash, plug/unplug, writing a disk) without the operator saying go. Bench rule: `oe off` and mechanism supply off before any Pico USB unplug/replug.
 - Commits: Conventional Commits, ending with the two trailer lines given by the controller.
 
 ## Review Focus
@@ -2138,19 +2138,19 @@ git commit -m "feat(tools): writeblk, writedisk and format subcommands"
 
 ---
 
-### Task 10: [BENCH, Rico] M5: write and format on the board
+### Task 10: [BENCH] M5: write and format on the board
 
-Every hardware step needs Rico's go. Disk 1 and disk 2 are scratch 800K DS disks; REF800K stays write-protected and is never inserted while writes are possible unless a step says "read only". Host tool prefix: `cd tools && PYTHONPATH=. .venv/bin/python -m a2m.cli`. Console port `/dev/cu.usbmodem114401`. Power-down order: mechanism supply off before any Pico USB unplug.
+Every hardware step needs the operator's go. Disk 1 and disk 2 are scratch 800K DS disks; REF800K stays write-protected and is never inserted while writes are possible unless a step says "read only". Host tool prefix: `cd tools && PYTHONPATH=. .venv/bin/python -m a2m.cli`. Console port `/dev/cu.usbmodem114401`. Power-down order: mechanism supply off before any Pico USB unplug.
 
 **Files:**
 - Create: `docs/build_log/m5.md`, `docs/captures/m5/` (screenshots, flux captures, console logs with setup notes)
 - Modify: `docs/research_notes.md` (new facts with tags), `HANDOFF.md`
 
-- [ ] **Step 1: Shot list (CLAUDE.local.md).** Before Rico builds: write + verify console; scratch disk (tab open) next to REF800K (tab protected); scope of /WRTGATE + WRTDATA over one sector write; board-formatted disk catalogued in the working UniDisk; bench overview with the scratch disk in Drive A. Names `docs/photos/m05/2026-10-DD_short-desc.jpg`.
+- [ ] **Step 1: Shot list (CLAUDE.local.md).** Before the operator builds: write + verify console; scratch disk (tab open) next to REF800K (tab protected); scope of /WRTGATE + WRTDATA over one sector write; board-formatted disk catalogued in the working UniDisk; bench overview with the scratch disk in Drive A. Names `docs/photos/m05/2026-10-DD_short-desc.jpg`.
 
-- [ ] **Step 2: Flash (Rico says go).** `make -C firmware flash`. If it fails with `failed to exit flash XIP mode`, power cycle the Pico first. Then `server off` regression: `status`, `seek 10`, `capture 0 0 1000` still answer as in M4.
+- [ ] **Step 2: Flash (the operator says go).** `make -C firmware flash`. If it fails with `failed to exit flash XIP mode`, power cycle the Pico first. Then `server off` regression: `status`, `seek 10`, `capture 0 0 1000` still answer as in M4.
 
-- [ ] **Step 3: Disk 1 snapshot.** Rico formats disk 1 on the IIe + working UniDisk (normal cable use; Filer or ADTPro). Insert in Drive A, tab open. `server on`, then `readdisk --port ... --out docs/captures/m5/disk1_before.po`. Expected 1600 blocks, no failed track sides.
+- [ ] **Step 3: Disk 1 snapshot.** The operator formats disk 1 on the IIe + working UniDisk (normal cable use; Filer or ADTPro). Insert in Drive A, tab open. `server on`, then `readdisk --port ... --out docs/captures/m5/disk1_before.po`. Expected 1600 blocks, no failed track sides.
 
 - [ ] **Step 4: First sector write, scope and meter.** Scope: CH1 /WRTGATE at CN104, CH2 WRTDATA at CN104, CH3 RD; trigger CH1 falling, single. Meter CN104 pin 11 (+5 V). Run `writeblk --port ... --block 100 --pattern 0xA5`.
   Record: status, tries, fire_us, backlog; scope: gate low to first WRTDATA edge (>= 1.8 us), last edge to gate high (>= 2 us), cell spacing (2.04 us +- 0.1 %), gate-low length (~11.7 ms); +5 V under write load. Save screenshots + setup notes in `docs/captures/m5/`.
@@ -2165,7 +2165,7 @@ Every hardware step needs Rico's go. Disk 1 and disk 2 are scratch 800K DS disks
 
 - [ ] **Step 9: Fill disk 2.** `writedisk --image REF800K.po`, then `readdisk --compare REF800K.po`: 0 blocks differ.
 
-- [ ] **Step 10: UniDisk check (normal cable use only).** Rico moves disk 2 to the working UniDisk on the IIe: it boots or catalogs like REF800K. Optional: ADTPro image of disk 2, diff against REF800K. (M5 pass, part 2.)
+- [ ] **Step 10: UniDisk check (normal cable use only).** The operator moves disk 2 to the working UniDisk on the IIe: it boots or catalogs like REF800K. Optional: ADTPro image of disk 2, diff against REF800K. (M5 pass, part 2.)
 
 - [ ] **Step 11: Error paths.** Disk 1 with the tab protected: `writeblk` -> status `ab`, `format 0 0` -> `FMT 0 0 0 ab`, and Drive A's scope shows no gate activity. No disk: `af`.
 

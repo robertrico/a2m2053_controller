@@ -7,7 +7,7 @@ Datasheet: `private/datasheets/sn74lvc8t245.pdf` (SCES584B). Copied from
 Only the datasheet came from ironsteel. That repo is a defunct IWM attempt;
 don't use it for research. Protocol truth = project_byte_hamr.
 
-Rico's built shifters: 8T245, 8 channels per board (8 A / 8 B), **DIR and OE
+The breakout boards on hand: 8T245, 8 channels per board (8 A / 8 B), **DIR and OE
 both broken out**, fully configurable. So the 3-chip plan below maps straight
 onto 3 boards: strap DIR, put OE on MCU GPIO where noted.
 

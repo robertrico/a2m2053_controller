@@ -19,7 +19,7 @@
 - Retry policy (spec section 6): 12 revolutions per fill, recal + re-seek after 6; wrong-track header -> resync + re-seek, budget 4, recal on the 3rd; data prolog must appear within 25 nibbles after the address epilog; 5000 ms hard cap per request; motor idle-off 1000 ms.
 - Reply status bytes: `0x00` ok, `0xE7` ok after soft errors, `0xA7` I/O error, `0xAF` no disk, `0xAD` bad block. Soft flags: RECAL 0x01, FOREIGN 0x02, BADDATA 0x04, BADADDR 0x08, OVERRUN 0x10.
 - Every wait has a timeout. No allocation in firmware code (static buffers only).
-- No hardware action (power, flash, plug/unplug) without Rico saying go. Bench rule: `oe off` and mechanism supply off before any Pico USB unplug/replug.
+- No hardware action (power, flash, plug/unplug) without the operator saying go. Bench rule: `oe off` and mechanism supply off before any Pico USB unplug/replug.
 - Commits: Conventional Commits, ending with the two trailer lines given by the controller.
 
 ## Review Focus
@@ -2247,7 +2247,7 @@ git commit -m "feat(tools): readdisk and readblk for the board-side reader"
 
 ---
 
-### Task 9: [BENCH, Rico] M4: blocks read on the board
+### Task 9: [BENCH] M4: blocks read on the board
 
 **Files:**
 - Create: `docs/build_log/m4.md`, `docs/captures/m4/`

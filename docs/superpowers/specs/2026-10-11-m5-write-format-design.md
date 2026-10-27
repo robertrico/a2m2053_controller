@@ -282,7 +282,7 @@ Python side: `synth.py` gets the ROM track layout (preamble, 35-byte gaps,
 `gcr.py` and `gcr.c` via fixtures; parsers for the `BLK`, `FMT` and
 `FORMAT END` replies.
 
-Bench (Rico; numbered steps in the plan). Disk 1 and disk 2 are scratch
+Bench (operator; numbered steps in the plan). Disk 1 and disk 2 are scratch
 disks; REF800K is never written.
 
 | Step | What | Done when |

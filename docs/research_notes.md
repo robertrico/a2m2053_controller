@@ -174,7 +174,7 @@ Source: `private/bitsavers_sony/MP-F51_specs/699-0321_800K_Double-Sided_ERS_Aug8
 some garble). Sep86 rev 669-0452-A alongside. Schematics (.tif) for
 MP-F51W internal / external / -03 unified in the same folder.
 
-Rico's mechanism has a Sony **CX20185** (QFP-44) on its board: FDD read/write
+The test-bed mechanism has a Sony **CX20185** (QFP-44) on its board: FDD read/write
 head amplifier (equivalents Sanyo LA8200M, Motorola MC2871). It lives on the
 mechanism, not on our controller. Analog read chain is already done for us;
 RD out of the mech is digital flux transitions.
@@ -242,7 +242,7 @@ drive, A9M0106), `699-0285-A_400K_Disk_Dec84.pdf`, `Liron/` photos (bitsavers
 (`mci.md`, `gcr_checksum.md`). All from
 https://mirrors.apple2.org.za/www.bitsavers.org/pdf/apple/disk/sony/
 
-## 8. Mechanism board (Rico's dead-board drive, photo 2026-10-07) **[photo]**
+## 8. Mechanism board (dead-board test drive, photo 2026-10-07) **[photo]**
 
 `photos/mechanism_board_cx23077a_cx20185.jpeg`. Underside of the mechanism.
 
@@ -254,7 +254,7 @@ https://mirrors.apple2.org.za/www.bitsavers.org/pdf/apple/disk/sony/
 | CN1 | 2x10, silk 1/2 ... 19/20 | Ribbon to controller CN104. Test points near it: CA0, CA1, CA2, LSTRB, RD, TRK0, 5VF, 12VF, 5VC, 12VC, GND, RESET. |
 | CN2, CN3, CN4 | small headers | Internal to the mechanism (motors / sensors). Not our concern. |
 
-- CN104/CN1 pin 20 (/PWM) is tied to +5V on the controller board. **Measured by Rico.**
+- CN104/CN1 pin 20 (/PWM) is tied to +5V on the controller board. **[measured]**
   Our board does the same.
 - 1985 date code means an early 800K mechanism, consistent with the Aug 1985
   ERS (699-0321).
@@ -329,7 +329,7 @@ Flat 20-pin mapping (right column): DB-19 pin n -> flat pin 2n-1 for 1-10
 - +5V at CN104 pin 11 must stay >= 4.75 V with the motor running, or read data
   vanishes (M3 and again M5). **[measured]**
 
-## 10. Rear D-sub <-> CN102 continuity (Rico, dead board, 2026-10-07; re-beeped 2026-10-13, same map) **[measured]**
+## 10. Rear D-sub <-> CN102 continuity (dead board, 2026-10-07; re-beeped 2026-10-13, same map) **[measured]**
 
 Expected map = Apple "regular" flat mapping (DB-19 n -> flat 2n-1 for 1-10,
 2(n-10) for 11-19). Everything matched that, except:
@@ -434,4 +434,4 @@ With +5V at CN104 pin 11 sagging to 4.0-4.8 V under motor load (bench wiring
 resistance), the mechanism's read data on RD disappears or breaks up, while
 status, tach, stepping and eject keep working. At about 5 V at the pin, both
 test mechanisms read every sector. The PCB needs low-resistance +5V/+12V/GND
-to CN104 and bulk caps at the connector: the IF-83 uses 4.7 uF 50 V electrolytics [photo/read by Rico]; use the same part.
+to CN104 and bulk caps at the connector: the IF-83 uses 4.7 uF 50 V electrolytics [photo]; use the same part.

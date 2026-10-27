@@ -65,7 +65,7 @@ round.
 - Ribbon headers, 2x10 shrouded, 2.54 mm
   (`Connector_IDC:IDC-Header_2x10_P2.54mm_Vertical`), long side parallel to
   the top edge, pin 1 at the bottom left, odd pins on the bottom row
-  (rotation 90). Positions from Rico's measurements on the IF-83; not
+  (rotation 90). Positions measured on the IF-83; not
   printed yet (ribbon cables, some play).
   J2 (CN104, mechanism): shroud's upper-left corner 3.5 mm from the board's
   left edge (below the step) and 18.5 mm below the 94 mm top edge. Pin 1 at
@@ -77,7 +77,7 @@ round.
 
 ## Rule: hand-solderable
 
-Rico must be able to assemble the board by hand with an iron (drag solder,
+The board must be assemblable by hand with an iron (drag solder,
 flux, chisel tip). No hot air, no reflow oven, no stencil required.
 
 - Fine-pitch limit: 0.65 mm pitch is the floor, and only where no coarser
@@ -87,7 +87,7 @@ flux, chisel tip). No hot air, no reflow oven, no stencil required.
 - Connectors through-hole (DB-19 host, CN104 20-pin mechanism, rear D-sub).
 - The bare RP2350A (QFN-60, 0.4 mm pitch, exposed pad) fails this rule. The
   board carries a Pico 2 module instead, soldered flat by its castellated
-  edge pads (no headers): as flat as possible. Decided by Rico, 2026-10-13.
+  edge pads (no headers): as flat as possible. Decided 2026-10-13.
   - Footprint: Pico castellated land pattern. No vias or exposed copper
     under the module; the Pico's underside test pads sit on solder mask.
   - Put the micro-USB end at a board edge so the cable still plugs in.
@@ -134,7 +134,7 @@ VCCA so the chip stays tristated through power-up and RP2350 boot.
 |---|---|---|---|
 | DWR | SOIC-24 wide | 1.27 mm | **Yes.** In stock, easy to solder. |
 | PWR | TSSOP-24 | 0.65 mm | Fallback only. Opens Nexperia 74LVC8T245PW and TI SN74LXC8T245PWR as alternates. |
-| DBQR | QSOP-24 | 0.635 mm | No. Supply bad (Oct 2026); Rico's stock is reserved for another board. |
+| DBQR | QSOP-24 | 0.635 mm | No. Supply bad (Oct 2026); the stock on hand is reserved for another board. |
 | DBR | SSOP-24 (5.3 mm) | 0.65 mm | No. Uncommon. |
 
 ### If TI SOIC dries up
@@ -156,7 +156,7 @@ VCCA so the chip stays tristated through power-up and RP2350 boot.
   wire dropped it to 4.3 V and it could not read.
 - **Pico power:** VSYS from the IIe +5V rail through a Schottky (D1,
   STPS2L40AF, SMA), the part Byte Hamr rev2 uses. It keeps USB VBUS from
-  back-feeding the host rail when USB is plugged in (Rico, 2026-10-14).
+  back-feeding the host rail when USB is plugged in (decided 2026-10-14).
 - **Shifter /OE pull-ups** (`docs/level_shifting.md`): 10k to VCCA on U2 and
   U3 /OE (and any shifter that must stay quiet through boot).
 - **Pull-ups / pull-downs**: as listed in `docs/level_shifting.md`
@@ -164,7 +164,7 @@ VCCA so the chip stays tristated through power-up and RP2350 boot.
   schematic is missing the LSTRB pull-down:** `/MECH_LSTRB` (U2.B4, J2.8)
   needs 10k to GND, as on the bench since M0. Every other pull on the list
   is in the schematic (checked 2026-10-14).
-- **No 3V3 supervisor.** Dropped at M9 (Rico, 2026-10-15). The M0 power-edge
+- **No 3V3 supervisor.** Dropped at M9 (2026-10-15). The M0 power-edge
   strobe on LSTRB (`docs/build_log/m0.md`) can at worst make the mechanism
   step or blip at power-on, as the stock UniDisk and DuoDisk do anyway; no
   disk spins and nothing is written then. Many IIe and Pico power cycles in

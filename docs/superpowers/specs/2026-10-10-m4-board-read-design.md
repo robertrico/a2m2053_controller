@@ -202,7 +202,7 @@ Host (Mac), `firmware/test`:
 Python side: tests for the `readdisk` stream parser (good, bad CRC,
 truncated, failed track side).
 
-Bench (Rico; numbered steps in the plan):
+Bench (operator; numbered steps in the plan):
 1. Flash. Server off: `status`, `seek`, `capture` still work (M1-M3
    regression).
 2. `server on`; `readblk` 0, 1599 and a few per zone; each matches REF800K.

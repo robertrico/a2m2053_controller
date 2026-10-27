@@ -47,7 +47,7 @@ No SD card: the media is the floppy.
 | GP19 | WRTDATA (GCR) | out | U2 |
 | GP20 | mechanism RD | in | U1 |
 | GP21 | U2 /OE (mechanism outputs) | out | none (10k pull-up to 3.3V) |
-| GP22 | eject button | in | none: a plain switch straight to the Pico, GND when pressed, internal pull-up (Rico, 2026-10-12). Firmware on at boot, `ejbtn off` disables it. |
+| GP22 | eject button | in | none: a plain switch straight to the Pico, GND when pressed, internal pull-up (decided 2026-10-12). Firmware on at boot, `ejbtn off` disables it. |
 | GP26 | LED | out | transistor, or a U3 spare channel |
 | GP27 | spare | - | |
 | GP28 | spare | - | |

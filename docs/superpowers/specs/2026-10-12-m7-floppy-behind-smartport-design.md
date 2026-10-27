@@ -1,9 +1,9 @@
 # M7: the floppy behind SmartPort (design)
 
 Status: implemented and passed on the bench 2026-10-12 (`docs/build_log/m7.md`).
-Written without Rico in the loop, built as if the
+Written without the owner in the loop, built as if the
 J2 mechanism breakout is wired (it lands 2026-10-13). **[choice]** marks
-calls that are Rico's to overrule. His brief, as for M6: functionality,
+calls that are the owner's to overrule. The brief, as for M6: functionality,
 timing, does it work; the bench is the test.
 
 Parent spec: `2026-10-07-a2m2053-controller-design.md` (sec. 1, 2.6, 3, 4).
@@ -159,7 +159,7 @@ Getting it onto the IIe: boot the M6 RAM disk (`sp disk ram`, `PR#5`),
 `LOAD SPCOMPARE`, then `sp disk floppy` from the console and `RUN`. For the
 UniDisk: `SAVE` it to a scratch floppy first.
 
-## 9. Bench plan (Rico)
+## 9. Bench plan
 
 Prerequisite: J2 wired and checked (HANDOFF step 2), read scan clean at 5.0 V
 on drive A, REF800K write-protected.

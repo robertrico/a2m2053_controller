@@ -9,7 +9,7 @@
 19:44:13 SP cmds status=0 readblk=0 writeblk=0 format=0 control=0 init=0 other=0
 19:44:13 SP pins PH0=0 PH1=0 PH2=0 PH3=0 WRREQ=1 HSTEN=1 WR=0 LASTONE=1
 19:44:13 OK
---- USB dropped (Rico powering bench/IIe); reconnect
+--- USB dropped (bench and IIe being powered); reconnect
 19:45:02 --- console open /dev/cu.usbmodem114401
 19:45:04 > sp
 19:45:04 sp

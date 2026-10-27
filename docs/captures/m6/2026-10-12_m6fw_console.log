@@ -70,7 +70,7 @@
 17:18:17 SP cmds status=0 readblk=0 writeblk=0 format=0 control=0 init=0 other=0
 17:18:17 SP pins PH0=1 PH1=1 PH2=1 PH3=1 WRREQ=1 HSTEN=1 WR=1 LASTONE=1
 17:18:17 OK
---- cold boot of all systems (Rico)
+--- cold boot of all systems
 17:23:34 --- console open /dev/cu.usbmodem114401
 17:23:34 
 17:23:34 SPL CMD d=1 c=01 b=12 s=00 ack=0

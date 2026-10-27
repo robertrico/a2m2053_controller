@@ -1,7 +1,7 @@
 # M6 implementation plan: SmartPort RAM disk
 
 Spec: `docs/superpowers/specs/2026-10-12-m6-smartport-ramdisk-design.md`.
-Branch: `m6`. Executed inline (Rico away; bench last). Every task ends with
+Branch: `m6`. Executed inline (owner away; bench last). Every task ends with
 `make -C firmware test` green and a commit. Host tests use the existing
 `firmware/test/test.h` harness; PIO tests use pytest in `tools/`.
 
