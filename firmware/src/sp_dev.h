@@ -25,7 +25,7 @@ typedef struct {
 typedef struct {
     uint8_t id;                          // 0 = no ID yet
     bool last;                           // INIT found LASTONE/ high
-    bool passthrough;                    // would enable PH3 to the rear port (ROM $44); no pins in M6
+    bool passthrough;                    // rear-port pass-through requested (ROM $44); sp_bus mirrors it to the pins
     const sp_store_t *store;             // swapped at run time (sp disk ram|floppy)
     bool (*lastone_high)(void *ctx);
     void *ctx;

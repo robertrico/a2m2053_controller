@@ -2,8 +2,8 @@
 """Generate firmware/test/fixtures from the Python decoder's synthetic tracks and REF800K.
 
 Usage (from tools/):
-  .venv/bin/python mkfixtures.py /Applications/ADTPro-v.r.m/disks/REF800K.po
-  .venv/bin/python mkfixtures.py --rom-only   (M5 fixtures only, no REF800K needed)
+  .venv/bin/python mkfixtures.py <ADTPro install>/disks/REF800K.po
+  .venv/bin/python mkfixtures.py --rom-only   (synthetic track fixtures only, no REF800K needed)
 """
 import hashlib
 import random

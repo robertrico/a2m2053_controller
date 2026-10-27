@@ -114,8 +114,8 @@ static bool rd_ready_late(fake_t *f, uint8_t a) {
     return true;
 }
 
-// M5 bench 2026-10-11: a seek that needed only the recal (target track 0) returned
-// before READY, and the format loop then saw READY high on every try.
+// Regression: a seek that only needs the recal (target track 0) must still wait for READY;
+// without it a format loop sees READY high on every try (bench 2026-10-11).
 static void test_seek_after_recal_waits_ready(void) {
     fake_t f; mech_bus_t b = fake_bus(&f, rd_ready_late);
     mech_state_t s; mech_state_init(&s);

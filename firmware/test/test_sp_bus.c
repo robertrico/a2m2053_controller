@@ -565,7 +565,7 @@ int main(void) {
     run_script(2e6);
     CHECK(w12->ok && w12->h.stat == 0 && rd.map[6] != 0 && dev.cmds[SP_READBLOCK] == 0);
 
-    // 13. REQ stuck high after a good reply (the M7 brown-out): at most SP_REREAD_MAX re-sends
+    // 13. REQ stuck high after a good reply (seen on the bench when the host browned out): at most SP_REREAD_MAX re-sends
     sim_reset();
     op(OP_RESET);
     send_cmd(1, SP_INIT, 2, 0, 0, 1);

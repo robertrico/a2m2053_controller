@@ -106,12 +106,11 @@ DATA_NIBBLES = 699        # 174 groups of 4 + 1 group of 3
 CHECKSUM_NIBBLES = 4
 
 # Address-field format byte: 0x20 = double-sided, low bits = interleave.
-# The decoder records it but never checks it. UniDisk value is a [guess].
+# The decoder records it but never checks it. The UniDisk value is unverified.
 FORMAT_UNIDISK = 0x24
 
 # On-disk order of the 3 mangled bytes inside each 4-nibble group, and of the
-# 3 checksum bytes. Not yet confirmed on real media: Task 12 runs
-# `a2mflux.py probe` on a real capture and changes these only if it says so.
+# 3 checksum bytes. Confirmed on real media with `a2mflux.py probe`.
 GROUP_ORDER = (0, 1, 2)
 CHECKSUM_ORDER = (0, 1, 2)
 

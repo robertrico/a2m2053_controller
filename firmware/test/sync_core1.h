@@ -1,5 +1,5 @@
 #pragma once
-// Core 1 for host tests: a transact that runs the request on the M5 server at once
+// Core 1 for host tests: a transact that runs the request on the mechanism server at once
 // (no queue), the way core1_main dispatches it.
 #include "fake_drive.h"
 #include "fstore.h"

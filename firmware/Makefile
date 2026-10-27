@@ -20,7 +20,7 @@ $(BUILD)/build.ninja:
 test:
 	$(MAKE) -C test
 
-# Rico only (hardware actions):
+# Hardware targets: drive the board over SWD (Debug Probe or picoprobe).
 # Rescue reset first: with core 1 running from flash, erasing the 864 KB image (M6 RAM disk)
 # timed out ("failed erasing sectors"); after a rescue reset it programs cleanly (2026-10-12).
 flash: all

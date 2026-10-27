@@ -209,7 +209,7 @@ static void test_header_callback_foreign_and_bad_data(void) {
     CHECK(h.n == 11 && h.nsec == 10);
 }
 
-// A header whose address checksum is bad must not fire the header callback: it gates M5 writes.
+// A header whose address checksum is bad must not fire the header callback: it gates writes.
 static int hdr_count_for_addr(const uint8_t addr[GCR_ADDR_FIELD_LEN]) {
     uint8_t bytes[64];
     size_t nb = 0;

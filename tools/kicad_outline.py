@@ -3,8 +3,8 @@
 Component-side view (photo was solder side, so mirrored left-right).
 Replaces every existing Edge.Cuts shape, and moves the mounting-hole
 footprints H1/H2 (frame ground, from the schematic) onto their centers.
-Moving footprints through the API crashed KiCad 10.0.4 twice right after an
-Update PCB from Schematic in the same session; save and restart KiCad first.
+The KiCad 10.0.4 API has crashed when moving footprints right after an Update PCB
+from Schematic: save and restart KiCad before running this.
 `--outline-only` redraws Edge.Cuts and leaves every footprint alone.
 Needs the KiCad API server on
 (Preferences > Plugins) and kicad-python (`pip install kicad-python`).
@@ -18,9 +18,9 @@ from kipy.geometry import Vector2
 X0, Y0 = 100.0, 50.0      # top-left of the full 100 mm body, at the 94 mm section top
 W, H = 100.0, 105.0       # body width; height from bottom to top of 94 mm section
 INSET = 3.0               # 94 mm section (calipers), centered
-STEP_L, STEP_R = 12.0, 6.0  # depth of the 94 mm section on each side (Rico, checked on the IF-83); the steps differ
+STEP_L, STEP_R = 12.0, 6.0  # depth of the 94 mm section on each side (checked on the IF-83); the steps differ
 TAB_X, TAB_W = INSET + 22.0, 15.5  # tab left edge 22 mm from the 94 mm section edge, width (calipers)
-TAB_H = 5.0               # tab height above the 94 mm top (Rico)
+TAB_H = 5.0               # tab height above the 94 mm top (calipers)
 COVE_H = 1.8              # step: quarter-ellipse cove, this tall, as wide as the step
 RS = 0.5                  # outside step corner radius
 RC = 1.0                  # bottom corner radius (the edge away from the tab)

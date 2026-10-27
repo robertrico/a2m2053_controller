@@ -1,6 +1,6 @@
 """Flux intervals <-> bit cells <-> GCR nibbles.
 
-Firmware PIO counts in 40 ns ticks (Task 8: 150 MHz / clkdiv 3 / 2 cycles
+Firmware PIO counts in 40 ns ticks (flux_rx.pio: 150 MHz / clkdiv 3 / 2 cycles
 per count). Each interval loses 4 PIO cycles (2 ticks) at the edge, so we
 add them back. 800K data rate is 489.6 kbit/s (ERS 699-0321): 2.0425 us cells.
 """

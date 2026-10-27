@@ -95,34 +95,20 @@ class FakeSerial:
 
 
 def test_capture_handles_chunked_data():
-    """Verify capture() waits for counted payload, not regex match inside binary.
-
-    Embeds both a fake FLUX END marker and a fake OK inside the payload.
-    Old code would: match the fake marker, see the fake OK, and return early
-    with a truncated stream. New code uses the FLUX BEGIN count to read exactly
-    the right number of bytes, then matches the real marker at the correct position.
-    """
-    # Create payload containing fake FLUX END marker and fake OK
+    """capture() must read the counted payload: a FLUX END or OK string inside the
+    binary payload must not end the read early."""
     raw = b"\nFLUX END 00000000\n" + b"\nOK\r\n" + b"\x01\x02\x03\x04"  # 28 bytes, even
     values = list(struct.unpack(f"<{len(raw)//2}H", raw))
     stream = make_stream(values)
 
     # Feed the stream in 7-byte chunks, forcing chunk boundaries inside the fake marker.
-    # Old code (END_RE.search) would:
-    #   1. Match the embedded fake FLUX END marker
-    #   2. See the fake OK in buf[-16:], satisfying its tail condition
-    #   3. Return prematurely, missing bytes after the fake OK
-    # New code (payload_count-based) reads exactly len(values)*2 bytes, then checks
-    # for the real FLUX END marker at the correct position.
     chunks = [stream[i:i+7] for i in range(0, len(stream), 7)]
 
     con = serialio.Console.__new__(serialio.Console)
     con.ser = FakeSerial(chunks)
 
-    # Verify capture returns the complete stream (would fail with old code)
     result = con.capture(0, 0, len(values), timeout=5.0)
     assert result == stream
-    # Verify we can parse it back to the original values
     parsed_vals, _ = proto.parse_capture(result)
     assert parsed_vals == values
 
@@ -151,15 +137,12 @@ def test_disk_cleanup_on_error(tmp_path):
         with pytest.raises(serialio.ConsoleError):
             cli.main(["disk", "--port", "fake", "--out", str(tmp_path / "o.po")])
 
-    # Verify setup commands were issued before recal
     recal_idx = commands.index("recal")
     assert commands[:recal_idx] == ["oe on", "enbl on", "motor on"]
 
-    # Verify cleanup commands were issued in finally
     assert "motor off" in commands
     assert "enbl off" in commands
     assert "oe off" in commands
-    # Verify they are the last three commands (in order)
     assert commands[-3:] == ["motor off", "enbl off", "oe off"]
 
 
@@ -262,7 +245,6 @@ def test_stream_disk_end_in_payload():
     pos = stream.find(fake_disk_end_text)
     assert pos > 0
     prefix = stream[:pos + len(fake_disk_end_text)]
-    # Should return False because we're still in the middle of the disk
     assert _proto.disk_stream_complete(prefix) == False
     # Full stream should return True and parse_disk should return the image with that text in block 0
     assert _proto.disk_stream_complete(stream) == True

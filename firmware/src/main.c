@@ -161,8 +161,8 @@ static bool request_ex(req_t *rq, reply_t *r, uint32_t timeout_ms, bool abort_on
 static bool request(req_t *rq, reply_t *r, uint32_t timeout_ms) { return request_ex(rq, r, timeout_ms, false); }
 
 // Floppy store -> core 1. No server: no reply, the store reports offline / $27. A timeout
-// does not lock the store out (sequence numbers drop the late reply); the console M5 paths
-// still refuse while srv_wedged.
+// does not lock the store out (sequence numbers drop the late reply); the console readblk/writeblk/format
+// paths still refuse while srv_wedged.
 static bool fs_transact(void *ctx, req_t *rq, reply_t *rp, uint32_t timeout_ms) {
     (void)ctx;
     if (!atomic_load(&srv_run) || !atomic_load(&srv_running)) return false;
