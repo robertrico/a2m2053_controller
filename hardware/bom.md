@@ -228,8 +228,7 @@ Order: 15 x 10k, 1 x 100k, 1 x 2k, 1 x 180, plus a few spares of each.
 
 ## Open items that change this BOM
 
-From `FABRICATION.md` "Confirm on the prototype at M9" and `HANDOFF.md`
-"Next":
+From `FABRICATION.md` "Confirm on the prototype at M9":
 
 1. ~~J4 and J5 pitch and plug type.~~ TE AMP CT, 2.0 mm, 2026-10-24.
    Footprints drawn and placed in the IF-83's order (2-pin outboard, 3-pin

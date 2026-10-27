@@ -37,3 +37,6 @@ hardware/export/
 
 # vendor 3D models (third party, see docs/SOURCES.md): local only
 hardware/kicad/3d/
+
+# personal workflow notes (resume order, order numbers, bench state): local only
+HANDOFF.md

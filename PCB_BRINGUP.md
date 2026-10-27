@@ -13,7 +13,7 @@ question and nothing downstream happens until it passes:
 
 The prototype passed M0 to M9 (`docs/build_log/`). The PCB carries the
 same chips, straps, pulls and Pico pins, with eight signals on different
-8T245 channels (`HANDOFF.md`, "Prototype vs PCB channel map"). The
+8T245 channels (see the channel map appendix at the end of this file). The
 channel moves are copper only; the firmware addresses Pico pins and is
 unchanged. Rewiring the breadboard to the PCB order was dropped, so the
 first assembled board is where the new channel order gets proven. That
@@ -64,7 +64,7 @@ built around proving it is absent.
 ## Equipment
 
 - Bench supply with current limit, +5 V and +12 V. Its current readout is
-  unreliable below about 30 mA (`HANDOFF.md`), so use the DMM in series
+  unreliable below about 30 mA, so use the DMM in series
   for the idle baseline.
 - DMM with diode test. Magnifier or microscope for the SOIC-24 joints.
 - Scope, three channels (oscope MCP). Note the CSV time-axis sign bug.
@@ -204,7 +204,7 @@ line takes part in one of them:
 
 A wrong answer here is a channel swap on U2 or U5, since the same
 firmware ran these on the prototype and only the copper changed. Compare
-against the channel table in `HANDOFF.md`.
+against the channel map appendix at the end of this file.
 
 Front panel: J4 and J5 plugged in. Press the button with the disk in: it
 ejects (counts against the eject budget below). LED lights during
@@ -338,5 +338,32 @@ Nothing else. The `loop`, `status`, `tach`, `seek`, `readblk`,
 - Gate 4: `sp` block per run, run lengths, temperatures.
 - Ejects used, seeks used.
 
-A board that passes all four gates is a Disk Hamr. Update `HANDOFF.md`
-and the manual's "Tested on" section when the first one does.
+A board that passes all four gates is a Disk Hamr. Update the manual's
+"Tested on" section when the first one does.
+
+## Appendix: prototype vs PCB channel map
+
+The PCB schematic moved eight signals to different 8T245 channels so the
+host bus drops straight from J3 into U1, mech RD sits next to J2, and the
+CA0-2/LSTRB fan from U2 to the Pico does not cross itself (U2 channels 1-4
+reversed). Same chips, same DIR and /OE, same pull values, same Pico pins.
+The breadboard still has the old order; rewiring it was dropped, the PCB is the test.
+
+Bench board names: bench J1 = host IDC20 (PCB J3), bench J2 = mechanism
+(same on both), bench J3 = rear IDC40 (PCB J1 DB-19).
+
+| Signal | Prototype | PCB | 8T245 pins (B / A) | Pico pin | Pull (B side) |
+|---|---|---|---|---|---|
+| LASTONE/ | U5 B1 / A1 | **U1 B6 / A6** | 16 / 8 | 2 | 2k to +5V |
+| /HSTEN | U1 B6 / A6 | **U1 B7 / A7** | 15 / 9 | 10 | 10k to +5V |
+| WR (host WRDATA) | U1 B7 / A7 | **U1 B8 / A8** | 14 / 10 | 11 | 100k to GND |
+| Mech RD | U1 B8 / A8 | **U5 B1 / A1** | 21 / 3 | 26 | 10k to +5V |
+| LSTRB | U2 B4 / A4 | **U2 B1 / A1** | 21 / 3 | 20 | 10k to GND (R18) |
+| CA2 | U2 B3 / A3 | **U2 B2 / A2** | 20 / 4 | 19 | none |
+| CA1 | U2 B2 / A2 | **U2 B3 / A3** | 19 / 5 | 17 | none |
+| CA0 | U2 B1 / A1 | **U2 B4 / A4** | 18 / 6 | 16 | none |
+
+Unchanged: U1 B1-B5 (PH0-3, /WRREQ), U2 B5-B8 (SEL, /ENBL, /WRTGATE,
+WRTDATA), U3, U4, the U5 DIR and /OE straps, U5 B2-B8 on GND. PCB U1
+order top to bottom: B1 PH0, B2 PH1, B3 PH2, B4 PH3, B5 /WRREQ, B6
+LASTONE/, B7 /HSTEN, B8 WR, which is J3's pin order.
