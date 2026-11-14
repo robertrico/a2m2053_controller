@@ -65,6 +65,7 @@ Research digest: `docs/research_notes.md`. Build and flash: `README.md`,
 | `docs/manual/` | Owner's manual for the finished board |
 | `hardware/kicad/` | KiCad project for Disk Hamr rev 1.0 |
 | `hardware/bom.md`, `hardware/bom.csv` | Bill of materials with part numbers, vendors and cost |
+| `hardware/stencil/` | 3D-printed stencil fixture, generated from the outline Gerber with stencilframer and OpenSCAD |
 | `FABRICATION.md` | PCB design rules: hand-solder rule, packages, board requirements from the bench |
 | `PCB_BRINGUP.md` | Bring-up plan for an assembled board, four gates, with the prototype-to-PCB channel map |
 | `firmware/`, `tools/` | Pico firmware with host tests; Python bench tools |
