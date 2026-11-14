@@ -1,0 +1,228 @@
+20:24:26 # usblog: waiting for /dev/cu.usbmodem*
+20:24:32 # connected /dev/cu.usbmodem114401
+20:24:37 SPL RESET
+20:24:38 SPL TIMEOUT d=1 c=05 b=0 s=40 stage=4
+20:24:38 SPL CMD d=1 c=05 b=0 s=40 ack=6
+20:25:23 > sp
+20:25:23 sp
+20:25:23 SP on id=1 last=1 pass=1 img=819200 ovl=0/384
+20:25:23 SP disk=floppy server=on wedged=0 exec_ms last=0 max=0 mech st=00 soft=00 tries=0
+20:25:23 SP pkts=1 acks=1 cksum=0 bad=0 ign=0 tmo=1 resets=1 rereads=0 replies=0
+20:25:23 SP ack_us last=6 max=6 data_max=- late=0 late_entry=0
+20:25:23 SP cmds status=0 readblk=0 writeblk=0 format=0 control=0 init=1 other=0
+20:25:23 SP pins PH0=0 PH1=0 PH2=0 PH3=0 WRREQ=1 HSTEN=1 WR=1 LASTONE=1
+20:25:23 OK
+20:27:19 > sp
+20:27:20 sp
+20:27:20 SP on id=1 last=1 pass=1 img=819200 ovl=0/384
+20:27:20 SP disk=floppy server=on wedged=0 exec_ms last=0 max=0 mech st=00 soft=00 tries=0
+20:27:20 SP pkts=1 acks=1 cksum=0 bad=0 ign=0 tmo=1 resets=1 rereads=0 replies=0
+20:27:20 SP ack_us last=6 max=6 data_max=- late=0 late_entry=0
+20:27:20 SP cmds status=0 readblk=0 writeblk=0 format=0 control=0 init=1 other=0
+20:27:20 SP pins PH0=0 PH1=0 PH2=0 PH3=0 WRREQ=1 HSTEN=1 WR=1 LASTONE=1
+20:27:20 OK
+20:27:21 SPL RESET
+20:27:22 SPL TIMEOUT d=1 c=05 b=3407872 s=40 stage=4
+20:27:22 SPL CMD d=1 c=05 b=3407872 s=40 ack=7
+20:27:24 SPL RESET
+20:27:25 SPL TIMEOUT d=1 c=05 b=3407872 s=40 stage=4
+20:27:25 SPL CMD d=1 c=05 b=3407872 s=40 ack=6
+20:27:56 # disconnected: read failed: [Errno 6] Device not configured
+20:28:02 # connected /dev/cu.usbmodem114401
+20:28:02 # disconnected: read failed: [Errno 6] Device not configured
+20:28:04 # connected /dev/cu.usbmodem114401
+20:28:12 SPL RESET
+20:28:13 SPL TIMEOUT d=1 c=05 b=0 s=40 stage=4
+20:28:13 SPL CMD d=1 c=05 b=0 s=40 ack=7
+20:28:28 SPL RESET
+20:28:30 SPL TIMEOUT d=1 c=05 b=3407872 s=40 stage=4
+20:28:30 SPL CMD d=1 c=05 b=3407872 s=40 ack=5
+20:28:33 SPL REREAD
+20:28:33 SPL TIMEOUT d=1 c=05 b=3407872 s=40 stage=6
+20:28:33 SPL REREAD
+20:28:33 SPL TIMEOUT d=1 c=05 b=3407872 s=40 stage=6
+20:28:33 SPL REREAD
+20:28:33 SPL TIMEOUT d=1 c=05 b=3407872 s=40 stage=6
+20:28:33 SPL REREAD
+20:28:33 SPL TIMEOUT d=1 c=05 b=3407872 s=40 stage=6
+20:28:33 SPL REREAD
+20:28:33 SPL TIMEOUT d=1 c=05 b=3407872 s=40 stage=6
+20:28:35 # disconnected: read failed: [Errno 6] Device not configured
+08:42:49 # scope setup: CH1 ACK (rear DB-19 hole 10), CH2 /WRREQ (hole 15), CH3 PH0/REQ (hole 11), CH4 U3 /OE (Pico pin 15, GP11); all 5 V/div, 10x, DC; trigger C2 NEG 2.5 V; 500 us/div, delay -3 ms, 7M. Mapping as assumed, not yet confirmed.
+08:43:40 # connected /dev/cu.usbmodem114401
+08:43:51 > sp
+08:43:51 sp
+08:43:51 SP on id=0 last=0 pass=0 img=819200 ovl=0/384
+08:43:51 SP disk=floppy server=on wedged=0 exec_ms last=0 max=0 mech st=00 soft=00 tries=0
+08:43:51 SP pkts=0 acks=0 cksum=0 bad=0 ign=0 tmo=0 resets=0 rereads=0 replies=0
+08:43:51 SP ack_us last=- max=- data_max=- late=0 late_entry=0
+08:43:51 SP cmds status=0 readblk=0 writeblk=0 format=0 control=0 init=0 other=0
+08:43:51 SP pins PH0=0 PH1=0 PH2=0 PH3=0 WRREQ=0 HSTEN=0 WR=0 LASTONE=1
+08:43:51 OK
+08:44:49 # disconnected: read failed: [Errno 6] Device not configured
+08:46:04 # connected /dev/cu.usbmodem114401
+08:46:08 SPL RESET
+08:46:09 SPL TIMEOUT d=1 c=05 b=0 s=40 stage=4
+08:46:09 SPL CMD d=1 c=05 b=0 s=40 ack=6
+08:46:17 > sp
+08:46:17 sp
+08:46:17 SP on id=1 last=1 pass=1 img=819200 ovl=0/384
+08:46:17 SP disk=floppy server=on wedged=0 exec_ms last=0 max=0 mech st=00 soft=00 tries=0
+08:46:17 SP pkts=1 acks=1 cksum=0 bad=0 ign=0 tmo=1 resets=1 rereads=0 replies=0
+08:46:17 SP ack_us last=6 max=6 data_max=- late=0 late_entry=0
+08:46:17 SP cmds status=0 readblk=0 writeblk=0 format=0 control=0 init=1 other=0
+08:46:17 SP pins PH0=0 PH1=1 PH2=0 PH3=1 WRREQ=1 HSTEN=1 WR=1 LASTONE=1
+08:46:17 OK
+08:47:36 SPL RESET
+08:47:37 SPL TIMEOUT d=1 c=05 b=3407872 s=40 stage=4
+08:47:37 SPL CMD d=1 c=05 b=3407872 s=40 ack=5
+08:48:53 # scope capture 1 (PR#5 INIT at 08:47:36): mapping confirmed (CH1 ACK DB-19 hole 10, CH2 /WRREQ hole 15, CH3 PH0 hole 11, CH4 U3 /OE at Pico pin 15), 5 V/div 10x DC, trigger C2 NEG 2.5 V, 500 us/div, 500 MSa/s. Screenshot docs/captures/pcb_rev1/2026-11-14_init_ack-wrreq-ph0-u3oe_500us.png
+08:48:53 # result (CSV, 100 ns/pt): /WRREQ low 879 us; U3 /OE falls 4.5 us after /WRREQ rise and stays low (-0.1 V); PH0 falls 157 us after /WRREQ rise; ACK never below 3.5 V (mean 4.73 V) with U3 enabled, no edge at 2.5 V in the whole 7 ms record.
+08:49:42 SPL RESET
+08:49:43 SPL TIMEOUT d=1 c=05 b=3407872 s=40 stage=4
+08:49:43 SPL CMD d=1 c=05 b=3407872 s=40 ack=5
+08:50:08 SPL RESET
+08:50:09 SPL TIMEOUT d=1 c=05 b=3407872 s=40 stage=4
+08:50:09 SPL CMD d=1 c=05 b=3407872 s=40 ack=4
+08:50:55 SPL RESET
+08:50:56 SPL TIMEOUT d=1 c=05 b=3407872 s=40 stage=4
+08:50:56 SPL CMD d=1 c=05 b=3407872 s=40 ack=5
+08:51:56 # scope capture 2 (PR#5 INIT): CH4 moved to Pico pin 12 (GP9, ACK A side), rest as capture 1. Screenshot docs/captures/pcb_rev1/2026-11-14_init_ack-wrreq-ph0-gp9_500us.png
+08:51:56 # result (CSV): GP9 idle 3.12 V; from /WRREQ rise for about 190 us it sits at 2.68 V (min 2.50), then back to 3.12 V. ACK at DB-19 stays 4.82 V. PH0 falls 164 us after /WRREQ rise. GP9 is driven low but held up by something.
+08:52:34 # disconnected: read failed: [Errno 6] Device not configured
+09:18:27 # connected /dev/cu.usbmodem114401
+09:18:32 SPL RESET
+09:18:33 SPL TIMEOUT d=1 c=05 b=0 s=40 stage=4
+09:18:33 SPL CMD d=1 c=05 b=0 s=40 ack=7
+09:19:07 SPL RESET
+09:19:08 SPL TIMEOUT d=1 c=05 b=3407872 s=40 stage=4
+09:19:08 SPL CMD d=1 c=05 b=3407872 s=40 ack=6
+09:19:31 SPL RESET
+09:19:32 SPL TIMEOUT d=1 c=05 b=3407872 s=40 stage=4
+09:19:32 SPL CMD d=1 c=05 b=3407872 s=40 ack=5
+09:20:16 SPL RESET
+09:20:17 SPL TIMEOUT d=1 c=05 b=3407872 s=40 stage=4
+09:20:17 SPL CMD d=1 c=05 b=3407872 s=40 ack=4
+09:20:31 SPL RESET
+09:20:33 SPL TIMEOUT d=1 c=05 b=3407872 s=40 stage=4
+09:20:33 SPL CMD d=1 c=05 b=3407872 s=40 ack=5
+09:20:45 # disconnected: read failed: [Errno 6] Device not configured
+09:32:12 # connected /dev/cu.usbmodem114401
+09:33:30 # disconnected: read failed: [Errno 6] Device not configured
+09:34:26 # connected /dev/cu.usbmodem114401
+09:34:33 # disconnected: read failed: [Errno 6] Device not configured
+09:34:57 # connected /dev/cu.usbmodem114401
+09:35:37 # disconnected: read failed: [Errno 6] Device not configured
+09:37:05 # connected /dev/cu.usbmodem114401
+09:37:14 > sp
+09:37:14 sp
+09:37:14 SP on id=0 last=0 pass=0 img=819200 ovl=0/384
+09:37:14 SP disk=floppy server=on wedged=0 exec_ms last=0 max=0 mech st=00 soft=00 tries=0
+09:37:14 SP pkts=0 acks=0 cksum=0 bad=0 ign=0 tmo=0 resets=0 rereads=0 replies=0
+09:37:14 SP ack_us last=- max=- data_max=- late=0 late_entry=0
+09:37:14 SP cmds status=0 readblk=0 writeblk=0 format=0 control=0 init=0 other=0
+09:37:14 SP pins PH0=0 PH1=0 PH2=0 PH3=0 WRREQ=0 HSTEN=0 WR=1 LASTONE=1
+09:37:14 OK
+09:39:08 > sp
+09:39:08 sp
+09:39:08 SP on id=0 last=0 pass=0 img=819200 ovl=0/384
+09:39:08 SP disk=floppy server=on wedged=0 exec_ms last=0 max=0 mech st=00 soft=00 tries=0
+09:39:08 SP pkts=0 acks=0 cksum=0 bad=0 ign=0 tmo=0 resets=0 rereads=0 replies=0
+09:39:08 SP ack_us last=- max=- data_max=- late=0 late_entry=0
+09:39:08 SP cmds status=0 readblk=0 writeblk=0 format=0 control=0 init=0 other=0
+09:39:08 SP pins PH0=0 PH1=0 PH2=0 PH3=0 WRREQ=0 HSTEN=0 WR=1 LASTONE=1
+09:39:08 OK
+09:42:20 # disconnected: read failed: [Errno 6] Device not configured
+09:53:27 # meter series, board off: host cable on J3, USB out, mechanism unplugged. Resistance mode.
+09:53:27 # M1 J3.11 (+5) <-> J3.1 (GND): 9.6 kOhm
+09:53:27 # M2 J3.8 (PH3) <-> J3.9 (-12V): 0.4 MOhm
+09:56:11 # M1 and M2 above are void: J3 shroud pin numbering was read wrong. Series restarted.
+09:56:11 # R1 J3.11 (+5) <-> J3.1 (GND): 15 Ohm (reported as "11 and 11"; pair taken as 11 <-> 1, to be confirmed)
+09:58:23 # R2 J3.9 (-12V) <-> J3.8 (PH3): MOhm range, reading wanders
+09:59:00 # R3 J3.9 (-12V) <-> J3.10 (/WRREQ): 0.4 MOhm +/- 0.3
+09:59:27 # R4 J3.9 (-12V) <-> J3.11 (+5): 0.5 MOhm +/- 0.2
+10:00:00 # R5 J3.9 (-12V) <-> J3.1 (GND): 0.5 MOhm +/- 0.1
+10:00:35 # R6 Pico pin 36 (3V3) <-> J3.1 (GND): 1.7 kOhm
+10:01:28 # R7 J3.11 (+5) <-> Pico pin 36 (3V3): 1.6 kOhm
+10:01:59 # R8 J3.2 (PH0) <-> J3.1 (GND): 10 kOhm
+10:02:21 # R9 J3.4 (PH1) <-> J3.1 (GND): 10 kOhm
+10:02:41 # R10 J3.6 (PH2) <-> J3.1 (GND): 10 kOhm
+10:03:00 # R11 J3.8 (PH3) <-> J3.1 (GND): 0.5 kOhm
+10:04:29 # R12 J3.11 (+5) <-> host DB-19 plug pin 6: beeps solid. Series done.
+10:07:18 # note: mechanism (J2) and everything else unplugged for R1-R12. R11 to be repeated.
+10:09:46 # R7 (PH3 pull-down, 10k by design) read about 0.5 kOhm in circuit, across its pads (same two nets as R11).
+10:11:22 # R7 is good: pulled and measured out of circuit, solid 10 kOhm, original part refitted. The low PH3 reading (R11) was U1 pin 18. [measured]
+10:12:42 # R1 repeated, J3.11 (+5) <-> J3.1 (GND), nothing plugged in: low again, short confirmed.
+10:51:51 # U1 replaced with a new chip. With the new U1 fitted: J3.8 (PH3) <-> J3.1 (GND): 10 kOhm. J3.11 (+5) <-> J3.1 (GND): about 90 kOhm. The pulled U1, out of circuit, beeps VCCB (+5 pins) to GND: internal short. [measured]
+10:56:42 # pre-wiring checks, new U1 fitted, nothing plugged in. P1 J3.13 (+12) <-> J3.1 (GND): MOhm range, wanders
+10:57:10 # P2 J3.13 (+12) <-> J3.11 (+5): 2.5 MOhm +/- 1
+10:57:48 # P3 J3.13 (+12) <-> J3.9 (-12): about 8 MOhm, wanders. Rail isolation complete: no rail-to-rail or rail-to-GND short.
+10:58:21 # new U1 bridge check, beeper. B1 J3.2 (PH0) <-> J3.4 (PH1): no beep
+10:58:39 # B2 J3.4 (PH1) <-> J3.6 (PH2): no beep
+10:58:55 # B3 J3.6 (PH2) <-> J3.8 (PH3): no beep
+10:59:12 # B4 J3.8 (PH3) <-> J3.10 (/WRREQ): no beep
+10:59:31 # B5 J3.10 (/WRREQ) <-> J3.14 (/HSTEN): no beep
+10:59:57 # B6 J3.14 (/HSTEN) <-> J3.18 (WR): no beep. New U1 B side: no bridges between host lines.
+11:00:45 # usblog: waiting for /dev/cu.usbmodem*
+11:00:45 # connected /dev/cu.usbmodem114401
+11:00:53 > sp
+11:00:53 sp
+11:00:53 SP on id=0 last=0 pass=0 img=819200 ovl=0/384
+11:00:53 SP disk=floppy server=on wedged=0 exec_ms last=0 max=0 mech st=00 soft=00 tries=0
+11:00:53 SP pkts=0 acks=0 cksum=0 bad=0 ign=0 tmo=0 resets=0 rereads=0 replies=0
+11:00:53 SP ack_us last=- max=- data_max=- late=0 late_entry=0
+11:00:53 SP cmds status=0 readblk=0 writeblk=0 format=0 control=0 init=0 other=0
+11:00:53 SP pins PH0=0 PH1=0 PH2=0 PH3=0 WRREQ=0 HSTEN=0 WR=1 LASTONE=1
+11:00:53 OK
+11:09:01 > sp
+11:09:01 sp
+11:09:01 SP on id=0 last=0 pass=0 img=819200 ovl=0/384
+11:09:01 SP disk=floppy server=on wedged=0 exec_ms last=0 max=0 mech st=00 soft=00 tries=0
+11:09:01 SP pkts=0 acks=0 cksum=0 bad=0 ign=0 tmo=0 resets=0 rereads=0 replies=0
+11:09:01 SP ack_us last=- max=- data_max=- late=0 late_entry=0
+11:09:01 SP cmds status=0 readblk=0 writeblk=0 format=0 control=0 init=0 other=0
+11:09:01 SP pins PH0=0 PH1=0 PH2=0 PH3=0 WRREQ=1 HSTEN=1 WR=0 LASTONE=1
+11:09:01 OK
+11:09:08 # bench +5 on J3.11/J3.1 (5 V, limit 0.6 A, draw 0.03 A), USB in, no Apple, no mechanism. sp pins all at their pull levels: PH0-3=0, WRREQ=1, HSTEN=1, WR=0, LASTONE=1. New U1 and GP1-GP8 read correctly at idle. [measured]
+11:16:06 # Liron check, our board not connected: Apple boots, working UniDisk on the Liron card does not come up, card's IWM feels warm. Liron card not alive. Resistance series on the card follows.
+11:17:27 # Liron card out of slot, nothing on its DB-19, black lead on DB-19 pin 1 (GND). L1 pin 6 (+5) <-> pin 1: 48 kOhm
+11:18:21 # L2 pin 5 (-12) <-> pin 1: display 0, no beep in beeper mode = no connection (open). On this meter "0, no beep" means open.
+11:20:00 # L3 pin 7 (+12) <-> pin 1: open (0, no beep)
+11:20:26 # L4 pin 11 (PH0) <-> pin 1: 52 kOhm
+11:20:43 # L5 pin 12 (PH1) <-> pin 1: 52 kOhm
+11:20:55 # L6 pin 13 (PH2) <-> pin 1: 52 kOhm
+11:21:07 # L7 pin 14 (PH3) <-> pin 1: 52 kOhm
+11:21:23 # L8 pin 15 (/WRREQ) <-> pin 1: 120 kOhm
+11:22:11 # L9 pin 17 (/HSTEN) <-> pin 1: open (0, no beep)
+11:22:30 # L10 pin 19 (WR) <-> pin 1: 51 kOhm
+11:22:49 # L11 pin 18 (RD) <-> pin 1: 57 kOhm
+11:23:14 # L12 pin 10 (ACK) <-> pin 1: 57 kOhm. Liron series done.
+11:24:39 # Liron diode mode, card out of slot, red on DB-19 pin 1. D1-D4 pins 11, 12, 13, 14 (PH0-3): 0.58 V each
+11:25:04 # D5 pin 15 (/WRREQ): 0.L = open, no junction. Meter in diode mode: leads together .000, leads apart 0.L.
+11:26:25 # D6 pin 17 (/HSTEN): 0.9 V
+11:26:45 # D7 pin 19 (WR): 0.5 V
+11:26:56 # D8 pin 18 (RD): 0.97 V
+11:27:22 # D9 pin 10 (ACK): 0.97 V. Liron diode series done. M6 reference on this card (old IWM, since replaced by a donor): PH0-3 0.825-0.834, /WRREQ 0.925, /HSTEN 0.751, ACK 0.87, RD 0.866.
+11:56:46 # reported from the bench: Liron IWM replaced with the IWM from the other dead board; "we're live, it's working". No USB console log of this run (Pico USB not connected).
+11:59:16 # reported from the bench: rev 1 board works as designed on the IIe with the repaired Liron: daisy chained, reads disks. No USB console capture of this run.
+12:01:39 # usblog: waiting for /dev/cu.usbmodem*
+12:01:39 # connected /dev/cu.usbmodem114401
+12:01:48 > sp
+12:01:48 sp
+12:01:48 SP on id=1 last=1 pass=1 img=819200 ovl=0/384
+12:01:48 SP disk=floppy server=on wedged=0 exec_ms last=0 max=379 mech st=00 soft=00 tries=0
+12:01:48 SP pkts=109 acks=109 cksum=0 bad=0 ign=0 tmo=0 resets=2 rereads=0 replies=109
+12:01:48 SP ack_us last=5 max=7 data_max=- late=0 late_entry=0
+12:01:48 SP cmds status=2 readblk=105 writeblk=0 format=0 control=0 init=2 other=0
+12:01:48 SP pins PH0=0 PH1=1 PH2=0 PH3=1 WRREQ=1 HSTEN=1 WR=1 LASTONE=1
+12:01:48 OK
+12:01:57 # rev 1 board on the IIe, boot from floppy, counters since Pico power-up: 109 packets, 109 ACKs, 109 replies, 105 READBLOCK, 2 INIT, 2 STATUS; cksum, bad, ign, tmo, rereads, late all 0; ack_us max 7; exec_ms max 379; id=1 last=1. Per-packet SPL lines for this boot were missed (logger restarted after the boot). [measured]
+12:02:18 # disconnected: read failed: [Errno 6] Device not configured
+12:02:36 # cause confirmed from the bench: after the U3 reflow the host cable (J3) and the mechanism cable (J2) were swapped and the Apple was switched on. That killed U1 and the Liron IWM /WRREQ output.
+14:20:30 # connected /dev/cu.usbmodem114401
+14:20:30 # disconnected: read failed: [Errno 6] Device not configured
+14:24:07 # reported from the bench: second rev 1 board, in the second drive, came up on the first try, built with what board 1 taught. No USB console capture, no counters, checks done before power not listed. Reported, not measured here.
+14:27:00 # reported from the bench: board 2 confirmed as a rev 1 board in the second dead drive. On board 2 the electrolytics (C11, C12, C13) are laid flat and J2 is the old connector reused instead of a box header, so the mechanism and host cables cannot be swapped; done because board 1 was a struggle to fit. Photos: docs/photos/pcb_rev1/.
+14:28:17 # reported from the bench: board 1 fit trouble was clearance all round: cable to the Apple, shielding parts, slide fit into the carriage. No dimensions taken.
+14:30:24 # decided at the bench: rev 1.1 stays open. Next build is a third rev 1.0 board, when another dead UniDisk turns up, built to the board 1/2 objectives (no J2/J3 swap, fit and clearance).
+14:53:37 # photo 14:52: three UniDisk 3.5 on the IIe together (original + two rev 1.0 boards), Bitsy Bye listing /M7TEST at S2,D1 = third SmartPort device on the slot 5 card. docs/photos/pcb_rev1/2026-11-14_fleet-working.jpg. Chain order not recorded.

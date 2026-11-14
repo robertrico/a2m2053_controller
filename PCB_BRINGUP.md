@@ -42,7 +42,7 @@ J1 for the next drive and is the rail that killed U1 and the Liron IWM in
 M6. The bench supply feeds J3 through the
 KingPow IDC20-to-screw-terminal breakout, the same one the prototype used.
 
-8T245 pins (DW package, `docs/private/` datasheet): 1 DIR, 2 VCCA,
+8T245 pins (DW package, `docs/private/` datasheet): 1 VCCA, 2 DIR,
 3-10 A1-A8, 11-13 GND, 14-21 B8-B1, 22 /OE, 23-24 VCCB.
 
 Shifter straps, from `docs/pin_budget.md`:
@@ -105,7 +105,7 @@ Board on the bench, nothing plugged in, Pico soldered.
 4. Adjacent-pin bridges: J3 pins 1-20 pairwise, J2 pins 1-20 pairwise, and
    each 8T245 pin against its neighbors. Open everywhere except the GND
    pins that are meant to share a net.
-5. Straps: meter pin 1 (DIR) and pin 22 (/OE) of U1-U5 against the strap
+5. Straps: meter pin 2 (DIR) and pin 22 (/OE) of U1-U5 against the strap
    table above. U1 and U5 DIR to GND, /OE to GND. U2, U3, U4 DIR to 3V3.
    U2 and U4 /OE to the same node (R13, GP21). U3 /OE to R12 and GP11.
 6. Pulls on the B side, meter to the rail: WR 100k to GND, /HSTEN 10k to

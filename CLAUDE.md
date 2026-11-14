@@ -61,7 +61,7 @@ Research digest: `docs/research_notes.md`. Build and flash: `README.md`,
 | `docs/private/` | Third-party docs, datasheets and photos. **Git-ignored, never in history.** |
 | `docs/photos/`, `docs/captures/` | Our own photos, scope captures and console logs (public) |
 | `docs/superpowers/specs/`, `docs/superpowers/plans/` | Design specs and the milestone plans they were built from |
-| `docs/build_log/` | Per-milestone notes and measurements, M0 to M9 |
+| `docs/build_log/` | Per-milestone notes and measurements, M0 to M9 and PCB rev 1 |
 | `docs/manual/` | Owner's manual for the finished board |
 | `hardware/kicad/` | KiCad project for Disk Hamr rev 1.0 |
 | `hardware/bom.md`, `hardware/bom.csv` | Bill of materials with part numbers, vendors and cost |

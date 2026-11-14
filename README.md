@@ -92,8 +92,9 @@ dead UniDisk.
 | M7.5 | Bench supply retired; runs on the IIe rails | [m7_5](docs/build_log/m7_5.md) |
 | M8 | Daisy chain with a working UniDisk, both orders | [m8](docs/build_log/m8.md) |
 | M9 | Disk swaps, write-protect, ejects, resets, long runs | [m9](docs/build_log/m9.md) |
+| PCB rev 1.0 | First two assembled boards on the IIe: reads disks, three drives in the chain | [pcb_rev1](docs/build_log/pcb_rev1.md) |
 
-**Drop-in PCB: in design.** The outline matches the IF-83 and fits the
+**Drop-in PCB: rev 1.0 assembled, two boards working on the IIe.** The outline matches the IF-83 and fits the
 original mounting holes and case opening (checked with 3D prints). The board
 must stay hand-solderable and well under the $150 the spare board couldn't
 sell for. Requirements carried from the bench: [FABRICATION.md](FABRICATION.md).
