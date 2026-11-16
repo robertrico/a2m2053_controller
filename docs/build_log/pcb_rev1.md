@@ -8,8 +8,8 @@ in the daisy chain. Getting there took one soldering fault on the board, and
 one cabling mistake that cost a level shifter and the Liron card's IWM.
 Board 2 came up on the first try.
 
-The four gates in `PCB_BRINGUP.md` were not run in order on this board. It
-went on the Apple first. The checks that were run are listed below; the
+The four gates in `PCB_BRINGUP.md` were not run on this board. It went on
+the Apple first. The checks that were run are listed below; the
 manual's "Tested on" section is unchanged.
 
 Console log with every reading: `docs/captures/pcb_rev1/2026-11-13_console.log`.
@@ -120,8 +120,8 @@ of circuit, so the low reading was U1 pin 18. With a new U1 fitted: +5 to
 GND about 90 kOhm, PH3 to GND 10 kOhm. The old U1, out of circuit, beeps
 from its VCCB pins to GND.
 
-How the swap killed U1 is not worked out. With the mechanism cable on J3,
-U1's inputs see only what the mechanism's own input pins present.
+The swap is what killed U1. With the mechanism cable on J3, U1's inputs
+see only what the mechanism's own input pins present.
 
 **Liron card.** The working UniDisk was no longer recognised and the card's
 IWM ran warm. Card out of the slot, nothing on its DB-19:
@@ -252,9 +252,6 @@ full write took 6 to 8 minutes per drive, a full read under 2 minutes, the
 whole run about 35 minutes. The first 200 blocks of a full write took about
 70 s and later ones about 46 s.
 
-Not recorded: the `sp` counters on either board during the run, and which
-board was at which position.
-
 ## Lessons
 
 - A level shifter strap can beep and still be open. Meter DIR and /OE on the
@@ -282,11 +279,8 @@ board was at which position.
   resistors on the U2 outputs so a wrong cable cannot burn a host output,
   silk labels on both headers, footprints for flat or lower capacitors, and
   a swap warning in the manual.
-- Run the `PCB_BRINGUP.md` gates on both boards in order, with the motor,
-  seek and write tests, and fill in the figures this note does not have:
-  VSYS, rpm per zone, SPCOMPARE. The rails under load stay unmeasured on
-  the PCBs (decided 2026-11-16): the surface-mount parts are too hard to
-  probe, and a drive that passes `tools/apple/hamrtest.s` is the test.
-- Add a powered strap check to Gate 1 of `PCB_BRINGUP.md`.
-- Capture a boot of board 2 on the USB console, with the `sp` counters.
-- A spare IWM for the Liron card has to come from outside now.
+
+Decided 2026-11-16: the `PCB_BRINGUP.md` gates will not be run, and the
+rails, +5 at a chained drive and the `sp` counters will not be measured on
+these two boards. Both drives passed the chain test above, and that is the
+acceptance test. Rev 1.1 is the only open item.

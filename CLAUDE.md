@@ -67,7 +67,7 @@ Research digest: `docs/research_notes.md`. Build and flash: `README.md`,
 | `hardware/bom.md`, `hardware/bom.csv` | Bill of materials with part numbers, vendors and cost |
 | `hardware/stencil/` | 3D-printed stencil fixture, generated from the outline Gerber with stencilframer and OpenSCAD |
 | `FABRICATION.md` | PCB design rules: hand-solder rule, packages, board requirements from the bench |
-| `PCB_BRINGUP.md` | Bring-up plan for an assembled board, four gates, with the prototype-to-PCB channel map |
+| `PCB_BRINGUP.md` | Bring-up plan written before the boards arrived. Never run; the boards were accepted on `tools/apple/hamrtest.s`. Still holds the prototype-to-PCB channel map |
 | `firmware/`, `tools/` | Pico firmware with host tests; Python bench tools |
 
 Tag every new fact in `research_notes.md` with its source. Mark guesses

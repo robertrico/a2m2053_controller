@@ -1,5 +1,10 @@
 # PCB bring-up: Disk Hamr rev 1.0
 
+Status: not run, and not going to be. Boards 1 and 2 went straight on the
+Apple and were accepted on the chain test of 2026-11-16
+(`docs/build_log/pcb_rev1.md`, `tools/apple/hamrtest.s`). Kept as the plan
+it was.
+
 What to do when the PCBWay boards and the DigiKey parts arrive and the
 first board is soldered. Four gates, in order. Each gate answers one
 question and nothing downstream happens until it passes:
