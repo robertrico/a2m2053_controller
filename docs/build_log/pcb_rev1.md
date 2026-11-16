@@ -222,6 +222,39 @@ device to slot 2, drive 1, so that listing is the third drive in the chain.
 Not recorded: the order of the drives in the chain, and which one holds the
 disk in the listing.
 
+## Chain test from the Apple
+
+2026-11-16, about 09:46 to 10:24. `HAMRTEST.SYSTEM`
+(`tools/apple/hamrtest.s`) booted from a 5.25 floppy in slot 6 and ran
+against all three drives through ProDOS block calls. Blank ProDOS disks
+`/TEST1`, `/TEST2`, `/TEST3`. The stock UniDisk was S5,D1 and the two
+Disk Hamr drives were S5,D2 and S2,D1, as reported from the bench. All 25
+steps passed. **[photo]**
+
+![HAMRTEST, roll call to the 3.5 copies](../captures/pcb_rev1/2026-11-16_hamrtest_start-to-copies.png)
+![HAMRTEST, ALL PASS](../captures/pcb_rev1/2026-11-16_hamrtest_all-pass.png)
+
+| Step | Drives | What |
+|---|---|---|
+| Roll call | all three | ProDOS volume header, 1600 blocks |
+| Light write and read | S5,D1 | 16 blocks spread over the disk |
+| Full write, full read | S5,D2 and S2,D1 | all 1600 blocks, each stamped with block number, drive and pseudo-random data, read back and compared |
+| Patterns | S5,D2 and S2,D1 | `$00`, `$FF`, `$AA`, `$55` on 20 blocks |
+| Seek | S5,D2 and S2,D1 | 50 pairs of block 0 / 1599 closing inward, then 100 scattered blocks, each compared |
+| Copy 3.5 to 3.5 | all three | 200 blocks each way between the two Disk Hamr drives, 16 blocks each way between the stock drive and each of them |
+| Copy 5.25 to 3.5 | S5,D2 and S2,D1 | the boot floppy's 280 blocks, compared against the floppy |
+| 3.5 to a 5.25 file | S5,D2 and S2,D1 | 32 blocks into a scratch file and back |
+| Chain switch | all three | one block from each drive in turn, 50 rounds |
+| Restore | S5,D2 and S2,D1 | blocks 0-6 put back and read back |
+
+Timing, read off screen captures taken every 1 to 3 minutes, so rough: a
+full write took 6 to 8 minutes per drive, a full read under 2 minutes, the
+whole run about 37 minutes. The first 200 blocks of a full write took about
+70 s and later ones about 46 s.
+
+Not recorded: the `sp` counters on either board during the run, and which
+board was at which position.
+
 ## Lessons
 
 - A level shifter strap can beep and still be open. Meter DIR and /OE on the
@@ -251,7 +284,9 @@ disk in the listing.
   a swap warning in the manual.
 - Run the `PCB_BRINGUP.md` gates on both boards in order, with the motor,
   seek and write tests, and fill in the figures this note does not have:
-  VSYS, +5 at CN104 pin 11 under load, rpm per zone, SPCOMPARE.
+  VSYS, rpm per zone, SPCOMPARE. The rails under load stay unmeasured on
+  the PCBs (decided 2026-11-16): the surface-mount parts are too hard to
+  probe, and a drive that passes `tools/apple/hamrtest.s` is the test.
 - Add a powered strap check to Gate 1 of `PCB_BRINGUP.md`.
 - Capture a boot of board 2 on the USB console, with the `sp` counters.
 - A spare IWM for the Liron card has to come from outside now.
