@@ -224,7 +224,7 @@ disk in the listing.
 
 ## Chain test from the Apple
 
-2026-11-16, about 09:46 to 10:24. `HAMRTEST.SYSTEM`
+2026-11-16, about 09:47 to 10:22. `HAMRTEST.SYSTEM`
 (`tools/apple/hamrtest.s`) booted from a 5.25 floppy in slot 6 and ran
 against all three drives through ProDOS block calls. Blank ProDOS disks
 `/TEST1`, `/TEST2`, `/TEST3`. The stock UniDisk was S5,D1 and the two
@@ -249,7 +249,7 @@ steps passed. **[photo]**
 
 Timing, read off screen captures taken every 1 to 3 minutes, so rough: a
 full write took 6 to 8 minutes per drive, a full read under 2 minutes, the
-whole run about 37 minutes. The first 200 blocks of a full write took about
+whole run about 35 minutes. The first 200 blocks of a full write took about
 70 s and later ones about 46 s.
 
 Not recorded: the `sp` counters on either board during the run, and which
